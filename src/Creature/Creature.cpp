@@ -3,6 +3,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 
+#include <box2d/b2_math.h>
 #include <box2d/b2_world.h>
 #include <box2d/box2d.h>
 
@@ -38,14 +39,17 @@ void Creature::ApplyGenes(b2World &world, string genes) {
     cout << r << " " << g << " " << b << endl;
 
 
-    this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), Util::pixelsToMeters(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), 50, al_map_rgb(r, g, b)));
+    this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(50, 50), al_map_rgb(r, g, b), b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), Util::DegreesToRadians(-15)));
     shared_ptr<BodySegment> prevPart = head;
 
-    for (int i = 0; i < 5; i ++) {
-        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), prevPart, -45, 0, 50, al_map_rgb(255, 0, 255)));
+    for (int i = 0; i < 20; i ++) {
+        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(75, 25), al_map_rgb(100, 100, 100), prevPart, Util::DegreesToRadians(45), Util::DegreesToRadians(15)));
         prevPart->AddChild(newPart);
         prevPart = newPart;
     }
+
+    shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(75, 25), al_map_rgb(100, 100, 100), head, Util::DegreesToRadians(180), Util::DegreesToRadians(180)));
+    prevPart->AddChild(newPart);
 }
 
 

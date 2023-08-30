@@ -31,3 +31,11 @@ float Util::mapVal(float input, float input_start, float input_end, float output
     float output = output_start + slope * (input - input_start);
     return output;
 }
+
+float Util::DegreesToRadians(int degrees) {
+    return degrees * M_PI / 180;
+}
+
+int RadiansToDegrees(float radians) {
+    return radians * 180 / M_PI;
+}

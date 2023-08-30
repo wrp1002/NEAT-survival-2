@@ -16,6 +16,7 @@
 #include <box2d/b2_body.h>
 #include <box2d/b2_circle_shape.h>
 #include <box2d/b2_common.h>
+#include <box2d/b2_fixture.h>
 #include <box2d/b2_joint.h>
 #include <box2d/b2_math.h>
 #include <box2d/b2_revolute_joint.h>
@@ -24,6 +25,7 @@
 #include <box2d/box2d.h>
 #include <box2d/b2_polygon_shape.h>
 
+#include <cmath>
 #include <functional>
 #include <iostream>
 #include <vector>
@@ -38,6 +40,7 @@
 #include "UI/Font.h"
 #include "Creature/Creature.h"
 
+#include "RectObject.h"
 
 using namespace std;
 
@@ -54,6 +57,7 @@ int main() {
 
     bool done = false;
     bool redraw = true;
+    float count;
     map<int, bool> keys;
 
 
@@ -107,6 +111,9 @@ int main() {
     shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes));
     creature->Init(world);
 
+    //shared_ptr<RectObject> obj = make_shared<RectObject>(RectObject(world, b2Vec2(Globals::SCREEN_WIDTH / 2, Globals::SCREEN_HEIGHT / 2), b2Vec2(50, 75), 0));
+    //shared_ptr<RectObject> obj2 = make_shared<RectObject>(RectObject(world, obj, M_PI + 1, b2Vec2(75, 10), M_PI_4 + M_PI));
+
 
     al_start_timer(timer);
 
@@ -130,6 +137,9 @@ int main() {
         }
         else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
             keys[ev.keyboard.keycode] = true;
+
+            if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                done = true;
         }
         else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
             keys[ev.keyboard.keycode] = false;
@@ -171,12 +181,15 @@ int main() {
             al_set_target_backbuffer(display);
             al_clear_to_color(al_map_rgb(0,0,0));
 
-            al_draw_filled_circle(100, 100, 50, al_map_rgb(255, 0, 255));
+            //al_draw_filled_circle(100, 100, 50, al_map_rgb(255, 0, 255));
 
             b2Vec2 groundPos = Util::metersToPixels(groundBody->GetPosition().x, groundBody->GetPosition().y);
             al_draw_filled_rectangle(Globals::SCREEN_WIDTH / 2 - groundWidth, Globals::SCREEN_HEIGHT - 50 - 10, Globals::SCREEN_WIDTH / 2 + groundWidth, Globals::SCREEN_HEIGHT - 50 + 10, al_map_rgb(100, 100, 100));
 
             creature.get()->Draw();
+            //obj->Draw();
+            //obj2->Draw();
+
 
             ALLEGRO_TRANSFORM identityTransform;
             al_identity_transform(&identityTransform);

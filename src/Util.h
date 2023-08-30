@@ -12,4 +12,7 @@ namespace Util {
     float pixelsToMeters(float val);
 
     float mapVal(float input, float input_start, float input_end, float output_start, float output_end);
+
+    float DegreesToRadians(int degrees);
+    int RadiansToDegrees(float radians);
 }
