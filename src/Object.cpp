@@ -22,9 +22,9 @@ Object::Object() {
     shapeType = SHAPE_TYPES::CIRCLE;
 }
 
-Object::Object(b2World &world, b2Vec2 pos, b2Vec2 size, float angle, ALLEGRO_COLOR color, int shapeType) {
-    this->pixelSize = size;
-    this->worldSize = Util::pixelsToMeters(size);
+Object::Object(b2World &world, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType) {
+    this->pixelSize = pixelSize;
+    this->worldSize = Util::pixelsToMeters(pixelSize);
     this->color = color;
     this->shapeType = shapeType;
 

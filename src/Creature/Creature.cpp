@@ -39,11 +39,12 @@ void Creature::ApplyGenes(b2World &world, string genes) {
     cout << r << " " << g << " " << b << endl;
 
 
-    this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(50, 50), al_map_rgb(r, g, b), Object::SHAPE_TYPES::RECT, b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), Util::DegreesToRadians(25)));
+    this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(50, 50), al_map_rgb(r, g, b), Object::SHAPE_TYPES::RECT, b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), Util::DegreesToRadians(45)));
     shared_ptr<BodySegment> prevPart = head;
 
-    for (int i = 0; i < 2; i ++) {
-        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(75, 25), al_map_rgb(100, 100, 100), Object::SHAPE_TYPES::CIRCLE, prevPart, Util::DegreesToRadians(45), Util::DegreesToRadians(0)));
+    for (int i = 0; i < 10; i ++) {
+        int size = (i * 10) + 10;
+        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(size, size / 2), al_map_rgb(100, 100, 100), i % 2, prevPart, Util::DegreesToRadians(15), Util::DegreesToRadians(10)));
         prevPart->AddChild(newPart);
         prevPart = newPart;
     }
