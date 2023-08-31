@@ -88,8 +88,6 @@ b2Vec2 BodySegment::GetPosOnParent(shared_ptr<BodySegment> otherObject, float an
 
     float angle = otherObject->body->GetAngle() - (angleOffset + angleOnObject);
 
-    cout << Util::RadiansToDegrees(angle) << endl;
-
     b2Vec2 relPos = b2Vec2(
         cos(angle) * thisWorldSize.x,
         sin(angle) * thisWorldSize.x
