@@ -36,6 +36,6 @@ float Util::DegreesToRadians(int degrees) {
     return degrees * M_PI / 180;
 }
 
-int RadiansToDegrees(float radians) {
+int Util::RadiansToDegrees(float radians) {
     return radians * 180 / M_PI;
 }

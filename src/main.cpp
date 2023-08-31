@@ -40,8 +40,6 @@
 #include "UI/Font.h"
 #include "Creature/Creature.h"
 
-#include "RectObject.h"
-
 using namespace std;
 
 const int boxSize = 25;

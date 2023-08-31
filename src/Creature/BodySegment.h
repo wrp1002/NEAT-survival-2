@@ -5,27 +5,29 @@
 #include <allegro5/allegro_primitives.h>
 
 #include <box2d/b2_math.h>
+#include <box2d/b2_shape.h>
 #include <box2d/box2d.h>
 
 #include <vector>
 #include <memory>
 
-#include "../RectObject.h"
+#include "../Object.h"
 
 using namespace std;
 
 
-class BodySegment : public RectObject {
+class BodySegment : public Object {
     private:
         weak_ptr<Creature> creature;
         vector<shared_ptr<BodySegment>> children;
+        int angleOnParent;
 
-        b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleFromObject);
+        b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleOffset);
 
     public:
 
-        BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, b2Vec2 pos, float angle);
-        BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, shared_ptr<BodySegment> parent, float angleOnParent, float angleFromParent);
+        BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle);
+        BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset);
 
         void Draw();
 

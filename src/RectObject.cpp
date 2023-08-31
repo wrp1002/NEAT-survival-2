@@ -12,6 +12,7 @@
 
 using namespace std;
 
+/*
 RectObject::RectObject(b2World &world, b2Vec2 pos, b2Vec2 size, float angle, ALLEGRO_COLOR color) : Object(size, color) {
     b2BodyDef bodyDef;
     bodyDef.type = b2_dynamicBody;
@@ -57,3 +58,4 @@ void RectObject::Draw() {
     al_identity_transform(&t);
     al_use_transform(&t);
 }
+*/

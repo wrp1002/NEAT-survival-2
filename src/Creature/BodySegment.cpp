@@ -6,29 +6,35 @@
 #include <allegro5/transformations.h>
 #include <box2d/b2_joint.h>
 #include <box2d/b2_math.h>
-#include <box2d/b2_settings.h>
+#include <box2d/b2_shape.h>
 #include <box2d/box2d.h>
 
 #include <fcntl.h>
 #include <vector>
 #include <memory>
+#include <iostream>
 
 #include "../Util.h"
-#include "../Camera.h"
-#include "../RectObject.h"
+#include "../Object.h"
 #include "Creature.h"
 
 using namespace std;
 
-BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, b2Vec2 pos, float angle) : RectObject(world, pos, size, -angle, color) {
+BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle) : Object(world, pos, size, angle, color, shapeType) {
     this->creature = parentCreature;
 }
 
-BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, shared_ptr<BodySegment> parent, float angleOnParent, float angleFromParent) :
-        RectObject(world, GetPosOnParent(parent, angleOnParent, angleFromParent), size, -angleFromParent + parent->body->GetAngle(), color) {
+BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 size, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset) :
+        Object(
+            world,
+            GetPosOnParent(parent, angleOnParent, angleOffset),
+            size, parent->body->GetAngle() - (angleOffset + angleOnParent),
+            color,
+            shapeType
+        ) {
 
     this->creature = parentCreature;
-
+    this->angleOnParent = Util::RadiansToDegrees(angleOnParent);
 
     // joint together
     b2RevoluteJointDef jointDef;
@@ -71,13 +77,13 @@ void BodySegment::Draw() {
     for (auto child : children)
         child->Draw();
 
-    RectObject::Draw();
+    Object::Draw();
 }
 
 
-b2Vec2 BodySegment::GetPosOnParent(shared_ptr<BodySegment> otherObject, float angleOnObject, float angleFromObject) {
-    b2Vec2 parentEdgePos = otherObject->GetEdgePoint(-angleOnObject + otherObject->body->GetAngle());
-    b2Vec2 relPos = b2Vec2(cos(-angleFromObject + otherObject->body->GetAngle()) * worldSize.x, sin(-angleFromObject + otherObject->body->GetAngle()) * worldSize.x);
+b2Vec2 BodySegment::GetPosOnParent(shared_ptr<BodySegment> otherObject, float angleOnObject, float angleOffset) {
+    b2Vec2 parentEdgePos = otherObject->GetEdgePoint(-angleOnObject + angleOffset + otherObject->body->GetAngle());
+    b2Vec2 relPos = b2Vec2(cos(otherObject->body->GetAngle() - (angleOffset + angleOnObject)) * worldSize.x, sin(otherObject->body->GetAngle() - (angleOffset + angleOnObject)) * worldSize.x);
 
     b2Vec2 pos = parentEdgePos + relPos;
     return Util::metersToPixels(pos);
