@@ -42,7 +42,7 @@ void Creature::ApplyGenes(b2World &world, string genes) {
     this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(50, 50), al_map_rgb(r, g, b), Object::SHAPE_TYPES::RECT, b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), Util::DegreesToRadians(45)));
     shared_ptr<BodySegment> prevPart = head;
 
-    for (int i = 0; i < 1; i ++) {
+    for (int i = 0; i < 4; i ++) {
         int size = (i * 10) + 10;
         shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(100, 10), al_map_rgb(100, 100, 100), Object::RECT, prevPart, Util::DegreesToRadians(15), Util::DegreesToRadians(10)));
         prevPart->AddChild(newPart);

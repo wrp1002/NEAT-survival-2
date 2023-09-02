@@ -76,7 +76,7 @@ void Object::Draw() {
             break;
         }
         case SHAPE_TYPES::RECT: {
-            al_draw_filled_rectangle(-pixelSize.x, -pixelSize.y, pixelSize.x, pixelSize.y, color);
+            al_draw_filled_rounded_rectangle(-pixelSize.x, -pixelSize.y, pixelSize.x, pixelSize.y, 10, 10, color);
             break;
         }
     }
