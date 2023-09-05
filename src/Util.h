@@ -12,6 +12,8 @@ namespace Util {
     float pixelsToMeters(float val);
 
     float mapVal(float input, float input_start, float input_end, float output_start, float output_end);
+    int clamp(int val, int min, int max);
+    float clamp(float val, float min, float max);
 
     float DegreesToRadians(int degrees);
     int RadiansToDegrees(float radians);

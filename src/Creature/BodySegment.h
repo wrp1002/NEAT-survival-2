@@ -4,6 +4,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 
+#include <box2d/b2_body.h>
 #include <box2d/b2_math.h>
 #include <box2d/b2_shape.h>
 #include <box2d/box2d.h>
@@ -20,6 +21,7 @@ class BodySegment : public Object {
     private:
         weak_ptr<Creature> creature;
         vector<shared_ptr<BodySegment>> children;
+        vector<float> validChildAngles;
         int angleOnParent;
 
         b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
@@ -31,6 +33,12 @@ class BodySegment : public Object {
 
         void Draw();
 
-        void AddChild(shared_ptr<BodySegment> child);
+        b2Body *GetBody();
+
+        void AddChild(shared_ptr<BodySegment> child, int angle);
+
+        void SetValidAngles(b2Vec2 pixelSize);
         bool childAngleValid(int angle);
+        bool CanAddChild();
+        int GetValidChildAngle(int angleGene);
 };

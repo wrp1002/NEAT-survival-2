@@ -19,9 +19,11 @@ class Creature : public std::enable_shared_from_this<Creature> {
         vector<shared_ptr<BodySegment>> bodySegments;
         vector<b2Joint *> joints;
         shared_ptr<BodySegment> head;
+        b2World *world;
 
     public:
         Creature(string genes);
+        ~Creature();
         void Init(b2World &world);
 
         void ApplyGenes(b2World &world, string genes);
@@ -34,4 +36,5 @@ class Creature : public std::enable_shared_from_this<Creature> {
 
 
         float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);
+        float GetNextGene(string &gene, int wholeDigits, int decimalDigits);
 };

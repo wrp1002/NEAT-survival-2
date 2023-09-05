@@ -9,6 +9,7 @@
 #include <box2d/b2_shape.h>
 #include <box2d/box2d.h>
 
+#include <cmath>
 #include <fcntl.h>
 #include <vector>
 #include <memory>
@@ -22,6 +23,8 @@ using namespace std;
 
 BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle) : Object(world, pos, pixelSize, -angle, color, shapeType) {
     this->creature = parentCreature;
+
+    SetValidAngles(pixelSize);
 }
 
 BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset) :
@@ -29,13 +32,14 @@ BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2
             world,
             GetPosOnParent(parent, angleOnParent, angleOffset, Util::pixelsToMeters(pixelSize)),
             pixelSize,
-            parent->body->GetAngle() - (angleOffset + angleOnParent),
+            parent->body->GetAngle() - (angleOffset + angleOnParent) - M_PI_2,
             color,
             shapeType
         ) {
 
     this->creature = parentCreature;
     this->angleOnParent = Util::RadiansToDegrees(angleOnParent);
+    SetValidAngles(pixelSize);
 
     // joint together
     b2RevoluteJointDef jointDef;
@@ -58,20 +62,40 @@ BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2
 
     //joints.push_back(joint);
 
+
 }
 
-void BodySegment::AddChild(shared_ptr<BodySegment> child) {
+void BodySegment::AddChild(shared_ptr<BodySegment> child, int angle) {
     children.push_back(child);
+    for (int i = validChildAngles.size() - 1; i >= 0; i--) {
+        if (validChildAngles[i] == angle) {
+            validChildAngles.erase(validChildAngles.begin() + i);
+        }
+    }
 }
 
-bool BodySegment::childAngleValid(int angle) {
-    /*
-    for (auto child : children) {
-        if (child.get()->angleOnBody == angle)
-            return false;
+void BodySegment::SetValidAngles(b2Vec2 pixelSize) {
+    validChildAngles.push_back(0); // right
+    validChildAngles.push_back(180); // left
+    validChildAngles.push_back(270); // down
+
+    if (shapeType == Object::CIRCLE) {
+        validChildAngles.push_back(45);
+        validChildAngles.push_back(135);
+        validChildAngles.push_back(225);
+        validChildAngles.push_back(315);
     }
-    */
-    return true;
+    else {
+
+    }
+}
+
+bool BodySegment::CanAddChild() {
+    return validChildAngles.size() > 0;
+}
+
+int BodySegment::GetValidChildAngle(int angleGene) {
+    return validChildAngles[angleGene % validChildAngles.size()];
 }
 
 void BodySegment::Draw() {
@@ -83,14 +107,19 @@ void BodySegment::Draw() {
 }
 
 
+b2Body *BodySegment::GetBody() {
+    return this->body;
+}
+
+
 b2Vec2 BodySegment::GetPosOnParent(shared_ptr<BodySegment> otherObject, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize) {
     b2Vec2 parentEdgePos = otherObject->GetEdgePoint(-angleOnObject + otherObject->body->GetAngle());
 
     float angle = otherObject->body->GetAngle() - (angleOffset + angleOnObject);
 
     b2Vec2 relPos = b2Vec2(
-        cos(angle) * thisWorldSize.x,
-        sin(angle) * thisWorldSize.x
+        cos(angle) * thisWorldSize.y,
+        sin(angle) * thisWorldSize.y
     );
 
     b2Vec2 pos = parentEdgePos + relPos ;

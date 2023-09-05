@@ -1,6 +1,7 @@
 #include "Util.h"
 
 #include "Globals.h"
+#include <fcntl.h>
 
 b2Vec2 Util::metersToPixels(float xMeters, float yMeters) {
     return b2Vec2(xMeters * Globals::scaling, yMeters * Globals::scaling);
@@ -30,6 +31,22 @@ float Util::mapVal(float input, float input_start, float input_end, float output
     float slope = (output_end - output_start) / (input_end - input_start);
     float output = output_start + slope * (input - input_start);
     return output;
+}
+
+int Util::clamp(int val, int min, int max) {
+    if (val < min)
+        return min;
+    if (val > max)
+        return max;
+    return val;
+}
+
+float Util::clamp(float val, float min, float max) {
+    if (val < min)
+        return min;
+    if (val > max)
+        return max;
+    return val;
 }
 
 float Util::DegreesToRadians(int degrees) {

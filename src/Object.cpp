@@ -37,7 +37,7 @@ Object::Object(b2World &world, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGR
     this->body = world.CreateBody(&bodyDef);
 
     b2FixtureDef fixtureDef;
-    b2CircleShape circleShapeDef; circleShapeDef.m_radius = worldSize.x;
+    b2CircleShape circleShapeDef; circleShapeDef.m_radius = worldSize.y;
     b2PolygonShape rectShapeDef;  rectShapeDef.SetAsBox(worldSize.x, worldSize.y);
 
     if (shapeType == SHAPE_TYPES::CIRCLE)
@@ -72,7 +72,7 @@ void Object::Draw() {
 
     switch (this->shapeType) {
         case SHAPE_TYPES::CIRCLE: {
-            al_draw_filled_circle(0, 0, pixelSize.x, color);
+            al_draw_filled_circle(0, 0, pixelSize.y, color);
             break;
         }
         case SHAPE_TYPES::RECT: {
@@ -81,7 +81,7 @@ void Object::Draw() {
         }
     }
 
-    al_draw_line(0, 0, 0, -30, al_map_rgb(255, 255, 255), 2);
+    al_draw_line(0, 0, 0, -pixelSize.y / 2, al_map_rgb(255, 255, 255), 2);
 
     al_identity_transform(&t);
     al_use_transform(&t);

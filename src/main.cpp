@@ -31,6 +31,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <string>
 
 
 #include "Camera.h"
@@ -97,17 +98,43 @@ int main() {
 
 
     string genes = "";
-
+    // gene length == 16
     // first 3 are instruction type
-    // 100==shape, 0==rect, 1==circle, 2==?, 3 digits for w&h
-    genes += "1001100100000000";
-    genes += "1255100200000000";
-    genes += "0000000000000000";
-    genes += "0000000000000000";
+    // 000==shape, 0==rect, 1==circle, 2==?, 3 digits for w&h, 3 digits for angle on parent & angle offset
+    //genes += string() + "000" + "1" + "050" + "150" + "000" + "000";
+    // 001==color, 3 digits for r, g, b |  4 unused
+    //genes += string() + "001" + "255" + "000" + "255" + "0000";
+    genes += string() + "000" + "1959150000000";    // shape
+    genes += string() + "002" + "0000000000000";    // create head
+    genes += string() + "000" + "0200900000000";    // shape
+    genes += string() + "003" + "1500000000000";    // angle
+    genes += string() + "002" + "0000000000000";    // create
+    genes += string() + "002" + "0000000000000";    // create
 
+    genes += string() + "003" + "2500000000000";    // angle
+    genes += string() + "000" + "1200500000000";    // shape
+    genes += string() + "002" + "0000000000000";    // create
+
+
+    /*
+    genes = "";
+    for (int i = 0; i < 50; i++) {
+        string gene = "";
+        for (int j = 0; j < 16; j++) {
+            gene += to_string(rand() % 10);
+        }
+        cout << "adding gene:" << gene << endl;
+        genes += gene;
+    }*/
+
+
+    cout << genes << endl;
+
+    vector<shared_ptr<Creature>> creatures;
 
     shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes));
     creature->Init(world);
+    creatures.push_back(creature);
 
     //shared_ptr<RectObject> obj = make_shared<RectObject>(RectObject(world, b2Vec2(Globals::SCREEN_WIDTH / 2, Globals::SCREEN_HEIGHT / 2), b2Vec2(50, 75), 0));
     //shared_ptr<RectObject> obj2 = make_shared<RectObject>(RectObject(world, obj, M_PI + 1, b2Vec2(75, 10), M_PI_4 + M_PI));
@@ -138,6 +165,25 @@ int main() {
 
             if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
                 done = true;
+
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE) {
+                string genes = "";
+                for (int i = 0; i < 50; i++) {
+                    string gene = "";
+                    for (int j = 0; j < 16; j++) {
+                        gene += to_string(rand() % 10);
+                    }
+                    cout << "adding gene:" << gene << endl;
+                    genes += gene;
+                }
+
+                cout << genes << endl;
+
+                creature = make_shared<Creature>(Creature(genes));
+                creature->Init(world);
+                creatures.push_back(creature);
+                cout << creatures.size() << endl;
+            }
         }
         else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
             keys[ev.keyboard.keycode] = false;
@@ -184,7 +230,8 @@ int main() {
             b2Vec2 groundPos = Util::metersToPixels(groundBody->GetPosition().x, groundBody->GetPosition().y);
             al_draw_filled_rectangle(Globals::SCREEN_WIDTH / 2 - groundWidth, Globals::SCREEN_HEIGHT - 50 - 10, Globals::SCREEN_WIDTH / 2 + groundWidth, Globals::SCREEN_HEIGHT - 50 + 10, al_map_rgb(100, 100, 100));
 
-            creature.get()->Draw();
+            for (auto creature: creatures)
+                creature.get()->Draw();
             //obj->Draw();
             //obj2->Draw();
 
