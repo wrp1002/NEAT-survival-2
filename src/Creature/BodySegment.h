@@ -5,6 +5,7 @@
 #include <allegro5/allegro_primitives.h>
 
 #include <box2d/b2_body.h>
+#include <box2d/b2_joint.h>
 #include <box2d/b2_math.h>
 #include <box2d/b2_shape.h>
 #include <box2d/box2d.h>
@@ -13,6 +14,7 @@
 #include <memory>
 
 #include "../Object.h"
+#include "Joint.h"
 
 using namespace std;
 
@@ -23,6 +25,7 @@ class BodySegment : public Object {
         vector<weak_ptr<BodySegment>> children;
         vector<float> validChildAngles;
         int angleOnParent;
+        b2Joint *parentJoint;
 
         b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
@@ -30,8 +33,8 @@ class BodySegment : public Object {
         int angleOffset;
         int innovationNum;
 
-        BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle);
-        BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset);
+        BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle);
+        BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo);
 
         void Draw();
 

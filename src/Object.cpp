@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+#include "GameManager.h"
+
 using namespace std;
 
 
@@ -22,7 +24,7 @@ Object::Object() {
     shapeType = SHAPE_TYPES::CIRCLE;
 }
 
-Object::Object(b2World &world, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType) {
+Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType) {
     this->pixelSize = pixelSize;
     this->worldSize = Util::pixelsToMeters(pixelSize);
     this->color = color;
@@ -34,7 +36,7 @@ Object::Object(b2World &world, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGR
     bodyDef.position = Util::pixelsToMeters(pos);
     bodyDef.angle = angle;
 
-    this->body = world.CreateBody(&bodyDef);
+    this->body = GameManager::world.CreateBody(&bodyDef);
 
     b2FixtureDef fixtureDef;
     b2CircleShape circleShapeDef; circleShapeDef.m_radius = worldSize.y;

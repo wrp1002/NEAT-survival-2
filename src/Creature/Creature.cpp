@@ -11,30 +11,36 @@
 #include <unordered_map>
 
 #include "BodySegment.h"
+#include "Joint.h"
+
+#include "../GameManager.h"
 #include "../Globals.h"
 #include "../Util.h"
 
 using namespace std;
 
-Creature::Creature(string genes) {
+Creature::Creature(string genes, b2Vec2 pos) {
     this->genes = genes;
+    this->startingPos = pos;
 }
 
 Creature::~Creature() {
+    for (auto joint : joints)
+        joint->SetShouldDeleteJoints(false);
+
     for (auto child : bodySegments)
-        this->world->DestroyBody(child->GetBody());
+        GameManager::world.DestroyBody(child->GetBody());
 }
 
-void Creature::Init(b2World &world) {
-    this->world = &world;
-    ApplyGenes(world);
+void Creature::Init() {
+    ApplyGenes();
 }
 
-void Creature::ApplyGenes(b2World &world) {
-    ApplyGenes(world, this->genes);
+void Creature::ApplyGenes() {
+    ApplyGenes(this->genes);
 }
 
-void Creature::ApplyGenes(b2World &world, string genes) {
+void Creature::ApplyGenes(string genes) {
     int r = 100, g = 100, b = 100;
     int width = 50, height = 50;
     int shapeType = 0;
@@ -47,6 +53,7 @@ void Creature::ApplyGenes(b2World &world, string genes) {
     int symmetryID = 0;
     int selectedParentID = 0;
     unordered_map<int, vector<shared_ptr<BodySegment>>> symmetryMap;
+    bool doSymmetry = true;
 
     int instructionTypes = 5;
     int maxSize = 50;
@@ -83,11 +90,12 @@ void Creature::ApplyGenes(b2World &world, string genes) {
                 cout << "Creating new object" << endl;
                 if (!head) {
                     cout << "Creating head" << endl;
-                    this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), Util::DegreesToRadians(0)));
+                    this->head = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, startingPos, Util::DegreesToRadians(0)));
                     bodySegments.push_back(head);
 
-                    symmetryMap[symmetryID].push_back(head);
-                    symmetryMap[symmetryID].push_back(head);
+                    for (int i = 0; i < 2; i++)
+                        symmetryMap[symmetryID].push_back(head);
+
                     symmetryID++;
                 }
                 else {
@@ -95,33 +103,41 @@ void Creature::ApplyGenes(b2World &world, string genes) {
                     cout << "body segments: " << bodySegments.size() << " selectedParentID:" << selectedParentID << endl;
 
                     vector<shared_ptr<BodySegment>> parentObjects = symmetryMap[selectedParentID];
-                    cout << "got parent" << endl;
 
                     if (parentObjects[0]->CanAddChild() && parentObjects[1]->CanAddChild()) {
+                        Joint::JointInfo jointInfo;
+                        jointInfo.useSpring = bool(int(GetNextGene(gene, 1, 0)) % 2);
+                        jointInfo.enableMotor = bool(int(GetNextGene(gene, 1, 0)) % 2);
+                        jointInfo.maxMotorTorque = 2.0;
+                        jointInfo.motorSpeed = 0;
+                        jointInfo.enableLimit = bool(int(GetNextGene(gene, 1, 0)) % 2);
+                        jointInfo.angleLimit = GetNextGene(gene, 0, 3) * M_PI;
+
+
                         int angleOnParent = parentObjects[0]->GetValidChildAngle(childAngleGene);
                         cout << "angleOnParent1: " << angleOnParent << endl;
-                        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[0], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(angleOffset)));
+                        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[0], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(angleOffset), jointInfo));
                         bodySegments.push_back(newPart);
                         parentObjects[0]->AddChild(newPart, angleOnParent);
                         symmetryMap[symmetryID].push_back((newPart));
 
-                        if (angleOnParent != 270)
-                            angleOnParent = (180 - angleOnParent + 360) % 360;
+                        if (doSymmetry) {
+                            // Don't do symmetry if angle is down
+                            if (angleOnParent != 270)
+                                angleOnParent = (180 - angleOnParent + 360) % 360;
 
-                        if (parentObjects[1]->childAngleValid(angleOnParent)) {
-                            cout << "angleOnParent2: " << angleOnParent << endl;
-                            newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[1], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-angleOffset)));
-                            bodySegments.push_back(newPart);
-                            parentObjects[1]->AddChild(newPart, angleOnParent);
+                            if (parentObjects[1]->childAngleValid(angleOnParent)) {
+                                cout << "angleOnParent2: " << angleOnParent << endl;
+                                newPart = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[1], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-angleOffset), jointInfo));
+                                bodySegments.push_back(newPart);
+                                parentObjects[1]->AddChild(newPart, angleOnParent);
+                            }
                         }
 
                         symmetryMap[symmetryID].push_back((newPart));
 
                         symmetryID++;
                         selectedParentID = symmetryID - 1;
-                    }
-                    else {
-                        cout << "no space left" << endl;
                     }
                 }
                 break;
@@ -169,14 +185,8 @@ void Creature::ApplyGenes(b2World &world, string genes) {
 
 
 void Creature::Update() {
-    for (int i = joints.size() - 1; i >= 0; i--) {
-        b2Vec2 reactionForce = joints[i]->GetReactionForce(Globals::FPS);
-        float forceModuleSq = reactionForce.LengthSquared();
-        if(forceModuleSq > 0.0075) {
-            cout << "deleting joint" << endl;
-            world->DestroyJoint(joints[i]);
-            joints.erase(joints.begin() + i);
-        }
+    for (auto joint : joints) {
+        joint->Update();
     }
 }
 
@@ -186,6 +196,10 @@ void Creature::Draw() {
 
     head->Draw();
 
+    for (auto joint : joints)
+        joint->Draw();
+
+    /*
     for (auto joint : joints) {
         b2Vec2 pos;
         pos = Util::metersToPixels(joint->GetAnchorA());
@@ -194,11 +208,12 @@ void Creature::Draw() {
         pos = Util::metersToPixels(joint->GetAnchorB());
         al_draw_filled_circle(pos.x, pos.y, 2, al_map_rgb(0, 255, 0));
     }
+    */
 }
 
 
-void Creature::AddJoint(b2Joint *joint) {
-    joints.push_back(joint);
+void Creature::AddJoint(shared_ptr<Joint> newJoint) {
+    joints.push_back(newJoint);
 }
 
 

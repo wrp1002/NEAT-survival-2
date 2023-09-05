@@ -16,23 +16,25 @@
 #include <memory>
 #include <iostream>
 
+#include "../GameManager.h"
 #include "../Util.h"
 #include "../Object.h"
 #include "Creature.h"
+#include "Joint.h"
 
 using namespace std;
 
-BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle) : Object(world, pos, pixelSize, -angle, color, shapeType) {
+BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle) : Object(pos, pixelSize, -angle, color, shapeType) {
     this->creature = parentCreature;
     this->innovationNum = 0;
     this->angleOffset = 0;
+    this->parentJoint = nullptr;
 
     SetValidAngles(pixelSize);
 }
 
-BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset) :
+BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo) :
         Object(
-            world,
             GetPosOnParent(parent, angleOnParent, angleOffset, Util::pixelsToMeters(pixelSize)),
             pixelSize,
             parent->body->GetAngle() - (angleOffset + angleOnParent) - M_PI_2,
@@ -49,38 +51,10 @@ BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2
     // joint together
     b2RevoluteJointDef jointDef;
     b2Vec2 jointPos = parent->GetEdgePoint(-angleOnParent + parent->body->GetAngle());
-    jointDef.Initialize(body, parent.get()->body, jointPos);
-    jointDef.lowerAngle = -0.5f * b2_pi;
-    jointDef.upperAngle = 0.5f * b2_pi;
-    jointDef.enableLimit = false;
-    jointDef.maxMotorTorque = 2.0f;
-    jointDef.motorSpeed = 0.0f;
-    jointDef.enableMotor = false;
-    jointDef.collideConnected = false;
 
-    b2Joint *joint = world.CreateJoint(&jointDef);
-
-    if (shared_ptr<Creature> creaturePtr = creature.lock()) {
-        creaturePtr->AddJoint(joint);
-    }
-
-    bool createSpring = true;
-
-    if (createSpring) {
-        b2DistanceJointDef distanceJointDef;
-        distanceJointDef.Initialize(body, parent->body, body->GetPosition(), parent->body->GetPosition());
-        float frequencyHz = 4.0f;
-        float dampingRatio = 0.5f;
-        b2LinearStiffness(distanceJointDef.stiffness, distanceJointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
-
-        joint = world.CreateJoint(&distanceJointDef);
-
-        if (shared_ptr<Creature> creaturePtr = creature.lock())
-            creaturePtr->AddJoint(joint);
-    }
-
-
-
+    shared_ptr<Joint> newJoint = make_shared<Joint>(Joint(jointInfo, jointPos, body, parent->body));
+    if (shared_ptr<Creature> creaturePtr = creature.lock())
+        creaturePtr->AddJoint(newJoint);
 }
 
 void BodySegment::AddChild(shared_ptr<BodySegment> child, int angle) {

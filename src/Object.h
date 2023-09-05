@@ -25,7 +25,7 @@ class Object {
         enum SHAPE_TYPES {RECT, CIRCLE};
 
         Object();
-        Object(b2World &world, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType);
+        Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType);
 
         void Update();
         void Draw();
