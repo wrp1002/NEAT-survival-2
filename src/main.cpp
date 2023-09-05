@@ -112,7 +112,9 @@ int main() {
     genes += string() + "002" + "0000000000000";    // create
 
     genes += string() + "003" + "2500000000000";    // angle
-    genes += string() + "000" + "1200500000000";    // shape
+    //genes += string() + "000" + "1200500000000";    // shape
+    genes += string() + "002" + "0000000000000";    // create
+    genes += string() + "002" + "0000000000000";    // create
     genes += string() + "002" + "0000000000000";    // create
 
 
@@ -159,6 +161,9 @@ int main() {
             */
 
             world.Step(Globals::FPS, velocityIterations, positionIterations);
+
+            for (auto creature: creatures)
+                creature.get()->Update();
         }
         else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
             keys[ev.keyboard.keycode] = true;

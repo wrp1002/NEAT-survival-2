@@ -4,6 +4,7 @@
 #include <allegro5/allegro_primitives.h>
 
 #include <allegro5/transformations.h>
+#include <box2d/b2_distance_joint.h>
 #include <box2d/b2_joint.h>
 #include <box2d/b2_math.h>
 #include <box2d/b2_shape.h>
@@ -47,7 +48,7 @@ BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2
     jointDef.Initialize(body, parent.get()->body, jointPos);
     jointDef.lowerAngle = -0.5f * b2_pi;
     jointDef.upperAngle = 0.5f * b2_pi;
-    jointDef.enableLimit = true;
+    jointDef.enableLimit = false;
     jointDef.maxMotorTorque = 2.0f;
     jointDef.motorSpeed = 0.0f;
     jointDef.enableMotor = false;
@@ -59,8 +60,21 @@ BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2
         creaturePtr->AddJoint(joint);
     }
 
+    bool createSpring = true;
 
-    //joints.push_back(joint);
+    if (createSpring) {
+        b2DistanceJointDef distanceJointDef;
+        distanceJointDef.Initialize(body, parent->body, body->GetPosition(), parent->body->GetPosition());
+        float frequencyHz = 4.0f;
+        float dampingRatio = 0.5f;
+        b2LinearStiffness(distanceJointDef.stiffness, distanceJointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
+
+        joint = world.CreateJoint(&distanceJointDef);
+
+        if (shared_ptr<Creature> creaturePtr = creature.lock())
+            creaturePtr->AddJoint(joint);
+    }
+
 
 
 }

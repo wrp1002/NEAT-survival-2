@@ -149,6 +149,18 @@ void Creature::ApplyGenes(b2World &world, string genes) {
 }
 
 
+void Creature::Update() {
+    for (int i = joints.size() - 1; i >= 0; i--) {
+        b2Vec2 reactionForce = joints[i]->GetReactionForce(Globals::FPS);
+        float forceModuleSq = reactionForce.LengthSquared();
+        if(forceModuleSq > 0.0075) {
+            cout << "deleting joint" << endl;
+            world->DestroyJoint(joints[i]);
+            joints.erase(joints.begin() + i);
+        }
+    }
+}
+
 void Creature::Draw() {
     head->Draw();
 
