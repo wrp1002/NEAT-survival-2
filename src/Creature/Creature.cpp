@@ -40,12 +40,12 @@ void Creature::ApplyGenes(b2World &world, string genes) {
     int shapeType = 0;
     int geneLength = 16;
     int angleOffset = 0;
-    int parentID = 0;
     int childAngleGene = 0;
 
     this->head = nullptr;
-    shared_ptr<BodySegment> prevPart = nullptr;
 
+    int symmetryID = 0;
+    int selectedParentID = 0;
     unordered_map<int, vector<shared_ptr<BodySegment>>> symmetryMap;
 
     int instructionTypes = 5;
@@ -84,22 +84,41 @@ void Creature::ApplyGenes(b2World &world, string genes) {
                 if (!head) {
                     cout << "Creating head" << endl;
                     this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), Util::DegreesToRadians(0)));
-                    prevPart = this->head;
                     bodySegments.push_back(head);
+
+                    symmetryMap[symmetryID].push_back(head);
+                    symmetryMap[symmetryID].push_back(head);
+                    symmetryID++;
                 }
                 else {
                     cout << "Creating BodySegment" << endl;
-                    cout << "body segments: " << bodySegments.size() << " parentID:" << parentID << endl;
-                    shared_ptr<BodySegment> parentObject = bodySegments[parentID];
+                    cout << "body segments: " << bodySegments.size() << " selectedParentID:" << selectedParentID << endl;
 
-                    if (parentObject->CanAddChild()) {
-                        int angleOnParent = parentObject->GetValidChildAngle(childAngleGene);
+                    vector<shared_ptr<BodySegment>> parentObjects = symmetryMap[selectedParentID];
+                    cout << "got parent" << endl;
 
-                        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObject, Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(angleOffset)));
+                    if (parentObjects[0]->CanAddChild() && parentObjects[1]->CanAddChild()) {
+                        int angleOnParent = parentObjects[0]->GetValidChildAngle(childAngleGene);
+                        cout << "angleOnParent1: " << angleOnParent << endl;
+                        shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[0], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(angleOffset)));
                         bodySegments.push_back(newPart);
-                        prevPart->AddChild(newPart, angleOnParent);
-                        prevPart = newPart;
-                        parentID = bodySegments.size() - 1;
+                        parentObjects[0]->AddChild(newPart, angleOnParent);
+                        symmetryMap[symmetryID].push_back((newPart));
+
+                        if (angleOnParent != 270)
+                            angleOnParent = (180 - angleOnParent + 360) % 360;
+
+                        if (parentObjects[1]->childAngleValid(angleOnParent)) {
+                            cout << "angleOnParent2: " << angleOnParent << endl;
+                            newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[1], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-angleOffset)));
+                            bodySegments.push_back(newPart);
+                            parentObjects[1]->AddChild(newPart, angleOnParent);
+                        }
+
+                        symmetryMap[symmetryID].push_back((newPart));
+
+                        symmetryID++;
+                        selectedParentID = symmetryID - 1;
                     }
                     else {
                         cout << "no space left" << endl;
@@ -110,15 +129,15 @@ void Creature::ApplyGenes(b2World &world, string genes) {
             // angleOnParent(1), angleOffset(3)
             case 3: {
                 childAngleGene = GetNextGene(gene, 1, 0);
-                angleOffset = GetNextGene(gene, 0, 3) * 40 - 20;
+                angleOffset = GetNextGene(gene, 0, 3) * 90 - 45;
                 cout << "Set childAngleGene:" << childAngleGene << " angleOffset:" << angleOffset << endl;
                 break;
             }
             // parentID(1)
             case 4: {
                 if (bodySegments.size() > 0) {
-                    parentID = int(GetNextGene(gene, 1, 0)) % bodySegments.size();
-                    cout << "Set parentID:" << parentID << endl;
+                    selectedParentID = int(GetNextGene(gene, 1, 0)) % symmetryID;
+                    cout << "Set symmetryID:" << symmetryID << endl;
                 }
                 break;
             }
@@ -162,6 +181,9 @@ void Creature::Update() {
 }
 
 void Creature::Draw() {
+    if (!bodySegments.size())
+        return;
+
     head->Draw();
 
     for (auto joint : joints) {

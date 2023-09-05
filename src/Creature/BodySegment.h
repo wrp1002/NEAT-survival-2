@@ -20,13 +20,15 @@ using namespace std;
 class BodySegment : public Object {
     private:
         weak_ptr<Creature> creature;
-        vector<shared_ptr<BodySegment>> children;
+        vector<weak_ptr<BodySegment>> children;
         vector<float> validChildAngles;
         int angleOnParent;
 
         b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
     public:
+        int angleOffset;
+        int innovationNum;
 
         BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle);
         BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset);

@@ -2,6 +2,7 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/altime.h>
 #include <allegro5/color.h>
 #include <allegro5/display.h>
 #include <allegro5/drawing.h>
@@ -58,6 +59,7 @@ int main() {
     bool redraw = true;
     float count;
     map<int, bool> keys;
+    float nextTime = 5;
 
 
     Camera::Init();
@@ -104,18 +106,24 @@ int main() {
     //genes += string() + "000" + "1" + "050" + "150" + "000" + "000";
     // 001==color, 3 digits for r, g, b |  4 unused
     //genes += string() + "001" + "255" + "000" + "255" + "0000";
-    genes += string() + "000" + "1959150000000";    // shape
+    genes += string() + "000" + "1959950000000";    // shape
     genes += string() + "002" + "0000000000000";    // create head
-    genes += string() + "000" + "0200900000000";    // shape
-    genes += string() + "003" + "1500000000000";    // angle
-    genes += string() + "002" + "0000000000000";    // create
+    //genes += string() + "000" + "0200900000000";    // shape
+    genes += string() + "003" + "3500000000000";    // angle
     genes += string() + "002" + "0000000000000";    // create
 
-    genes += string() + "003" + "2500000000000";    // angle
+    genes += string() + "003" + "4300500000000";    // angle
+    genes += string() + "002" + "0000000000000";    // create
+
+    genes = "33270047261965839371800403010815334330276373056903205545858050585139156705001893134688365460630163290170692983317905754510576612132261432742294986781133382963409845980375604215883196636945485369179119891514013324199784424983010243332603006359868958302012343588133393993530636423485909155503516877186631604469939529434906";
+    //genes = "16046997046216714658134496517170987696391034827212228987731668768449291514999730184992767833821765885966658741761350547442934122822528206270568794760405890224616980720547603472040110892846409018310365127694190121203609469493224250985654265570612193041280522960188643291041024244760980952440488265894190292718315505511957";
+
+    //genes += string() + "003" + "1950000000000";    // angle
+    //genes += string() + "002" + "0000000000000";    // create
+
+    //genes += string() + "003" + "2500000000000";    // angle
     //genes += string() + "000" + "1200500000000";    // shape
-    genes += string() + "002" + "0000000000000";    // create
-    genes += string() + "002" + "0000000000000";    // create
-    genes += string() + "002" + "0000000000000";    // create
+    //genes += string() + "002" + "0000000000000";    // create
 
 
     /*
@@ -160,18 +168,19 @@ int main() {
             head->body->ApplyForce(b2Vec2(50 * (keys[ALLEGRO_KEY_RIGHT] - keys[ALLEGRO_KEY_LEFT]), 0), head->body->GetWorldCenter(), true);
             */
 
-            world.Step(Globals::FPS, velocityIterations, positionIterations);
-
             for (auto creature: creatures)
                 creature.get()->Update();
-        }
-        else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-            keys[ev.keyboard.keycode] = true;
 
-            if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                done = true;
+            world.Step(Globals::FPS, velocityIterations, positionIterations);
 
-            else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE) {
+            float currentTime = al_get_time();
+            if (currentTime > nextTime) {
+                cout << "hi" << endl;
+                nextTime = currentTime + 3;
+
+
+                creatures.clear();
+
                 string genes = "";
                 for (int i = 0; i < 50; i++) {
                     string gene = "";
@@ -188,6 +197,17 @@ int main() {
                 creature->Init(world);
                 creatures.push_back(creature);
                 cout << creatures.size() << endl;
+            }
+
+        }
+        else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+            keys[ev.keyboard.keycode] = true;
+
+            if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                done = true;
+
+            else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE) {
+
             }
         }
         else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
@@ -209,7 +229,8 @@ int main() {
             */
         }
         else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-            UserInput::StartDragging(b2Vec2(ev.mouse.x, ev.mouse.y));
+            if (ev.mouse.button == 2)
+                UserInput::StartDragging(b2Vec2(ev.mouse.x, ev.mouse.y));
         }
         else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
             if (ev.mouse.display == display) {

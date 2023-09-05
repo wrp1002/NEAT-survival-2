@@ -24,6 +24,8 @@ using namespace std;
 
 BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle) : Object(world, pos, pixelSize, -angle, color, shapeType) {
     this->creature = parentCreature;
+    this->innovationNum = 0;
+    this->angleOffset = 0;
 
     SetValidAngles(pixelSize);
 }
@@ -40,6 +42,8 @@ BodySegment::BodySegment(b2World &world, shared_ptr<Creature> parentCreature, b2
 
     this->creature = parentCreature;
     this->angleOnParent = Util::RadiansToDegrees(angleOnParent);
+    this->angleOffset = Util::RadiansToDegrees(angleOffset);
+    this->innovationNum = parent->innovationNum + 1;
     SetValidAngles(pixelSize);
 
     // joint together
@@ -112,11 +116,20 @@ int BodySegment::GetValidChildAngle(int angleGene) {
     return validChildAngles[angleGene % validChildAngles.size()];
 }
 
+bool BodySegment::childAngleValid(int angle) {
+    for (auto testAngle : validChildAngles)
+        if (angle == testAngle)
+            return true;
+    return false;
+}
+
 void BodySegment::Draw() {
     Object::Draw();
 
-    for (auto child : children)
-        child->Draw();
+    for (auto child : children) {
+        if (!child.expired())
+            child.lock()->Draw();
+    }
 
 }
 
