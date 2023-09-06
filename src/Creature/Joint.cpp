@@ -65,7 +65,6 @@ void Joint::Destroy() {
 
 void Joint::RemoveJoint(b2Joint *joint) {
     for (int i = allJoints.size() - 1; i >= 0; i--) {
-        cout << allJoints[i] << endl;
         if (allJoints[i] == joint) {
             allJoints.erase(allJoints.begin() + i);
         }

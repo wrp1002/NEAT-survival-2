@@ -30,6 +30,7 @@
 #include "UserInput.h"
 #include "Util.h"
 #include "UI/Font.h"
+#include "UI/Toolbar.h"
 #include "Creature/Creature.h"
 
 using namespace std;
@@ -54,7 +55,7 @@ int main() {
     GameManager::Init();
     Camera::Init();
     UserInput::Init();
-
+    Toolbar::Init(GameManager::display);
 
 
     b2BodyDef groundBodyDef;
