@@ -13,37 +13,37 @@ using namespace std;
 
 
 class Joint {
-    private:
-        b2RevoluteJoint *revoluteJoint;
-        b2DistanceJoint *springJoint;
-        vector<b2Joint *> allJoints;
-        bool broken;
-        bool shouldDeleteJoints;
+	private:
+		b2RevoluteJoint *revoluteJoint;
+		b2DistanceJoint *springJoint;
+		vector<b2Joint *> allJoints;
+		bool broken;
+		bool shouldDeleteJoints;
 
-        bool JointShouldBreak(b2Joint *joint);
+		bool JointShouldBreak(b2Joint *joint);
 
-    public:
-        struct JointInfo {
-            bool useSpring;
-            bool enableLimit;
-            float angleLimit;
-            bool enableMotor;
-            float maxMotorTorque;
-            float motorSpeed;
-        };
+	public:
+		struct JointInfo {
+			bool useSpring;
+			bool enableLimit;
+			float angleLimit;
+			bool enableMotor;
+			float maxMotorTorque;
+			float motorSpeed;
+		};
 
-        Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB);
-        ~Joint();
-
-
-        void Update();
-        void Draw();
-        void Destroy();
-        void RemoveJoint(b2Joint *joint);
+		Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB);
+		~Joint();
 
 
-        void SetBroken(bool val);
-        void SetShouldDeleteJoints(bool val);
+		void Update();
+		void Draw();
+		void Destroy();
+		void RemoveJoint(b2Joint *joint);
 
-        bool IsBroken();
+
+		void SetBroken(bool val);
+		void SetShouldDeleteJoints(bool val);
+
+		bool IsBroken();
 };

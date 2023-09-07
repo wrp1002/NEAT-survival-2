@@ -11,32 +11,34 @@
 
 class BodySegment;
 class Joint;
+class NEAT;
 
 using namespace std;
 
 
 class Creature : public std::enable_shared_from_this<Creature> {
-    private:
-        b2Vec2 startingPos;
-        string genes;
-        vector<shared_ptr<BodySegment>> bodySegments;
-        vector<shared_ptr<Joint>> joints;
-        shared_ptr<BodySegment> head;
+	private:
+		shared_ptr<NEAT> nn;
+		b2Vec2 startingPos;
+		string genes;
+		vector<shared_ptr<BodySegment>> bodySegments;
+		vector<shared_ptr<Joint>> joints;
+		shared_ptr<BodySegment> head;
 
-    public:
-        Creature(string genes, b2Vec2 pos);
-        ~Creature();
-        void Init();
+	public:
+		Creature(string genes, b2Vec2 pos);
+		~Creature();
+		void Init();
 
-        void ApplyGenes(string genes);
-        void ApplyGenes();
+		void ApplyGenes(string genes);
+		void ApplyGenes();
 
-        void Update();
-        void Draw();
+		void Update();
+		void Draw();
 
-        void AddJoint(shared_ptr<Joint> newJoint);
+		void AddJoint(shared_ptr<Joint> newJoint);
 
 
-        float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);
-        float GetNextGene(string &gene, int wholeDigits, int decimalDigits);
+		float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);
+		float GetNextGene(string &gene, int wholeDigits, int decimalDigits);
 };

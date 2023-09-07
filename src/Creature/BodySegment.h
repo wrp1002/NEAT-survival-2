@@ -20,30 +20,30 @@ using namespace std;
 
 
 class BodySegment : public Object {
-    private:
-        weak_ptr<Creature> creature;
-        vector<weak_ptr<BodySegment>> children;
-        vector<float> validChildAngles;
-        int angleOnParent;
-        b2Joint *parentJoint;
+	private:
+		weak_ptr<Creature> creature;
+		vector<weak_ptr<BodySegment>> children;
+		vector<float> validChildAngles;
+		int angleOnParent;
+		b2Joint *parentJoint;
 
-        b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
+		b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
-    public:
-        int angleOffset;
-        int innovationNum;
+	public:
+		int angleOffset;
+		int innovationNum;
 
-        BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle);
-        BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo);
+		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle);
+		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo);
 
-        void Draw();
+		void Draw();
 
-        b2Body *GetBody();
+		b2Body *GetBody();
 
-        void AddChild(shared_ptr<BodySegment> child, int angle);
+		void AddChild(shared_ptr<BodySegment> child, int angle);
 
-        void SetValidAngles(b2Vec2 pixelSize);
-        bool childAngleValid(int angle);
-        bool CanAddChild();
-        int GetValidChildAngle(int angleGene);
+		void SetValidAngles(b2Vec2 pixelSize);
+		bool childAngleValid(int angle);
+		bool CanAddChild();
+		int GetValidChildAngle(int angleGene);
 };

@@ -12,6 +12,6 @@ namespace Font {
 	extern unordered_map<string, ALLEGRO_FONT*> fonts;
 
 	ALLEGRO_FONT* GetFont(string fontName, int fontSize);
-    void DrawText(string fontName, int fontSize, string text, int x, int y);
+	void DrawText(string fontName, int fontSize, string text, int x, int y);
 };
 

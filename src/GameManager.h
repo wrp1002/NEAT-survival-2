@@ -22,6 +22,7 @@ namespace GameManager {
 
     void Init();
     void InitAllegro();
+    void Shutdown();
 
     void Update();
     void Draw();

@@ -14,22 +14,22 @@
 using namespace std;
 
 class Object {
-    protected:
-        b2Body *body;
-        b2Vec2 pixelSize;
-        b2Vec2 worldSize;
-        ALLEGRO_COLOR color;
-        int shapeType;
+	protected:
+		b2Body *body;
+		b2Vec2 pixelSize;
+		b2Vec2 worldSize;
+		ALLEGRO_COLOR color;
+		int shapeType;
 
-    public:
-        enum SHAPE_TYPES {RECT, CIRCLE};
+	public:
+		enum SHAPE_TYPES {RECT, CIRCLE};
 
-        Object();
-        Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType);
+		Object();
+		Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType);
 
-        void Update();
-        void Draw();
+		void Update();
+		void Draw();
 
-        b2Vec2 GetEdgePoint(float angle);
+		b2Vec2 GetEdgePoint(float angle);
 };
 

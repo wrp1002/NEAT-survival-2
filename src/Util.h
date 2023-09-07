@@ -17,4 +17,11 @@ namespace Util {
 
     float DegreesToRadians(int degrees);
     int RadiansToDegrees(float radians);
+
+    double Random();
+	float RandomDir();
+    int RandomInt(int min, int max);
+	int RandomSign();
+	float RandomNormal();
+	double Round(double num);
 }

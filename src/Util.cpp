@@ -56,3 +56,35 @@ float Util::DegreesToRadians(int degrees) {
 int Util::RadiansToDegrees(float radians) {
     return radians * 180 / M_PI;
 }
+
+double Util::Random() {
+    return double(rand()) / double(RAND_MAX);
+}
+
+float Util::RandomDir() {
+    return float((rand() % 360 - 180) * (M_PI / 180));
+}
+
+int Util::RandomInt(int min, int max) {
+    return rand() % (max - min) + min;
+}
+
+int Util::RandomSign() {
+    if (rand() % 2 == 0)
+        return 1;
+    else
+        return -1;
+}
+
+float Util::RandomNormal() {
+    float amount = 16;
+    double sum = 0;
+    for (int i = 0; i < amount; i++)
+        sum += Random();
+    sum /= amount;
+    return float(sum);
+}
+
+double Util::Round(double num) {
+    return double(int(num * 100) / 100);
+}
