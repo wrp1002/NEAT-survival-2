@@ -93,18 +93,15 @@ namespace Toolbar {
 				break;
 			}
 			case BUTTON_IDS::SPEED_DECREASE: {
-				//GameManager::DecreaseSpeed();
-				UpdateSpeedDisplay();
+				GameManager::DecreaseSpeed();
 				break;
 			}
 			case BUTTON_IDS::SPEED_INCREASE: {
-				//GameManager::IncreaseSpeed();
-				UpdateSpeedDisplay();
+				GameManager::IncreaseSpeed();
 				break;
 			}
 			case BUTTON_IDS::SPEED_RESET: {
-				//GameManager::ResetSpeed();
-				UpdateSpeedDisplay();
+				GameManager::ResetSpeed();
 				break;
 			}
 
@@ -190,7 +187,7 @@ namespace Toolbar {
 	}
 
 	void UpdateSpeedDisplay() {
-		//SetMenuCaption(BUTTON_IDS::SPEED_DISPLAY, fmt::format("Current: {}x", GameManager::speed));
+		SetMenuCaption(BUTTON_IDS::SPEED_DISPLAY, fmt::format("Current: {}x", GameManager::speed));
 	}
 
 	/*

@@ -15,6 +15,8 @@
 #include "Util.h"
 #include "Camera.h"
 
+#include "UI/Toolbar.h"
+
 using namespace std;
 
 namespace GameManager {
@@ -77,12 +79,14 @@ namespace GameManager {
 		if (paused)
 			return;
 
-		GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
+		for (int i = 0; i < speed; i++) {
+			GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
 
-		for (auto agent: agents)
-			agent.get()->Update();
+			for (auto agent: agents)
+				agent.get()->Update();
 
-		simTicks++;
+			simTicks++;
+		}
 	}
 
 	void Draw() {
@@ -157,15 +161,18 @@ namespace GameManager {
 
 	void ResetSpeed() {
 		speed = 1;
+		Toolbar::UpdateSpeedDisplay();
 	}
 
 	void IncreaseSpeed() {
 		speed++;
+		Toolbar::UpdateSpeedDisplay();
 	}
 
 	void DecreaseSpeed() {
 		if (speed > 1)
 			speed--;
+		Toolbar::UpdateSpeedDisplay();
 	}
 
 	int GetSpeed() {

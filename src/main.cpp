@@ -176,17 +176,15 @@ int main() {
 
 			if (al_get_time() - lastRedrawTime > maxRedrawTime) {
 				cout << "Last redraw was more than " << maxRedrawTime << " seconds ago" << endl;
-				//cout << "Clearing event queue and lowering speed to " << (GameManager::GetSpeed() > 1 ? GameManager::GetSpeed() - 1 : 1) << endl;
+				cout << "Clearing event queue and lowering speed to " << (GameManager::speed > 1 ? GameManager::speed - 1 : 1) << endl;
 
-				/*
-				if (GameManager::GetSpeed() == 1) {
+				if (GameManager::speed == 1) {
 					GameManager::TogglePaused();
 					cout << "MAJOR LAG DETECTED. paused sim" << endl;
 				}
-				*/
 
-				//GameManager::DecreaseSpeed();
-				//al_flush_event_queue(event_queue);
+				GameManager::DecreaseSpeed();
+				al_flush_event_queue(GameManager::event_queue);
 			}
 			else {
 				for (int i = 0; i < 1; i++) {
