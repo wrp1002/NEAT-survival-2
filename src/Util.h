@@ -24,4 +24,6 @@ namespace Util {
 	int RandomSign();
 	float RandomNormal();
 	double Round(double num);
+
+    void ResetTransform();
 }

@@ -1,6 +1,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 
+#include <allegro5/keycodes.h>
 #include <allegro5/transformations.h>
 #include <box2d/b2_block_allocator.h>
 #include <box2d/b2_body.h>
@@ -58,9 +59,6 @@ void CreateRandomAgent() {
 
 int main() {
 	srand(time(0));
-
-	int32 velocityIterations = 6;
-	int32 positionIterations = 2;
 
 	bool done = false;
 	bool redraw = true;
@@ -134,6 +132,9 @@ int main() {
 				done = true;
 			else if (ev.keyboard.keycode == ALLEGRO_KEY_I)
 				InfoDisplay::Toggle();
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE)
+				GameManager::TogglePaused();
+
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
 			UserInput::SetPressed(ev.keyboard.keycode, false);
@@ -189,7 +190,6 @@ int main() {
 			}
 			else {
 				for (int i = 0; i < 1; i++) {
-					GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
 					GameManager::Update();
 				}
 
@@ -214,17 +214,15 @@ int main() {
 			al_set_target_backbuffer(GameManager::display);
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 
-			//al_draw_filled_circle(100, 100, 50, al_map_rgb(255, 0, 255));
-
 			GameManager::Draw();
 
-
-			ALLEGRO_TRANSFORM identityTransform;
-			al_identity_transform(&identityTransform);
-			al_use_transform(&identityTransform);
+			Util::ResetTransform();
 			Font::DrawText("arial.ttf", 16, "string text", 10, 10);
 
 			al_flip_display();
+
+			if (InfoDisplay::IsVisible())
+				InfoDisplay::Draw();
 		}
 
 

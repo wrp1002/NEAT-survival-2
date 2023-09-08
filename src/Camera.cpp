@@ -42,8 +42,6 @@ namespace Camera {
 		//	al_translate_transform(&t, followObject->GetPos().x, followObject->GetPos().y);
 		//else
 		al_translate_transform(&transform, cameraPos.x + Globals::SCREEN_WIDTH / 2, cameraPos.y + Globals::SCREEN_HEIGHT / 2);
-
-		al_use_transform(&transform);
 	}
 
 	void UpdateZoom(int diff) {

@@ -9,6 +9,7 @@
 #include <box2d/b2_math.h>
 
 #include <iostream>
+#include <fmt/format.h>
 
 #include "Globals.h"
 #include "Util.h"
@@ -17,6 +18,13 @@
 using namespace std;
 
 namespace GameManager {
+	int speed;
+	bool paused;
+	double simStartTime;
+	double simTicks;
+	int32 velocityIterations;
+	int32 positionIterations;
+
 	ALLEGRO_DISPLAY *display;
 	ALLEGRO_EVENT_QUEUE *event_queue;
 	ALLEGRO_TIMER *timer;
@@ -26,7 +34,14 @@ namespace GameManager {
 	vector<shared_ptr<Creature>> agents;
 
 	void Init() {
+		velocityIterations = 6;
+		positionIterations = 2;
+		speed = 1;
+		paused = false;
 		InitAllegro();
+
+		simTicks = 0;
+		simStartTime = al_get_time();
 	}
 
 	void InitAllegro() {
@@ -59,8 +74,15 @@ namespace GameManager {
 	}
 
 	void Update() {
+		if (paused)
+			return;
+
+		GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
+
 		for (auto agent: agents)
 			agent.get()->Update();
+
+		simTicks++;
 	}
 
 	void Draw() {
@@ -94,4 +116,69 @@ namespace GameManager {
 	void ClearAgents() {
 		agents.clear();
 	}
+
+
+	double GetSimTime() {
+		return al_get_time() - simStartTime;
+	}
+
+	string GetSimTimeStr() {
+		double simTime = GetSimTime();
+		string simTimeLabel = "sec";
+
+		if (simTime > 3600) {
+			simTime /= 3600;
+			simTimeLabel = "hr";
+		}
+		else if (simTime > 60) {
+			simTime /= 60;
+			simTimeLabel = "min";
+		}
+
+		return fmt::format("{:.2f} {}", simTime, simTimeLabel);
+	}
+
+	string GetSimTicksStr() {
+		double simTime = simTicks / 30;
+		string simTimeLabel = "sec";
+
+		if (simTime > 3600) {
+			simTime /= 3600;
+			simTimeLabel = "hr";
+		}
+		else if (simTime > 60) {
+			simTime /= 60;
+			simTimeLabel = "min";
+		}
+
+		return fmt::format("{:.2f} {}", simTime, simTimeLabel);
+	}
+
+
+	void ResetSpeed() {
+		speed = 1;
+	}
+
+	void IncreaseSpeed() {
+		speed++;
+	}
+
+	void DecreaseSpeed() {
+		if (speed > 1)
+			speed--;
+	}
+
+	int GetSpeed() {
+		return speed;
+	}
+
+
+	void TogglePaused() {
+		paused = !paused;
+	}
+
+	bool IsPaused() {
+		return paused;
+	}
+
 }

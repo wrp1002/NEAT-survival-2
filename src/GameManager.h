@@ -11,23 +11,39 @@ using namespace std;
 
 
 namespace GameManager {
-    extern ALLEGRO_DISPLAY *display;
-    extern ALLEGRO_EVENT_QUEUE *event_queue;
-    extern ALLEGRO_TIMER *timer;
+	extern int speed;
+	extern bool paused;
+	extern double simStartTime;
+	extern double simTicks;
+	extern int32 velocityIterations;
+	extern int32 positionIterations;
 
-    extern b2Vec2 gravity;
-    extern b2World world;
+	extern ALLEGRO_DISPLAY *display;
+	extern ALLEGRO_EVENT_QUEUE *event_queue;
+	extern ALLEGRO_TIMER *timer;
 
-    extern vector<shared_ptr<Creature>> agents;
+	extern b2Vec2 gravity;
+	extern b2World world;
 
-    void Init();
-    void InitAllegro();
-    void Shutdown();
+	extern vector<shared_ptr<Creature>> agents;
 
-    void Update();
-    void Draw();
+	void Init();
+	void InitAllegro();
+	void Shutdown();
 
-    void CreateAgent(string genes, b2Vec2 pos);
-    void ClearAgents();
+	void Update();
+	void Draw();
 
+	void CreateAgent(string genes, b2Vec2 pos);
+	void ClearAgents();
+
+	double GetSimTime();
+	string GetSimTimeStr();
+	string GetSimTicksStr();
+
+	bool IsPaused();
+	void TogglePaused();
+	void ResetSpeed();
+	void IncreaseSpeed();
+	void DecreaseSpeed();
 }

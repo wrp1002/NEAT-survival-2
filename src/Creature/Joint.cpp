@@ -47,8 +47,6 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 
 
 Joint::~Joint() {
-	cout << "joint destoryor" << endl;
-
 }
 
 void Joint::Destroy() {

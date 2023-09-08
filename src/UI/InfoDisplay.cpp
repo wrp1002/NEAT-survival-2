@@ -7,6 +7,7 @@
 
 #include "Font.h"
 #include "../GameManager.h"
+#include "../Util.h"
 
 #include "../NEAT/NEAT.h"
 #include "../NEAT/Node.h"
@@ -60,31 +61,27 @@ namespace InfoDisplay {
 		if (display == nullptr)
 			return;
 
-		ALLEGRO_TRANSFORM t;
-		al_identity_transform(&t);
-		al_use_transform(&t);
-
 		al_set_target_backbuffer(display);
 		al_clear_to_color(al_map_rgb(0, 0, 0));
+
+		Util::ResetTransform();
 
 		ALLEGRO_FONT* font = Font::GetFont("Minecraft.ttf", 14);
 		vector<string> infoText;
 
-
-		/*
 		infoText.insert(infoText.end(), {
-			fmt::format("Food: {}", GameManager::allFood.size()),
-			fmt::format("Objects: {}", GameManager::allObjects.size()),
+			//fmt::format("Food: {}", GameManager::allFood.size()),
+			//fmt::format("Objects: {}", GameManager::allObjects.size()),
 			fmt::format("Agents: {}", GameManager::agents.size()),
 
 			fmt::format("Sim Time: {}", GameManager::GetSimTicksStr()),
-			fmt::format("Speed: {}x", GameManager::GetSpeed()),
+			fmt::format("Speed: {}x", GameManager::speed),
 			fmt::format("R Time: {}", GameManager::GetSimTimeStr()),
 
-			fmt::format("Total En: {:.2f}", GameManager::GetTotalEnergy()),
+			//fmt::format("Total En: {:.2f}", GameManager::GetTotalEnergy()),
 		});
 
-
+		/*
 		if (!selectedObject.expired()) {
 			shared_ptr<Object> object = selectedObject.lock();
 

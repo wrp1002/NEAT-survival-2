@@ -1,6 +1,7 @@
 #include "Util.h"
 
 #include "Globals.h"
+#include <allegro5/transformations.h>
 #include <fcntl.h>
 
 b2Vec2 Util::metersToPixels(float xMeters, float yMeters) {
@@ -87,4 +88,11 @@ float Util::RandomNormal() {
 
 double Util::Round(double num) {
     return double(int(num * 100) / 100);
+}
+
+
+void Util::ResetTransform() {
+    ALLEGRO_TRANSFORM identityTransform;
+    al_identity_transform(&identityTransform);
+    al_use_transform(&identityTransform);
 }
