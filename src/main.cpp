@@ -39,6 +39,22 @@ const int boxSize = 25;
 const int groundWidth = 600;
 
 
+void CreateRandomAgent() {
+	string genes = "";
+	for (int i = 0; i < 50; i++) {
+		string gene = "";
+		for (int j = 0; j < 16; j++) {
+			gene += to_string(rand() % 10);
+		}
+		cout << "adding gene:" << gene << endl;
+		genes += gene;
+	}
+
+	cout << genes << endl;
+
+	GameManager::CreateAgent(genes, b2Vec2(rand() % 10000 - 5000, rand() % 10000 - 5000));
+}
+
 
 int main() {
 	srand(time(0));
@@ -59,14 +75,6 @@ int main() {
 	UserInput::Init();
 	Toolbar::Init(GameManager::display);
 	InfoDisplay::Init(GameManager::event_queue);
-
-
-	b2BodyDef groundBodyDef;
-	groundBodyDef.position = Util::pixelsToMeters(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT - 50);
-	b2Body* groundBody = GameManager::world.CreateBody(&groundBodyDef);
-	b2PolygonShape groundBox;
-	groundBox.SetAsBox(groundWidth / Globals::scaling, 10.0f / Globals::scaling);
-	groundBody->CreateFixture(&groundBox, 0.0f);
 
 
 	string genes = "";
@@ -98,6 +106,9 @@ int main() {
 	GameManager::CreateAgent(genes, b2Vec2(0, 0));
 
 	cout << genes << endl;
+
+	for (int i = 0; i < 100; i++)
+		CreateRandomAgent();
 
 	al_start_timer(GameManager::timer);
 
@@ -177,8 +188,10 @@ int main() {
 				//al_flush_event_queue(event_queue);
 			}
 			else {
-				GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
-				GameManager::Update();
+				for (int i = 0; i < 1; i++) {
+					GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
+					GameManager::Update();
+				}
 
 				/*
 				if (Camera::followObject.expired() && GameRules::IsRuleEnabled("FollowRandomAgent")) {
@@ -189,27 +202,6 @@ int main() {
 				*/
 			}
 
-
-			float currentTime = al_get_time();
-			if (currentTime > nextTime) {
-				nextTime = currentTime + 3;
-
-				GameManager::ClearAgents();
-
-				string genes = "";
-				for (int i = 0; i < 50; i++) {
-					string gene = "";
-					for (int j = 0; j < 16; j++) {
-						gene += to_string(rand() % 10);
-					}
-					cout << "adding gene:" << gene << endl;
-					genes += gene;
-				}
-
-				cout << genes << endl;
-
-				GameManager::CreateAgent(genes, b2Vec2(0, 0));
-			}
 		}
 
 
@@ -220,12 +212,9 @@ int main() {
 			Camera::UpdateTransform();
 
 			al_set_target_backbuffer(GameManager::display);
-			al_clear_to_color(al_map_rgb(0,0,0));
+			al_clear_to_color(al_map_rgb(0, 0, 0));
 
 			//al_draw_filled_circle(100, 100, 50, al_map_rgb(255, 0, 255));
-
-			b2Vec2 groundPos = Util::metersToPixels(groundBody->GetPosition().x, groundBody->GetPosition().y);
-			al_draw_filled_rectangle(Globals::SCREEN_WIDTH / 2 - groundWidth, Globals::SCREEN_HEIGHT - 50 - 10, Globals::SCREEN_WIDTH / 2 + groundWidth, Globals::SCREEN_HEIGHT - 50 + 10, al_map_rgb(100, 100, 100));
 
 			GameManager::Draw();
 

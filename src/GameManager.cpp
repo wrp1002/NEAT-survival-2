@@ -11,6 +11,8 @@
 #include <iostream>
 
 #include "Globals.h"
+#include "Util.h"
+#include "Camera.h"
 
 using namespace std;
 
@@ -19,7 +21,7 @@ namespace GameManager {
 	ALLEGRO_EVENT_QUEUE *event_queue;
 	ALLEGRO_TIMER *timer;
 
-	b2Vec2 gravity(0.0, 10.0);
+	b2Vec2 gravity(0.0, 0.0);
 	b2World world(gravity);
 	vector<shared_ptr<Creature>> agents;
 
@@ -62,12 +64,28 @@ namespace GameManager {
 	}
 
 	void Draw() {
-		for (auto agent: agents)
+		for (auto agent: agents) {
 			agent.get()->Draw();
+		}
+
+		bool drawWorldBorder = true;
+
+		if (drawWorldBorder) {
+			b2Vec2 origin(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0);
+
+			ALLEGRO_TRANSFORM t;
+			al_identity_transform(&t);
+			al_translate_transform(&t, origin.x, origin.y);
+			al_compose_transform(&t, &Camera::transform);
+
+			al_use_transform(&t);
+
+			al_draw_circle(0, 0, Globals::WORLD_SIZE_PX, al_map_rgb(255, 255, 255), 2);
+		}
 	}
 
 	void CreateAgent(string genes, b2Vec2 pos) {
-		shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes, b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0)));
+		shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes, pos));
 		creature->Init();
 		agents.push_back(creature);
 		cout << agents.size() << endl;

@@ -18,6 +18,11 @@ using namespace std;
 
 class Creature : public std::enable_shared_from_this<Creature> {
 	private:
+		static const int extraInputCount = 10;
+		static const int extraOutputCount = 10;
+		int baseInputs;
+		int baseOutputs;
+
 		shared_ptr<NEAT> nn;
 		b2Vec2 startingPos;
 		string genes;

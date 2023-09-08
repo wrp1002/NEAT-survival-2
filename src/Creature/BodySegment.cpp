@@ -24,16 +24,15 @@
 
 using namespace std;
 
-BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle) : Object(pos, pixelSize, -angle, color, shapeType) {
+BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle, NerveInfo &nerveInfo) : Object(pos, pixelSize, -angle, color, shapeType) {
 	this->creature = parentCreature;
-	this->innovationNum = 0;
-	this->angleOffset = 0;
 	this->parentJoint = nullptr;
+	this->nerveInfo = nerveInfo;
 
 	SetValidAngles(pixelSize);
 }
 
-BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo) :
+BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
 		Object(
 			GetPosOnParent(parent, angleOnParent, angleOffset, Util::pixelsToMeters(pixelSize)),
 			pixelSize,
@@ -44,8 +43,7 @@ BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, 
 
 	this->creature = parentCreature;
 	this->angleOnParent = Util::RadiansToDegrees(angleOnParent);
-	this->angleOffset = Util::RadiansToDegrees(angleOffset);
-	this->innovationNum = parent->innovationNum + 1;
+	this->nerveInfo = nerveInfo;
 	SetValidAngles(pixelSize);
 
 	// joint together
@@ -55,6 +53,7 @@ BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, 
 	shared_ptr<Joint> newJoint = make_shared<Joint>(Joint(jointInfo, jointPos, body, parent->body));
 	if (shared_ptr<Creature> creaturePtr = creature.lock())
 		creaturePtr->AddJoint(newJoint);
+	this->parentJoint = newJoint;
 }
 
 void BodySegment::AddChild(shared_ptr<BodySegment> child, int angle) {
@@ -125,4 +124,27 @@ b2Vec2 BodySegment::GetPosOnParent(shared_ptr<BodySegment> otherObject, float an
 
 	b2Vec2 pos = parentEdgePos + relPos ;
 	return Util::metersToPixels(pos);
+}
+
+
+float BodySegment::GetNerveOutput() {
+	if (!parentJoint)
+		return 0;
+
+	return parentJoint->GetAngle();
+}
+
+int BodySegment::GetNerveOutputIndex() {
+	return nerveInfo.outputIndex;
+}
+
+int BodySegment::GetNerveInputIndex() {
+	return nerveInfo.inputIndex;
+}
+
+void BodySegment::SetNerveInput(float val) {
+	if (!parentJoint)
+		return;
+
+	parentJoint->SetSpeed(val);
 }

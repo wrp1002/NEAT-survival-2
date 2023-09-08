@@ -17,11 +17,34 @@
 #include "../Globals.h"
 #include "../Util.h"
 
+#include "../NEAT/NEAT.h"
+
 using namespace std;
 
 Creature::Creature(string genes, b2Vec2 pos) {
 	this->genes = genes;
 	this->startingPos = pos;
+
+	vector<string> inputLabels = {
+		"const",
+		"sin",
+	};
+	for (int i = 0; i < extraInputCount; i++)
+		inputLabels.push_back("in" + to_string(i));
+
+	vector<string> outputLabels = {
+
+	};
+	for (int i = 0; i < extraInputCount; i++)
+		outputLabels.push_back("out" + to_string(i));
+
+	this->baseInputs = inputLabels.size() - extraInputCount;
+	this->baseOutputs = outputLabels.size() - extraOutputCount;
+
+	nn = make_shared<NEAT>(NEAT(inputLabels, outputLabels));
+
+	for (int i = 0; i < 10; i++)
+		nn->MutateAddConnection();
 }
 
 Creature::~Creature() {
@@ -90,7 +113,12 @@ void Creature::ApplyGenes(string genes) {
 				cout << "Creating new object" << endl;
 				if (!head) {
 					cout << "Creating head" << endl;
-					this->head = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, startingPos, Util::DegreesToRadians(0)));
+					BodySegment::NerveInfo nerveInfo;
+					nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+					nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+					nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
+					nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+					this->head = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, startingPos, Util::DegreesToRadians(0), nerveInfo));
 					bodySegments.push_back(head);
 
 					for (int i = 0; i < 2; i++)
@@ -108,15 +136,21 @@ void Creature::ApplyGenes(string genes) {
 						Joint::JointInfo jointInfo;
 						jointInfo.useSpring = bool(int(GetNextGene(gene, 1, 0)) % 2);
 						jointInfo.enableMotor = bool(int(GetNextGene(gene, 1, 0)) % 2);
-						jointInfo.maxMotorTorque = 2.0;
+						jointInfo.maxMotorTorque = 20.0;
 						jointInfo.motorSpeed = 0;
 						jointInfo.enableLimit = bool(int(GetNextGene(gene, 1, 0)) % 2);
 						jointInfo.angleLimit = GetNextGene(gene, 0, 3) * M_PI;
 
+						BodySegment::NerveInfo nerveInfo;
+						nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+						nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+						nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
+						nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+
 
 						int angleOnParent = parentObjects[0]->GetValidChildAngle(childAngleGene);
 						cout << "angleOnParent1: " << angleOnParent << endl;
-						shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[0], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(angleOffset), jointInfo));
+						shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[0], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(angleOffset), jointInfo, nerveInfo));
 						bodySegments.push_back(newPart);
 						parentObjects[0]->AddChild(newPart, angleOnParent);
 						symmetryMap[symmetryID].push_back((newPart));
@@ -127,8 +161,11 @@ void Creature::ApplyGenes(string genes) {
 								angleOnParent = (180 - angleOnParent + 360) % 360;
 
 							if (parentObjects[1]->childAngleValid(angleOnParent)) {
+								nerveInfo.inputIndex = (nerveInfo.inputIndex + extraInputCount / 2) % (baseInputs + extraInputCount);
+								nerveInfo.outputIndex = (nerveInfo.outputIndex + extraOutputCount / 2) % (baseOutputs + extraOutputCount);
+
 								cout << "angleOnParent2: " << angleOnParent << endl;
-								newPart = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[1], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-angleOffset), jointInfo));
+								newPart = make_shared<BodySegment>(BodySegment(shared_from_this(), b2Vec2(width, height), al_map_rgb(r, g, b), shapeType, parentObjects[1], Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-angleOffset), jointInfo, nerveInfo));
 								bodySegments.push_back(newPart);
 								parentObjects[1]->AddChild(newPart, angleOnParent);
 							}
@@ -161,33 +198,40 @@ void Creature::ApplyGenes(string genes) {
 
 	}
 
-	//string colorGene = genes.substr(section * geneLength, section * geneLength + geneLength);
-	//cout << colorGene << endl;
-	//int first = colorGene[0];
-
-
-	/*
-	this->head = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(50, 50), al_map_rgb(r, g, b), Object::SHAPE_TYPES::RECT, b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0), Util::DegreesToRadians(45)));
-	shared_ptr<BodySegment> prevPart = head;
-
-	for (int i = 0; i < 4; i ++) {
-		int size = (i * 10) + 10;
-		shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(100, 10), al_map_rgb(r, g, b), Object::RECT, prevPart, Util::DegreesToRadians(15), Util::DegreesToRadians(10)));
-		prevPart->AddChild(newPart);
-		prevPart = newPart;
-	}
-
-	shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(world, shared_from_this(), b2Vec2(75, 25), al_map_rgb(r, g, b), Object::SHAPE_TYPES::RECT, head, Util::DegreesToRadians(180), Util::DegreesToRadians(0)));
-	prevPart->AddChild(newPart);
-	*/
-
 }
 
 
 void Creature::Update() {
+	vector<double> inputs = {
+		1.0,
+		sin(al_get_time())
+	};
+
+	for (int i = 0; i < extraInputCount; i++)
+		inputs.push_back(0);
+
+	for (auto part : bodySegments) {
+		int index = part->GetNerveOutputIndex();
+		float val = part->GetNerveOutput();
+
+		inputs[index] += val;
+	}
+
+	this->nn->Calculate(inputs);
+
 	for (auto joint : joints) {
 		joint->Update();
 	}
+
+	vector<double> output = nn->GetOutputs();
+
+	for (auto part : bodySegments) {
+		int index = part->GetNerveInputIndex();
+		float val = output[index];
+
+		part->SetNerveInput(val);
+	}
+
 }
 
 void Creature::Draw() {

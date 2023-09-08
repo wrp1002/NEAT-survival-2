@@ -19,6 +19,7 @@ class Joint {
 		vector<b2Joint *> allJoints;
 		bool broken;
 		bool shouldDeleteJoints;
+		float speed;
 
 		bool JointShouldBreak(b2Joint *joint);
 
@@ -44,6 +45,8 @@ class Joint {
 
 		void SetBroken(bool val);
 		void SetShouldDeleteJoints(bool val);
+		void SetSpeed(float val);
 
 		bool IsBroken();
+		float GetAngle();
 };

@@ -32,9 +32,10 @@ Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, i
 
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-
 	bodyDef.position = Util::pixelsToMeters(pos);
 	bodyDef.angle = angle;
+	bodyDef.linearDamping = 0.1;
+	bodyDef.angularDamping = 0.1;
 
 	this->body = GameManager::world.CreateBody(&bodyDef);
 
@@ -84,9 +85,6 @@ void Object::Draw() {
 	}
 
 	al_draw_line(0, 0, 0, -pixelSize.y / 2, al_map_rgb(255, 255, 255), 2);
-
-	al_identity_transform(&t);
-	al_use_transform(&t);
 }
 
 

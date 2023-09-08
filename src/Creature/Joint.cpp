@@ -13,6 +13,7 @@
 
 Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB) {
 	this->broken = false;
+	this->speed = 0;
 	this->shouldDeleteJoints = true;
 	this->revoluteJoint = nullptr;
 	this->springJoint = nullptr;
@@ -123,6 +124,13 @@ void Joint::SetShouldDeleteJoints(bool val) {
 	this->shouldDeleteJoints = val;
 }
 
+void Joint::SetSpeed(float val) {
+	if (!revoluteJoint)
+		return;
+
+	revoluteJoint->SetMotorSpeed(val*3);
+}
+
 
 bool Joint::IsBroken() {
 	return this->broken;
@@ -133,4 +141,11 @@ bool Joint::JointShouldBreak(b2Joint *joint) {
 	float forceModuleSq = reactionForce.LengthSquared();
 	float maxForce = 0.02;
 	return forceModuleSq >= maxForce;
+}
+
+float Joint::GetAngle() {
+	if (!revoluteJoint)
+		return 0;
+
+	return revoluteJoint->GetJointAngle();
 }

@@ -17,7 +17,7 @@ namespace Camera {
 
 
 	void Init() {
-		pos = b2Vec2(0, 0);
+		pos = b2Vec2(-Globals::SCREEN_WIDTH / 2.0, -Globals::SCREEN_HEIGHT / 2.0);
 		zoom = 1.0;
 		zoomFactor = 0.2;
 		minZoom = 0.15;
