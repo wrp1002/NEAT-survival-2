@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BodyPart.h"
 #include <allegro5/transformations.h>
 #include <box2d/b2_joint.h>
 #include <box2d/b2_math.h>
@@ -26,7 +27,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		shared_ptr<NEAT> nn;
 		b2Vec2 startingPos;
 		string genes;
-		vector<shared_ptr<BodySegment>> bodySegments;
+		vector<shared_ptr<BodyPart>> bodySegments;
 		vector<shared_ptr<Joint>> joints;
 		shared_ptr<BodySegment> head;
 

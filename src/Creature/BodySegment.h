@@ -13,50 +13,29 @@
 #include <vector>
 #include <memory>
 
-#include "../Object.h"
+#include "BodyPart.h"
 #include "Joint.h"
-
 
 using namespace std;
 
 
-class BodySegment : public Object {
-	public:
-		struct NerveInfo {
-			bool inputEnabled;
-			bool outputEnabled;
-			int inputIndex;
-			bool outputIndex;
-		};
-
+class BodySegment : public BodyPart {
 	private:
-		weak_ptr<Creature> creature;
-		vector<weak_ptr<BodySegment>> children;
+		vector<weak_ptr<BodyPart>> children;
 		vector<float> validChildAngles;
 		int angleOnParent;
-		shared_ptr<Joint> parentJoint;
-		NerveInfo nerveInfo;
-
-		b2Vec2 GetPosOnParent(shared_ptr<BodySegment> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
 	public:
 		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle, NerveInfo &nerveInfo);
-		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodySegment> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo);
+		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodyPart> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo);
 
 
 		void Draw();
 
-		b2Body *GetBody();
-
-		void AddChild(shared_ptr<BodySegment> child, int angle);
+		void AddChild(shared_ptr<BodyPart> child, int angle);
 
 		void SetValidAngles(b2Vec2 pixelSize);
 		bool childAngleValid(int angle);
 		bool CanAddChild();
 		int GetValidChildAngle(int angleGene);
-
-		float GetNerveOutput();
-		int GetNerveOutputIndex();
-		int GetNerveInputIndex();
-		void SetNerveInput(float val);
 };

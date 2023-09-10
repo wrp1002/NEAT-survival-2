@@ -3,6 +3,7 @@
 #include <box2d/b2_body.h>
 #include <box2d/b2_distance_joint.h>
 #include <box2d/b2_joint.h>
+#include <box2d/b2_math.h>
 #include <box2d/b2_revolute_joint.h>
 #include <box2d/b2_world.h>
 

@@ -4,6 +4,7 @@
 
 #include <box2d/b2_distance_joint.h>
 #include <box2d/b2_joint.h>
+#include <box2d/b2_math.h>
 #include <box2d/b2_revolute_joint.h>
 
 #include "../GameManager.h"
@@ -79,14 +80,14 @@ void Joint::Update() {
 			revoluteJoint = nullptr;
 			cout << "revoluteJoint broke" << endl;
 		}
-	}
 
-	if (springJoint) {
-		if (JointShouldBreak(springJoint)) {
-			RemoveJoint(springJoint);
-			GameManager::world.DestroyJoint(springJoint);
-			springJoint = nullptr;
-			cout << "springJoint broke" << endl;
+		if (springJoint) {
+			if (JointShouldBreak(springJoint)) {
+				RemoveJoint(springJoint);
+				GameManager::world.DestroyJoint(springJoint);
+				springJoint = nullptr;
+				cout << "springJoint broke" << endl;
+			}
 		}
 	}
 }
