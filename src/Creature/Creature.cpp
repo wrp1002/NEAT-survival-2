@@ -10,6 +10,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "BodyPart.h"
 #include "BodySegment.h"
 #include "Joint.h"
 
@@ -24,6 +25,7 @@ using namespace std;
 Creature::Creature(string genes, b2Vec2 pos) {
 	this->genes = genes;
 	this->startingPos = pos;
+	this->alive = true;
 
 	vector<string> inputLabels = {
 		"const",
@@ -50,9 +52,6 @@ Creature::Creature(string genes, b2Vec2 pos) {
 Creature::~Creature() {
 	for (auto joint : joints)
 		joint->SetShouldDeleteJoints(false);
-
-	for (auto child : bodySegments)
-		GameManager::world.DestroyBody(child->GetBody());
 }
 
 void Creature::Init() {
@@ -97,6 +96,9 @@ void Creature::Update() {
 		part->SetNerveInput(val);
 	}
 
+
+	if (rand() % 1000 == 0)
+		alive = false;
 }
 
 void Creature::Draw() {
@@ -121,10 +123,31 @@ void Creature::Draw() {
 }
 
 
+void Creature::ApplyForce(b2Vec2 force) {
+	this->head->GetBody()->ApplyForce(force, this->head->GetBody()->GetPosition(), true);
+}
+
+
 void Creature::AddJoint(shared_ptr<Joint> newJoint) {
 	joints.push_back(newJoint);
 }
 
+void Creature::DestroyAllJoints() {
+	for (auto joint : joints)
+		joint->Destroy();
+	joints.clear();
+}
+
+
+void Creature::AddPart(shared_ptr<BodyPart> part) {
+	this->bodySegments.push_back(part);
+	part->UpdateObjectUserData();
+}
+
+
+bool Creature::IsAlive() {
+	return alive;
+}
 
 float Creature::decimalFromSubstring(string str, int wholeDigits, int decimalDigits) {
 	assert(str.size() >= wholeDigits + decimalDigits);
@@ -139,3 +162,8 @@ float Creature::GetNextGene(string &gene, int wholeDigits, int decimalDigits) {
 	gene = gene.substr(delta, gene.size() - delta);
 	return val;
 }
+
+vector<shared_ptr<BodyPart>> Creature::GetAllParts() {
+	return bodySegments;
+}
+

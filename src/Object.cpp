@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "Camera.h"
+#include "ObjectUserData.h"
 #include "Util.h"
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/color.h>
@@ -10,7 +11,9 @@
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_shape.h>
 
+#include <cstdint>
 #include <iostream>
+#include <memory>
 
 #include "GameManager.h"
 
@@ -21,27 +24,34 @@ Object::Object() {
 	this->pixelSize = b2Vec2(10, 10);
 	this->worldSize = Util::pixelsToMeters(pixelSize);
 	this->color = al_map_rgb(255, 0, 255);
-	shapeType = SHAPE_TYPES::CIRCLE;
+	this->polymorphic_id = "Object";
+	this->shapeType = SHAPE_TYPES::CIRCLE;
+	this->objectUserData = make_shared<ObjectUserData>(ObjectUserData());
 }
 
 Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType) {
+	cout << "shape ytyype" << shapeType << endl;
 	this->pixelSize = pixelSize;
 	this->worldSize = Util::pixelsToMeters(pixelSize);
 	this->color = color;
 	this->shapeType = shapeType;
+	this->polymorphic_id = "Object";
+	this->objectUserData = make_shared<ObjectUserData>(ObjectUserData());
 
 	b2BodyDef bodyDef;
+	b2FixtureDef fixtureDef;
+	b2CircleShape circleShapeDef; circleShapeDef.m_radius = worldSize.y;
+	b2PolygonShape rectShapeDef;  rectShapeDef.SetAsBox(worldSize.x, worldSize.y);
+
+
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position = Util::pixelsToMeters(pos);
 	bodyDef.angle = angle;
 	bodyDef.linearDamping = 0.1;
 	bodyDef.angularDamping = 0.1;
+	bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
 
 	this->body = GameManager::world.CreateBody(&bodyDef);
-
-	b2FixtureDef fixtureDef;
-	b2CircleShape circleShapeDef; circleShapeDef.m_radius = worldSize.y;
-	b2PolygonShape rectShapeDef;  rectShapeDef.SetAsBox(worldSize.x, worldSize.y);
 
 	if (shapeType == SHAPE_TYPES::CIRCLE)
 		fixtureDef.shape = &circleShapeDef;
@@ -51,8 +61,14 @@ Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, i
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.3f;
 	fixtureDef.restitution = 0.5f;
+	fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
 
 	body->CreateFixture(&fixtureDef);
+}
+
+void Object::UpdateObjectUserData() {
+	objectUserData->parentObject = shared_from_this();
+	objectUserData->objectType = polymorphic_id;
 }
 
 
@@ -88,6 +104,11 @@ void Object::Draw() {
 }
 
 
+void Object::ApplyForce(b2Vec2 force) {
+	body->ApplyForce(force, body->GetPosition(), true);
+}
+
+
 // Raycast from a point from this angle towards the object to find collision point on edge
 b2Vec2 Object::GetEdgePoint(float angle) {
 	b2Transform transform;
@@ -115,4 +136,12 @@ b2Vec2 Object::GetEdgePoint(float angle) {
 	}
 
 	return b2Vec2(0, 0);
+}
+
+b2Vec2 Object::GetPos() {
+	return body->GetPosition();
+}
+
+string Object::GetType() {
+	return polymorphic_id;
 }

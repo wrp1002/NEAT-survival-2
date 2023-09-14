@@ -6,18 +6,82 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
 
+#include <box2d/b2_body.h>
+#include <box2d/b2_circle_shape.h>
+#include <box2d/b2_fixture.h>
 #include <box2d/b2_math.h>
 
+#include <box2d/b2_world.h>
+#include <cstdint>
 #include <iostream>
 #include <fmt/format.h>
+#include <memory>
 
+#include "Creature/BodyPart.h"
 #include "Globals.h"
 #include "Util.h"
 #include "Camera.h"
+#include "ObjectUserData.h"
 
 #include "UI/Toolbar.h"
 
 using namespace std;
+
+class MyContactListener : public b2ContactListener {
+	public:
+		void BeginContact(b2Contact* contact) {
+			weak_ptr<Object> obj;
+			if (contact->GetFixtureA()->GetBody() == GameManager::worldBorder) {
+				uintptr_t ptr = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+				ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
+				if (userData)
+					obj = userData->parentObject;
+			}
+			else if (contact->GetFixtureB()->GetBody() == GameManager::worldBorder) {
+				uintptr_t ptr = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+				ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
+				if (userData)
+					obj = userData->parentObject;
+			}
+
+			if (!obj.expired()) {
+				for (int i = GameManager::objectsOutsideBorder.size() - 1; i >= 0; i--) {
+					if (GameManager::objectsOutsideBorder[i].lock() == obj.lock())
+						GameManager::objectsOutsideBorder.erase((GameManager::objectsOutsideBorder.begin() + i));
+				}
+			}
+		}
+
+		void EndContact(b2Contact* contact) {
+			if (contact->GetFixtureA()->GetBody() == GameManager::worldBorder) {
+				uintptr_t ptr = contact->GetFixtureB()->GetUserData().pointer;
+				ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
+				if (userData) {
+					GameManager::objectsOutsideBorder.push_back(userData->parentObject);
+				}
+				else
+					cout << "No user data!" << endl;
+			}
+			else if (contact->GetFixtureB()->GetBody() == GameManager::worldBorder) {
+				uintptr_t ptr = contact->GetFixtureA()->GetUserData().pointer;
+				ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
+				if (userData) {
+					GameManager::objectsOutsideBorder.push_back(userData->parentObject);
+				}
+				else
+					cout << "No user data!" << endl;
+			}
+		}
+
+		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
+
+		}
+
+		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
+
+		}
+};
+
 
 namespace GameManager {
 	int speed;
@@ -33,14 +97,25 @@ namespace GameManager {
 
 	b2Vec2 gravity(0.0, 0.0);
 	b2World world(gravity);
+	b2Body *worldBorder;
+
 	vector<shared_ptr<Creature>> agents;
+	vector<shared_ptr<Object>> looseObjects;
+	vector<weak_ptr<Object>> objectsOutsideBorder;
 
 	void Init() {
+		InitAllegro();
+
 		velocityIterations = 6;
 		positionIterations = 2;
 		speed = 1;
 		paused = false;
-		InitAllegro();
+
+		MyContactListener *contactListener = new MyContactListener;
+
+		world.SetContactListener(contactListener);
+
+		worldBorder = CreateWorldBorder();
 
 		simTicks = 0;
 		simStartTime = al_get_time();
@@ -75,6 +150,26 @@ namespace GameManager {
 		al_uninstall_keyboard();
 	}
 
+	b2Body *CreateWorldBorder() {
+		b2BodyDef bodyDef;
+		bodyDef.position = b2Vec2(0, 0);
+		bodyDef.type = b2_staticBody;
+
+		b2Body *body = world.CreateBody(&bodyDef);
+
+		b2CircleShape shapeDef;
+		shapeDef.m_radius = Util::pixelsToMeters(Globals::WORLD_SIZE_PX);
+
+		b2FixtureDef fixtureDef;
+		fixtureDef.shape = &shapeDef;
+		fixtureDef.isSensor = true;
+		//fixtureDef.userData.pointer;
+
+		body->CreateFixture(&fixtureDef);
+
+		return body;
+	}
+
 	void Update() {
 		if (paused)
 			return;
@@ -82,22 +177,51 @@ namespace GameManager {
 		for (int i = 0; i < speed; i++) {
 			GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
 
-			for (auto agent: agents)
-				agent.get()->Update();
+			for (int i = agents.size() - 1; i >= 0; i--) {
+				agents[i]->Update();
+
+				if (!agents[i]->IsAlive()) {
+					agents[i]->DestroyAllJoints();
+
+					vector<shared_ptr<BodyPart>> agentParts = agents[i]->GetAllParts();
+					looseObjects.insert(looseObjects.end(), agentParts.begin(), agentParts.end());
+
+					agents.erase(agents.begin() + i);
+
+				}
+			}
+
+			for (auto object : looseObjects)
+				object->Update();
+
+
+			for (int i = objectsOutsideBorder.size() - 1; i >= 0; i--) {
+				if (shared_ptr<Object> object = objectsOutsideBorder[i].lock()) {
+					b2Vec2 pos = object->GetPos();
+					float diff = pos.Normalize() - Util::pixelsToMeters(Globals::WORLD_SIZE_PX);
+					object->ApplyForce(-diff * pos);
+				}
+				else {
+					objectsOutsideBorder.erase(objectsOutsideBorder.begin() + i);
+					continue;
+				}
+			}
 
 			simTicks++;
 		}
 	}
 
 	void Draw() {
-		for (auto agent: agents) {
-			agent.get()->Draw();
-		}
+		for (auto object : looseObjects)
+			object->Draw();
+
+		for (auto agent : agents)
+			agent->Draw();
 
 		bool drawWorldBorder = true;
 
 		if (drawWorldBorder) {
-			b2Vec2 origin(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0);
+			b2Vec2 origin(0, 0);
 
 			ALLEGRO_TRANSFORM t;
 			al_identity_transform(&t);
@@ -110,15 +234,20 @@ namespace GameManager {
 		}
 	}
 
-	void CreateAgent(string genes, b2Vec2 pos) {
+	shared_ptr<Creature> CreateAgent(string genes, b2Vec2 pos) {
 		shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes, pos));
 		creature->Init();
 		agents.push_back(creature);
 		cout << agents.size() << endl;
+		return creature;
 	}
 
 	void ClearAgents() {
 		agents.clear();
+	}
+
+	void AddObject(shared_ptr<Object> newObject) {
+		looseObjects.push_back(newObject);
 	}
 
 

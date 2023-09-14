@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Creature/Creature.h"
+#include <box2d/b2_body.h>
 #include <box2d/b2_math.h>
 #include <box2d/b2_world.h>
 
@@ -24,18 +25,25 @@ namespace GameManager {
 
 	extern b2Vec2 gravity;
 	extern b2World world;
+	extern b2Body *worldBorder;
 
 	extern vector<shared_ptr<Creature>> agents;
+	extern vector<shared_ptr<Object>> looseObjects;
+	extern vector<weak_ptr<Object>> objectsOutsideBorder;
+
 
 	void Init();
 	void InitAllegro();
 	void Shutdown();
+	b2Body * CreateWorldBorder();
 
 	void Update();
 	void Draw();
 
-	void CreateAgent(string genes, b2Vec2 pos);
+	shared_ptr<Creature> CreateAgent(string genes, b2Vec2 pos);
 	void ClearAgents();
+
+	void AddObject(shared_ptr<Object> newObject);
 
 	double GetSimTime();
 	string GetSimTimeStr();

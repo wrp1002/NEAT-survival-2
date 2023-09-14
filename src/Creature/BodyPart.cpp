@@ -7,6 +7,7 @@
 
 #include "BodySegment.h"
 
+
 BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : Object(pos, pixelSize, angle, color, shapeType) {
     this->nerveInfo = nerveInfo;
     this->creature = parentCreature;

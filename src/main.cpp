@@ -17,14 +17,17 @@
 #include <box2d/b2_polygon_shape.h>
 
 #include <cmath>
+#include <cstdint>
 #include <functional>
 #include <iostream>
+#include <sys/types.h>
 #include <vector>
 #include <map>
 #include <memory>
 #include <string>
 
 
+#include "Creature/BodyPart.h"
 #include "GameManager.h"
 #include "Camera.h"
 #include "Globals.h"
@@ -33,6 +36,7 @@
 #include "UI/Font.h"
 #include "UI/Toolbar.h"
 #include "UI/InfoDisplay.h"
+#include "ObjectUserData.h"
 
 using namespace std;
 
@@ -53,7 +57,9 @@ void CreateRandomAgent() {
 
 	cout << genes << endl;
 
-	GameManager::CreateAgent(genes, b2Vec2(rand() % 10000 - 5000, rand() % 10000 - 5000));
+	float angle = Util::RandomDir();
+	int dist = rand() % Globals::WORLD_SIZE_PX;
+	GameManager::CreateAgent(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist));
 }
 
 
@@ -101,12 +107,21 @@ int main() {
 	//genes += string() + "000" + "1200500000000";    // shape
 	//genes += string() + "002" + "0000000000000";    // create
 
-	GameManager::CreateAgent(genes, b2Vec2(0, 0));
+	genes = "";
+	for (int i = 0; i < 50; i++) {
+		string gene = "";
+		for (int j = 0; j < 16; j++) {
+			gene += to_string(rand() % 10);
+		}
+		cout << "adding gene:" << gene << endl;
+		genes += gene;
+	}
+
+	shared_ptr<Creature> playerCreature = GameManager::CreateAgent(genes, b2Vec2(0, 0));
 
 	cout << genes << endl;
 
-	for (int i = 0; i < 100; i++)
-		CreateRandomAgent();
+	for (int i = 0; i < 100; i++) CreateRandomAgent();
 
 	al_start_timer(GameManager::timer);
 
@@ -134,7 +149,6 @@ int main() {
 				InfoDisplay::Toggle();
 			else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE)
 				GameManager::TogglePaused();
-
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
 			UserInput::SetPressed(ev.keyboard.keycode, false);
@@ -199,6 +213,11 @@ int main() {
 				}
 				*/
 			}
+
+
+			playerCreature->ApplyForce(b2Vec2(
+				(UserInput::IsPressed(ALLEGRO_KEY_RIGHT) - UserInput::IsPressed(ALLEGRO_KEY_LEFT)) * 30,
+				(UserInput::IsPressed(ALLEGRO_KEY_DOWN) - UserInput::IsPressed(ALLEGRO_KEY_UP)) * 30));
 
 		}
 

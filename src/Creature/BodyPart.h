@@ -25,7 +25,6 @@ class BodyPart : public Object {
         NerveInfo nerveInfo;
         weak_ptr<Creature> creature;
         shared_ptr<Joint> parentJoint;
-        string polymorphic_id;
 
         static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 

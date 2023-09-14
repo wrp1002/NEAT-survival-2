@@ -6,6 +6,7 @@
 #include <box2d/b2_joint.h>
 #include <box2d/b2_math.h>
 #include <box2d/b2_revolute_joint.h>
+#include <cstdint>
 
 #include "../GameManager.h"
 #include "../Globals.h"
@@ -29,6 +30,7 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 	jointDef.motorSpeed = jointInfo.motorSpeed;
 	jointDef.enableMotor = jointInfo.enableMotor;
 	jointDef.collideConnected = false;
+	//jointDef.userData.pointer = reinterpret_cast<uintptr_t>(nullptr);
 
 	revoluteJoint = (b2RevoluteJoint *)GameManager::world.CreateJoint(&jointDef);
 	allJoints.push_back(revoluteJoint);
