@@ -9,13 +9,13 @@
 
 
 BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : Object(pos, pixelSize, angle, color, shapeType) {
-    this->nerveInfo = nerveInfo;
-    this->creature = parentCreature;
-    this->polymorphic_id = "BodyPart";
+	this->nerveInfo = nerveInfo;
+	this->creature = parentCreature;
+	this->polymorphic_id = "BodyPart";
 }
 
 string BodyPart::GetPolymorphicID() {
-    return polymorphic_id;
+	return polymorphic_id;
 }
 
 
@@ -39,7 +39,7 @@ void BodyPart::Update() {
 }
 
 void BodyPart::Draw() {
-    Object::Draw();
+	Object::Draw();
 }
 
 
@@ -52,11 +52,11 @@ bool BodyPart::CanAddChild() {
 }
 
 bool BodyPart::childAngleValid(int angle) {
-    return false;
+	return false;
 }
 
 int BodyPart::GetValidChildAngle(int angleGene) {
-    return 0;
+	return 0;
 }
 
 void BodyPart::AddChild(shared_ptr<BodyPart> child, int angle) {

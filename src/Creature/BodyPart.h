@@ -13,37 +13,37 @@ class Creature;
 class Joint;
 
 class BodyPart : public Object {
-    public:
-        struct NerveInfo {
+	public:
+		struct NerveInfo {
 			bool inputEnabled;
 			bool outputEnabled;
 			int inputIndex;
 			bool outputIndex;
 		};
 
-    protected:
-        NerveInfo nerveInfo;
-        weak_ptr<Creature> creature;
-        shared_ptr<Joint> parentJoint;
+	protected:
+		NerveInfo nerveInfo;
+		weak_ptr<Creature> creature;
+		shared_ptr<Joint> parentJoint;
 
-        static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
+		static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
-    public:
-        BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo);
+	public:
+		BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo);
 
-        string GetPolymorphicID();
+		string GetPolymorphicID();
 
-        virtual void Update();
-        virtual void Draw();
+		virtual void Update();
+		virtual void Draw();
 
-        b2Body *GetBody();
+		b2Body *GetBody();
 
-        virtual bool CanAddChild();
-        virtual bool childAngleValid(int angle);
-        virtual int GetValidChildAngle(int angleGene);
-        virtual void AddChild(shared_ptr<BodyPart> child, int angle);
+		virtual bool CanAddChild();
+		virtual bool childAngleValid(int angle);
+		virtual int GetValidChildAngle(int angleGene);
+		virtual void AddChild(shared_ptr<BodyPart> child, int angle);
 
-        virtual float GetNerveOutput();
+		virtual float GetNerveOutput();
 		int GetNerveOutputIndex();
 		int GetNerveInputIndex();
 		virtual void SetNerveInput(float val);
