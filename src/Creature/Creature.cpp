@@ -63,6 +63,7 @@ void Creature::ApplyGenes() {
 }
 
 void Creature::Update() {
+	// Inputs
 	vector<double> inputs = {
 		1.0,
 		sin(al_get_time())
@@ -78,17 +79,12 @@ void Creature::Update() {
 		inputs[index] += val;
 	}
 
+	// Calculations
 	this->nn->Calculate(inputs);
 
-	for (auto joint : joints) {
-		joint->Update();
-	}
 
-	for (auto part : bodySegments)
-		part->Update();
-
+	// Outputs
 	vector<double> output = nn->GetOutputs();
-
 	for (auto part : bodySegments) {
 		int index = part->GetNerveInputIndex();
 		float val = output[index];
@@ -97,8 +93,15 @@ void Creature::Update() {
 	}
 
 
-	if (rand() % 1000 == 0)
-		alive = false;
+	// Update parts
+	for (auto joint : joints) {
+		joint->Update();
+	}
+
+	for (auto part : bodySegments)
+		part->Update();
+
+
 }
 
 void Creature::Draw() {
@@ -109,17 +112,6 @@ void Creature::Draw() {
 
 	for (auto joint : joints)
 		joint->Draw();
-
-	/*
-	for (auto joint : joints) {
-		b2Vec2 pos;
-		pos = Util::metersToPixels(joint->GetAnchorA());
-		al_draw_filled_circle(pos.x, pos.y, 2, al_map_rgb(0, 255, 0));
-
-		pos = Util::metersToPixels(joint->GetAnchorB());
-		al_draw_filled_circle(pos.x, pos.y, 2, al_map_rgb(0, 255, 0));
-	}
-	*/
 }
 
 

@@ -58,7 +58,7 @@ void CreateRandomAgent() {
 	cout << genes << endl;
 
 	float angle = Util::RandomDir();
-	int dist = rand() % Globals::WORLD_SIZE_PX;
+	int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
 	GameManager::CreateAgent(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist));
 }
 
@@ -117,6 +117,8 @@ int main() {
 		genes += gene;
 	}
 
+	genes = string() + "000" + "0220000000000";
+
 	shared_ptr<Creature> playerCreature = GameManager::CreateAgent(genes, b2Vec2(0, 0));
 
 	cout << genes << endl;
@@ -158,6 +160,7 @@ int main() {
 			b2Vec2 mousePos(ev.mouse.x, ev.mouse.y);
 			if (ev.mouse.display == GameManager::display) {
 				UserInput::SetMousePos(mousePos);
+
 				int wheelDiff = ev.mouse.z - UserInput::mouseWheel;
 				Camera::UpdateZoom(wheelDiff);
 				UserInput::mouseWheel = ev.mouse.z;
@@ -167,7 +170,9 @@ int main() {
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-			if (ev.mouse.button == 2)
+			if (ev.mouse.button == 1)
+				InfoDisplay::SelectObject(UserInput::hoveredObject);
+			else if (ev.mouse.button == 2)
 				UserInput::StartDragging(b2Vec2(ev.mouse.x, ev.mouse.y));
 		}
 		else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
@@ -201,9 +206,7 @@ int main() {
 				al_flush_event_queue(GameManager::event_queue);
 			}
 			else {
-				for (int i = 0; i < 1; i++) {
-					GameManager::Update();
-				}
+				GameManager::Update();
 
 				/*
 				if (Camera::followObject.expired() && GameRules::IsRuleEnabled("FollowRandomAgent")) {
@@ -216,8 +219,8 @@ int main() {
 
 
 			playerCreature->ApplyForce(b2Vec2(
-				(UserInput::IsPressed(ALLEGRO_KEY_RIGHT) - UserInput::IsPressed(ALLEGRO_KEY_LEFT)) * 30,
-				(UserInput::IsPressed(ALLEGRO_KEY_DOWN) - UserInput::IsPressed(ALLEGRO_KEY_UP)) * 30));
+				(UserInput::IsPressed(ALLEGRO_KEY_RIGHT) - UserInput::IsPressed(ALLEGRO_KEY_LEFT)) * 5,
+				(UserInput::IsPressed(ALLEGRO_KEY_DOWN) - UserInput::IsPressed(ALLEGRO_KEY_UP)) * 5));
 
 		}
 
@@ -225,6 +228,8 @@ int main() {
 		if (redraw && al_is_event_queue_empty(GameManager::event_queue)) {
 			redraw = false;
 			lastRedrawTime = al_get_time();
+
+			InfoDisplay::Draw();
 
 			Camera::UpdateTransform();
 
@@ -237,9 +242,6 @@ int main() {
 			Font::DrawText("arial.ttf", 16, "string text", 10, 10);
 
 			al_flip_display();
-
-			if (InfoDisplay::IsVisible())
-				InfoDisplay::Draw();
 		}
 
 

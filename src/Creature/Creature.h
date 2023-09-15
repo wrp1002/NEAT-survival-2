@@ -27,6 +27,10 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		int baseOutputs;
 		bool alive;
 
+		double health, maxHealth;
+		double energy, maxEnergy;
+
+
 		shared_ptr<NEAT> nn;
 		b2Vec2 startingPos;
 		string genes;
@@ -50,6 +54,8 @@ class Creature : public std::enable_shared_from_this<Creature> {
 
 		void ApplyGenes(string genes);
 		void ApplyGenes();
+
+		void CreateHead(string gene, CurrentGenes &currentGenes, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID);
 		void CreateBodySegment(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID);
 		void CreateMouth(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID);
 		void CreateCilium(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID);

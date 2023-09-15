@@ -30,7 +30,6 @@ Object::Object() {
 }
 
 Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType) {
-	cout << "shape ytyype" << shapeType << endl;
 	this->pixelSize = pixelSize;
 	this->worldSize = Util::pixelsToMeters(pixelSize);
 	this->color = color;

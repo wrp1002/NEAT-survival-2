@@ -15,6 +15,7 @@
 
 namespace InfoDisplay {
 	ALLEGRO_DISPLAY* display;
+	ALLEGRO_FONT *font;
 	ALLEGRO_EVENT_QUEUE* event_queue;
 	weak_ptr<Object> selectedObject;
 	b2Vec2 screenSize;
@@ -22,7 +23,9 @@ namespace InfoDisplay {
 
 	void Init(ALLEGRO_EVENT_QUEUE *event_queue) {
 		ALLEGRO_DISPLAY* display = nullptr;
+		font = Font::GetFont("Minecrafta.ttf", 14);
 		InfoDisplay::event_queue = event_queue;
+
 		weak_ptr<Object> selectedObject;
 		screenSize = b2Vec2(400, 600);
 		mousePos = b2Vec2(0, 0);
@@ -66,7 +69,6 @@ namespace InfoDisplay {
 
 		Util::ResetTransform();
 
-		ALLEGRO_FONT* font = Font::GetFont("Minecraft.ttf", 14);
 		vector<string> infoText;
 
 		infoText.insert(infoText.end(), {
@@ -80,6 +82,13 @@ namespace InfoDisplay {
 
 			//fmt::format("Total En: {:.2f}", GameManager::GetTotalEnergy()),
 		});
+
+
+		if (!selectedObject.expired()) {
+			infoText.insert(infoText.end(), {
+				fmt::format("Type: {}", selectedObject.lock()->GetType())
+			});
+		}
 
 		/*
 		if (!selectedObject.expired()) {

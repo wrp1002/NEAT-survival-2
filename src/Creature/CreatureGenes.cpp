@@ -31,7 +31,7 @@ void Creature::ApplyGenes(string genes) {
 		string gene = genes.substr(i, geneLength);
 		cout << endl;
 		cout << gene << endl;
-		int instructionType = int(GetNextGene(gene, 3, 0)) % instructionTypes;;
+		int instructionType = int(GetNextGene(gene, 2, 0)) % instructionTypes;
 		cout << "instructionType: " << instructionType << endl;
 
 		switch(instructionType) {
@@ -56,29 +56,7 @@ void Creature::ApplyGenes(string genes) {
 			case 2: {
 				cout << "Creating new object" << endl;
 				if (!head) {
-					cout << "Creating head" << endl;
-					BodyPart::NerveInfo nerveInfo;
-					nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-					nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-					nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-					nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
-
-					float angle = GetNextGene(gene, 0, 3) * 360;
-
-					this->head = make_shared<BodySegment>(BodySegment(
-						shared_from_this(),
-						b2Vec2(currentGenes.width, currentGenes.height),
-						al_map_rgb(currentGenes.r, currentGenes.g, currentGenes.b),
-						currentGenes.shapeType,
-						startingPos,
-						Util::DegreesToRadians(angle),
-						nerveInfo
-					));
-					AddPart(head);
-
-					for (int i = 0; i < 2; i++)
-						symmetryMap[symmetryID].push_back(head);
-
+					CreateHead(gene, currentGenes, symmetryMap, symmetryID);
 					symmetryID++;
 				}
 				else {
@@ -119,22 +97,48 @@ void Creature::ApplyGenes(string genes) {
 			// parentID(1)
 			case 4: {
 				if (bodySegments.size() > 0) {
-					selectedParentID = int(GetNextGene(gene, 1, 0)) % symmetryID;
-					cout << "Set symmetryID:" << symmetryID << endl;
+					selectedParentID = int(GetNextGene(gene, 2, 0)) % symmetryID;
+					cout << "Set selectedParentID:" << symmetryID << endl;
 				}
 				break;
 			}
 		}
+	}
 
-		if (!this->head) {
-			cout << "uh oh no head. time to crash" << endl;
-		}
-
+	if (!this->head) {
+		cout << "uh oh no head. time to crash" << endl;
+		CreateHead("0000000000000000", currentGenes, symmetryMap, symmetryID);
+		symmetryID++;
 	}
 
 }
 
 
+
+void Creature::CreateHead(string gene, CurrentGenes &currentGenes, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID) {
+	cout << "Creating head" << endl;
+	BodyPart::NerveInfo nerveInfo;
+	nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+	nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
+	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+
+	float angle = GetNextGene(gene, 0, 3) * 360;
+
+	this->head = make_shared<BodySegment>(BodySegment(
+		shared_from_this(),
+		b2Vec2(currentGenes.width, currentGenes.height),
+		al_map_rgb(currentGenes.r, currentGenes.g, currentGenes.b),
+		currentGenes.shapeType,
+		startingPos,
+		Util::DegreesToRadians(angle),
+		nerveInfo
+	));
+	AddPart(head);
+
+	for (int i = 0; i < 2; i++)
+		symmetryMap[symmetryID].push_back(head);
+}
 
 void Creature::CreateBodySegment(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID) {
 	Joint::JointInfo jointInfo;
@@ -199,7 +203,6 @@ void Creature::CreateBodySegment(string gene, CurrentGenes &currentGenes, vector
 	}
 
 	symmetryMap[symmetryID].push_back((newPart));
-
 }
 
 void Creature::CreateMouth(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID) {
