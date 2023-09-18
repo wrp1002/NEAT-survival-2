@@ -47,6 +47,10 @@ b2Body *BodyPart::GetBody() {
 	return this->body;
 }
 
+weak_ptr<Creature> BodyPart::GetParentCreature() {
+	return creature;
+}
+
 bool BodyPart::CanAddChild() {
 	return false;
 }

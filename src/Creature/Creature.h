@@ -74,4 +74,6 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);
 		float GetNextGene(string &gene, int wholeDigits, int decimalDigits);
 		vector<shared_ptr<BodyPart>> GetAllParts();
+
+		shared_ptr<NEAT> GetNN();
 };

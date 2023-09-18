@@ -23,99 +23,11 @@
 #include "Util.h"
 #include "Camera.h"
 #include "ObjectUserData.h"
+#include "ContactListener.h"
 
 #include "UI/Toolbar.h"
 
 using namespace std;
-
-class MyContactListener : public b2ContactListener {
-	public:
-		void BeginContact(b2Contact* contact) {
-
-			if (contact->GetFixtureA()->GetBody() == GameManager::worldBorder || contact->GetFixtureB()->GetBody() == GameManager::worldBorder) {
-				weak_ptr<Object> obj;
-				if (contact->GetFixtureA()->GetBody() == GameManager::worldBorder) {
-					uintptr_t ptr = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-					ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
-					if (userData)
-						obj = userData->parentObject;
-				}
-				else if (contact->GetFixtureB()->GetBody() == GameManager::worldBorder) {
-					uintptr_t ptr = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
-					ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
-					if (userData)
-						obj = userData->parentObject;
-				}
-
-				if (!obj.expired()) {
-					for (int i = GameManager::objectsOutsideBorder.size() - 1; i >= 0; i--) {
-						if (GameManager::objectsOutsideBorder[i].lock() == obj.lock())
-							GameManager::objectsOutsideBorder.erase((GameManager::objectsOutsideBorder.begin() + i));
-					}
-				}
-			}
-			else {
-				ObjectUserData *userData1 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
-				ObjectUserData *userData2 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
-
-				ObjectUserData *mouseData = nullptr;
-				ObjectUserData *otherObj = nullptr;
-
-				if (userData1 && userData1->objectType == "mouse") {
-					mouseData = userData1;
-					otherObj = userData2;
-				}
-				else if (userData2 && userData2->objectType == "mouse") {
-					mouseData = userData2;
-					otherObj = userData1;
-				}
-
-				if (mouseData && otherObj) {
-					cout << "Mouse hover begin! " << otherObj->objectType << endl;
-					UserInput::SetHoveredObject(otherObj->parentObject);
-				}
-
-			}
-
-		}
-
-		void EndContact(b2Contact* contact) {
-			b2Body *bodyA = contact->GetFixtureA()->GetBody();
-			b2Body *bodyB = contact->GetFixtureB()->GetBody();
-			ObjectUserData *userDataA = reinterpret_cast<ObjectUserData *>(bodyA->GetUserData().pointer);
-			ObjectUserData *userDataB = reinterpret_cast<ObjectUserData *>(bodyB->GetUserData().pointer);
-			ObjectUserData *userData;
-
-			if (!userDataA || !userDataB) {
-				cout << "missing user data" << endl;
-				return;
-			}
-
-			if (userDataA->objectType == "mouse" || userDataB->objectType == "mouse")
-				UserInput::ClearHoveredObject();
-
-			if (userDataA->objectType == "border" || userDataB->objectType == "border") {
-				cout << "border end collision" << endl;
-				if (userDataA->objectType == "border")
-					userData = userDataB;
-				else if (userDataB->objectType == "border")
-					userData = userDataA;
-
-				if (userData)
-					GameManager::objectsOutsideBorder.push_back(userData->parentObject);
-				else
-					cout << "No user data!" << endl;
-			}
-		}
-
-		void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
-
-		}
-
-		void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
-
-		}
-};
 
 
 namespace GameManager {

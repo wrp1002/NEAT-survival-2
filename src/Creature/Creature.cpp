@@ -159,3 +159,6 @@ vector<shared_ptr<BodyPart>> Creature::GetAllParts() {
 	return bodySegments;
 }
 
+shared_ptr<NEAT> Creature::GetNN() {
+	return nn;
+}

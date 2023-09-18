@@ -117,13 +117,17 @@ int main() {
 		genes += gene;
 	}
 
-	genes = string() + "000" + "0220000000000";
+	genes = "";
+	genes += string() + "00" + "19999990000000";
+	genes += string() + "02" + "00000000000000";
+
+	genes += string() + "02" + "80000000000000";
 
 	shared_ptr<Creature> playerCreature = GameManager::CreateAgent(genes, b2Vec2(0, 0));
 
 	cout << genes << endl;
 
-	for (int i = 0; i < 100; i++) CreateRandomAgent();
+	//for (int i = 0; i < 100; i++) CreateRandomAgent();
 
 	al_start_timer(GameManager::timer);
 

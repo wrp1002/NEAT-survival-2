@@ -84,10 +84,27 @@ namespace InfoDisplay {
 		});
 
 
-		if (!selectedObject.expired()) {
+		if (shared_ptr<Object> object = selectedObject.lock()) {
 			infoText.insert(infoText.end(), {
 				fmt::format("Type: {}", selectedObject.lock()->GetType())
 			});
+
+
+			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(object)) {
+				infoText.insert(infoText.end(), {
+
+				});
+
+				if (shared_ptr<Creature> creature = bodyPart->GetParentCreature().lock()) {
+					infoText.insert(infoText.end(), {
+						"",
+						DrawNN(creature->GetNN()),
+					});
+				}
+
+
+			}
+
 		}
 
 		/*

@@ -75,22 +75,8 @@ void Joint::RemoveJoint(b2Joint *joint) {
 
 
 void Joint::Update() {
-	if (revoluteJoint) {
-		if (JointShouldBreak(revoluteJoint)) {
-			RemoveJoint(revoluteJoint);
-			GameManager::world.DestroyJoint(revoluteJoint);
-			revoluteJoint = nullptr;
-			cout << "revoluteJoint broke" << endl;
-		}
-
-		if (springJoint) {
-			if (JointShouldBreak(springJoint)) {
-				RemoveJoint(springJoint);
-				GameManager::world.DestroyJoint(springJoint);
-				springJoint = nullptr;
-				cout << "springJoint broke" << endl;
-			}
-		}
+	if (revoluteJoint && JointShouldBreak(revoluteJoint) || springJoint && JointShouldBreak(springJoint)) {
+		Destroy();
 	}
 }
 

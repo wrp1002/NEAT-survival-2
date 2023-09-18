@@ -37,6 +37,7 @@ class BodyPart : public Object {
 		virtual void Draw();
 
 		b2Body *GetBody();
+		weak_ptr<Creature> GetParentCreature();
 
 		virtual bool CanAddChild();
 		virtual bool childAngleValid(int angle);
