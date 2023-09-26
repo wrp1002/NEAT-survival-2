@@ -66,7 +66,7 @@ void Creature::ApplyGenes(string genes) {
 					vector<shared_ptr<BodyPart>> parentObjects = symmetryMap[selectedParentID];
 
 					if (parentObjects[0]->CanAddChild() && parentObjects[1]->CanAddChild()) {
-						cout << "type3id: " << parentObjects[0]->GetPolymorphicID() << endl;
+						cout << "type3id: " << parentObjects[0]->GetType() << endl;
 						int partType = GetNextGene(gene, 1, 0);
 
 						shared_ptr<BodyPart> newPart;

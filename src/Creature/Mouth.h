@@ -9,7 +9,11 @@ using namespace std;
 
 class Mouth : public BodyPart {
 	private:
-		bool isBiting;
+		static const int biteCooldown = 50;
+
+		bool biting;
+		bool triggerBiteDamage;
+		int cooldownTimer;
 		float animationRate;
 		float animationFrame;
 		float animationState;
@@ -23,4 +27,6 @@ class Mouth : public BodyPart {
 
 		float GetNerveOutput();
 		void SetNerveInput(float val);
+
+		bool CanBite();
 };

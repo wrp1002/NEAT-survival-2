@@ -27,15 +27,17 @@ Object::Object() {
 	this->polymorphic_id = "Object";
 	this->shapeType = SHAPE_TYPES::CIRCLE;
 	this->objectUserData = make_shared<ObjectUserData>(ObjectUserData());
+	this->alive = true;
 }
 
 Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType) {
 	this->pixelSize = pixelSize;
 	this->worldSize = Util::pixelsToMeters(pixelSize);
 	this->color = color;
-	this->shapeType = shapeType;
 	this->polymorphic_id = "Object";
+	this->shapeType = shapeType;
 	this->objectUserData = make_shared<ObjectUserData>(ObjectUserData());
+	this->alive = true;
 
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;
@@ -66,6 +68,7 @@ Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, i
 }
 
 void Object::UpdateObjectUserData() {
+	cout << "update object data " << polymorphic_id << endl;
 	objectUserData->parentObject = shared_from_this();
 	objectUserData->objectType = polymorphic_id;
 }
@@ -143,4 +146,9 @@ b2Vec2 Object::GetPos() {
 
 string Object::GetType() {
 	return polymorphic_id;
+}
+
+
+bool Object::IsAlive() {
+	return alive;
 }

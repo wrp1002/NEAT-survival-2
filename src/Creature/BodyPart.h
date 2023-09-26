@@ -29,9 +29,8 @@ class BodyPart : public Object {
 		static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
 	public:
+		BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, NerveInfo &nerveInfo);
 		BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo);
-
-		string GetPolymorphicID();
 
 		virtual void Update();
 		virtual void Draw();

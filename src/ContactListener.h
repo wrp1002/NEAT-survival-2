@@ -16,5 +16,9 @@ class MyContactListener : public b2ContactListener {
 
 		void HandleBorderBeginContact(b2Contact *contact);
 		void HandleBorderEndContact(ObjectUserData *userData1, ObjectUserData *userData2);
+
 		void HandleMouseBeginContact(ObjectUserData *userData1, ObjectUserData *userData2);
+
+		void HandleMouthBeginContact(ObjectUserData *userData1, ObjectUserData *userData2);
+		void HandleMouthEndContact(ObjectUserData *userData1, ObjectUserData *userData2);
 };

@@ -1,5 +1,6 @@
 #include "Mouth.h"
 
+#include "BodyPart.h"
 #include "BodySegment.h"
 #include "Creature.h"
 
@@ -7,22 +8,56 @@
 #include "../Camera.h"
 #include <allegro5/allegro_primitives.h>
 #include <box2d/b2_math.h>
+#include <memory>
+
+#include "../ObjectUserData.h"
+#include "../GameManager.h"
+
 
 Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
 	BodyPart(
 		parentCreature,
-		GetPosOnParent(parentPart, angleOnParent, 0, Util::pixelsToMeters(b2Vec2(10, 10))),
-		b2Vec2(15, 10),
-		parentPart->GetBody()->GetAngle() - (angleOnParent) - M_PI_2,
 		color,
-		Object::SHAPE_TYPES::RECT,
 		nerveInfo
 	) {
 
-	this->animationRate = 0.1;
+	this->triggerBiteDamage = false;
+	this->cooldownTimer = 0;
+	this->animationRate = 0.2;
 	this->animationFrame = 0;
 	this->animationState = 0;
 	this->polymorphic_id = "Mouth";
+	this->biting = false;
+
+	this->shapeType = SHAPE_TYPES::RECT;
+	this->pixelSize = b2Vec2(15, 10);
+	this->worldSize = Util::pixelsToMeters(this->pixelSize);
+
+	b2BodyDef bodyDef;
+	b2FixtureDef fixtureDef;
+	b2PolygonShape rectShapeDef;
+	rectShapeDef.SetAsBox(worldSize.x, worldSize.y);
+
+
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position = Util::pixelsToMeters(GetPosOnParent(parentPart, angleOnParent, angleOffset, this->worldSize));
+	bodyDef.angle = parentPart->GetBody()->GetAngle() - (angleOffset + angleOnParent) - M_PI_2;
+	bodyDef.linearDamping = 0.1;
+	bodyDef.angularDamping = 0.1;
+	bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+
+	this->body = GameManager::world.CreateBody(&bodyDef);
+
+	fixtureDef.shape = &rectShapeDef;
+	fixtureDef.isSensor = true;
+	fixtureDef.density = 1.0f;
+	fixtureDef.friction = 0.3f;
+	fixtureDef.restitution = 0.5f;
+	fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+
+	body->CreateFixture(&fixtureDef);
+
+
 
 	// joint together
 	b2Vec2 jointPos = parentPart->GetEdgePoint(-angleOnParent + parentPart->GetBody()->GetAngle());
@@ -37,8 +72,53 @@ void Mouth::Update() {
 	if (creature.expired())
 		return;
 
-	animationFrame += animationRate;
-	animationState = abs(sin(animationFrame));
+	if (animationState > 0.1) {
+		animationFrame += animationRate;
+		animationState = abs(sin(animationFrame));
+		return;
+	}
+
+	if (cooldownTimer > 0)
+		cooldownTimer--;
+
+	if (!biting)
+		return;
+
+	biting = false;
+
+	cout << "BITING!!" << endl;
+
+	// Animation is over. trigger bite
+	for (b2ContactEdge* ce = body->GetContactList(); ce; ce = ce->next) {
+		b2Contact* contact = ce->contact;
+		if (!contact->IsTouching())
+			continue;
+
+		shared_ptr<Object> otherObject;
+
+		ObjectUserData *userDataA = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetUserData().pointer);
+		ObjectUserData *userDataB = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetUserData().pointer);
+
+		if (userDataA && userDataA->parentObject.lock() && userDataA->parentObject.lock().get() != this)
+			otherObject = userDataA->parentObject.lock();
+		if (userDataB && userDataB->parentObject.lock() && userDataB->parentObject.lock().get() != this)
+			otherObject = userDataB->parentObject.lock();
+
+		if (!otherObject)
+			continue;
+
+		if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(otherObject)) {
+			if (creature.lock() == bodyPart->GetParentCreature().lock()) {
+				continue;
+			}
+
+			if (!bodyPart->GetParentCreature().expired())
+				bodyPart->GetParentCreature().lock()->TakeDamage(1);
+		}
+
+		cout << "mouth colliding with " << otherObject->GetType() << endl;
+	}
+
 }
 
 void Mouth::Draw() {
@@ -72,5 +152,13 @@ float Mouth::GetNerveOutput() {
 }
 
 void Mouth::SetNerveInput(float val) {
+	if (val > 0 && CanBite()) {
+		biting = true;
+		animationState = 0.15;
+		cooldownTimer = biteCooldown;
+	}
+}
 
+bool Mouth::CanBite() {
+	return cooldownTimer <= 0;
 }

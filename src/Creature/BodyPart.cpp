@@ -8,14 +8,18 @@
 #include "BodySegment.h"
 
 
+BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, NerveInfo &nerveInfo) : Object() {
+	this->creature = parentCreature;
+	this->nerveInfo = nerveInfo;
+	this->polymorphic_id = "BodyPart";
+	this->color = color;
+}
+
 BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : Object(pos, pixelSize, angle, color, shapeType) {
 	this->nerveInfo = nerveInfo;
 	this->creature = parentCreature;
 	this->polymorphic_id = "BodyPart";
-}
-
-string BodyPart::GetPolymorphicID() {
-	return polymorphic_id;
+	this->color = color;
 }
 
 

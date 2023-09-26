@@ -64,7 +64,7 @@ void CreateRandomAgent() {
 
 
 int main() {
-	srand(time(0));
+	srand(100);
 
 	bool done = false;
 	bool redraw = true;
@@ -124,10 +124,11 @@ int main() {
 	genes += string() + "02" + "80000000000000";
 
 	shared_ptr<Creature> playerCreature = GameManager::CreateAgent(genes, b2Vec2(0, 0));
+	playerCreature->SetAsPlayer(true);
 
 	cout << genes << endl;
 
-	//for (int i = 0; i < 100; i++) CreateRandomAgent();
+	for (int i = 0; i < 2; i++) CreateRandomAgent();
 
 	al_start_timer(GameManager::timer);
 
@@ -224,7 +225,10 @@ int main() {
 
 			playerCreature->ApplyForce(b2Vec2(
 				(UserInput::IsPressed(ALLEGRO_KEY_RIGHT) - UserInput::IsPressed(ALLEGRO_KEY_LEFT)) * 5,
-				(UserInput::IsPressed(ALLEGRO_KEY_DOWN) - UserInput::IsPressed(ALLEGRO_KEY_UP)) * 5));
+				(UserInput::IsPressed(ALLEGRO_KEY_DOWN) - UserInput::IsPressed(ALLEGRO_KEY_UP)) * 5)
+			);
+
+			playerCreature->SetBiting(UserInput::IsPressed(ALLEGRO_KEY_B));
 
 		}
 

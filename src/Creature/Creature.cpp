@@ -8,11 +8,13 @@
 #include <box2d/box2d.h>
 
 #include <iostream>
+#include <memory>
 #include <unordered_map>
 
 #include "BodyPart.h"
 #include "BodySegment.h"
 #include "Joint.h"
+#include "Mouth.h"
 
 #include "../GameManager.h"
 #include "../Globals.h"
@@ -26,6 +28,12 @@ Creature::Creature(string genes, b2Vec2 pos) {
 	this->genes = genes;
 	this->startingPos = pos;
 	this->alive = true;
+	this->isPlayer = false;
+
+	this->maxHealth = 5;
+	this->health = maxHealth;
+	this->maxEnergy = 10;
+	this->energy = maxEnergy;
 
 	vector<string> inputLabels = {
 		"const",
@@ -62,6 +70,10 @@ void Creature::ApplyGenes() {
 	ApplyGenes(this->genes);
 }
 
+void Creature::SetAsPlayer(bool val) {
+	this->isPlayer = val;
+}
+
 void Creature::Update() {
 	// Inputs
 	vector<double> inputs = {
@@ -83,13 +95,15 @@ void Creature::Update() {
 	this->nn->Calculate(inputs);
 
 
-	// Outputs
-	vector<double> output = nn->GetOutputs();
-	for (auto part : bodySegments) {
-		int index = part->GetNerveInputIndex();
-		float val = output[index];
+	if (!isPlayer) {
+		// Outputs
+		vector<double> output = nn->GetOutputs();
+		for (auto part : bodySegments) {
+			int index = part->GetNerveInputIndex();
+			float val = output[index];
 
-		part->SetNerveInput(val);
+			part->SetNerveInput(val);
+		}
 	}
 
 
@@ -101,6 +115,9 @@ void Creature::Update() {
 	for (auto part : bodySegments)
 		part->Update();
 
+
+	if (health <= 0)
+		alive = false;
 
 }
 
@@ -136,6 +153,10 @@ void Creature::AddPart(shared_ptr<BodyPart> part) {
 	part->UpdateObjectUserData();
 }
 
+void Creature::TakeDamage(double amount) {
+	this->health -= amount;
+}
+
 
 bool Creature::IsAlive() {
 	return alive;
@@ -161,4 +182,13 @@ vector<shared_ptr<BodyPart>> Creature::GetAllParts() {
 
 shared_ptr<NEAT> Creature::GetNN() {
 	return nn;
+}
+
+
+void Creature::SetBiting(bool val) {
+	for (auto part : bodySegments) {
+		if (shared_ptr<Mouth> mouth = dynamic_pointer_cast<Mouth>(part)) {
+			mouth->SetNerveInput(val);
+		}
+	}
 }

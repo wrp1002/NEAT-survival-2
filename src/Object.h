@@ -27,6 +27,7 @@ class Object : public enable_shared_from_this<Object> {
 		int shapeType;
 		string polymorphic_id;
 		shared_ptr<ObjectUserData> objectUserData;
+		bool alive;
 
 	public:
 		enum SHAPE_TYPES {RECT, CIRCLE};
@@ -43,5 +44,7 @@ class Object : public enable_shared_from_this<Object> {
 		b2Vec2 GetEdgePoint(float angle);
 		b2Vec2 GetPos();
 		string GetType();
+
+		bool IsAlive();
 };
 

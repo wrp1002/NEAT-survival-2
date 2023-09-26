@@ -26,6 +26,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		int baseInputs;
 		int baseOutputs;
 		bool alive;
+		bool isPlayer;
 
 		double health, maxHealth;
 		double energy, maxEnergy;
@@ -54,6 +55,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 
 		void ApplyGenes(string genes);
 		void ApplyGenes();
+		void SetAsPlayer(bool val);
 
 		void CreateHead(string gene, CurrentGenes &currentGenes, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID);
 		void CreateBodySegment(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID);
@@ -69,6 +71,8 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		void DestroyAllJoints();
 		void AddPart(shared_ptr<BodyPart> part);
 
+		void TakeDamage(double amount);
+
 
 		bool IsAlive();
 		float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);
@@ -76,4 +80,8 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		vector<shared_ptr<BodyPart>> GetAllParts();
 
 		shared_ptr<NEAT> GetNN();
+
+
+		// player control functions
+		void SetBiting(bool val);
 };

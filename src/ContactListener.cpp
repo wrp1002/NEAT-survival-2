@@ -20,8 +20,6 @@ void MyContactListener::BeginContact(b2Contact* contact) {
 		if (userData1->objectType == "mouse" || userData2->objectType == "mouse")
 			HandleMouseBeginContact(userData1, userData2);
 
-
-
 	}
 
 }
@@ -29,21 +27,20 @@ void MyContactListener::BeginContact(b2Contact* contact) {
 void MyContactListener::EndContact(b2Contact* contact) {
 	b2Body *bodyA = contact->GetFixtureA()->GetBody();
 	b2Body *bodyB = contact->GetFixtureB()->GetBody();
-	ObjectUserData *userDataA = reinterpret_cast<ObjectUserData *>(bodyA->GetUserData().pointer);
-	ObjectUserData *userDataB = reinterpret_cast<ObjectUserData *>(bodyB->GetUserData().pointer);
+	ObjectUserData *userData1 = reinterpret_cast<ObjectUserData *>(bodyA->GetUserData().pointer);
+	ObjectUserData *userData2 = reinterpret_cast<ObjectUserData *>(bodyB->GetUserData().pointer);
 
 
-	if (!userDataA || !userDataB) {
+	if (!userData1 || !userData2) {
 		cout << "missing user data" << endl;
 		return;
 	}
 
-	if (userDataA->objectType == "mouse" || userDataB->objectType == "mouse")
+	if (userData1->objectType == "mouse" || userData2->objectType == "mouse")
 		UserInput::ClearHoveredObject();
 
-	if (userDataA->objectType == "border" || userDataB->objectType == "border") {
-		HandleBorderEndContact(userDataA, userDataB);
-	}
+	else if (userData1->objectType == "border" || userData2->objectType == "border")
+		HandleBorderEndContact(userData1, userData2);
 }
 
 void MyContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold) {
