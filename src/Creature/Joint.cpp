@@ -32,7 +32,7 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 	jointDef.collideConnected = false;
 	//jointDef.userData.pointer = reinterpret_cast<uintptr_t>(nullptr);
 
-	revoluteJoint = (b2RevoluteJoint *)GameManager::world.CreateJoint(&jointDef);
+	this->revoluteJoint = (b2RevoluteJoint *)GameManager::world.CreateJoint(&jointDef);
 	allJoints.push_back(revoluteJoint);
 
 
@@ -43,7 +43,7 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 		float dampingRatio = 0.5f;
 		b2LinearStiffness(distanceJointDef.stiffness, distanceJointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
 
-		springJoint = (b2DistanceJoint *)GameManager::world.CreateJoint(&distanceJointDef);
+		this->springJoint = (b2DistanceJoint *)GameManager::world.CreateJoint(&distanceJointDef);
 		allJoints.push_back(springJoint);
 	}
 }
@@ -53,16 +53,16 @@ Joint::~Joint() {
 }
 
 void Joint::Destroy() {
-	if (revoluteJoint) {
-		RemoveJoint(revoluteJoint);
+	if (revoluteJoint != nullptr) {
 		GameManager::world.DestroyJoint(revoluteJoint);
 		revoluteJoint = nullptr;
 	}
-	if (springJoint) {
-		RemoveJoint(springJoint);
+	if (springJoint != nullptr) {
 		GameManager::world.DestroyJoint(springJoint);
 		springJoint = nullptr;
 	}
+	allJoints.clear();
+	broken = true;
 }
 
 void Joint::RemoveJoint(b2Joint *joint) {
@@ -71,10 +71,15 @@ void Joint::RemoveJoint(b2Joint *joint) {
 			allJoints.erase(allJoints.begin() + i);
 		}
 	}
+	if (allJoints.size() == 0)
+		broken = true;
 }
 
 
 void Joint::Update() {
+	if (broken)
+		return;
+
 	if (revoluteJoint && JointShouldBreak(revoluteJoint) || springJoint && JointShouldBreak(springJoint)) {
 		Destroy();
 	}
@@ -82,7 +87,13 @@ void Joint::Update() {
 
 
 void Joint::Draw() {
+	if (broken)
+		return;
+
 	for (auto joint : allJoints) {
+		if (!joint)
+			continue;
+
 		b2Vec2 pos = Util::metersToPixels(joint->GetAnchorA());
 
 		ALLEGRO_TRANSFORM t;

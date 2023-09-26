@@ -26,6 +26,9 @@ class BodyPart : public Object {
 		weak_ptr<Creature> creature;
 		shared_ptr<Joint> parentJoint;
 
+		float health, maxHealth;
+		float energy, maxEnergy;
+
 		static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
 	public:
@@ -34,9 +37,12 @@ class BodyPart : public Object {
 
 		virtual void Update();
 		virtual void Draw();
+		virtual void Destroy();
 
 		b2Body *GetBody();
 		weak_ptr<Creature> GetParentCreature();
+
+		void TakeDamage(double amount);
 
 		virtual bool CanAddChild();
 		virtual bool childAngleValid(int angle);

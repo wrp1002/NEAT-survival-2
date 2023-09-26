@@ -58,8 +58,7 @@ Creature::Creature(string genes, b2Vec2 pos) {
 }
 
 Creature::~Creature() {
-	for (auto joint : joints)
-		joint->SetShouldDeleteJoints(false);
+
 }
 
 void Creature::Init() {
@@ -106,45 +105,45 @@ void Creature::Update() {
 		}
 	}
 
-
-	// Update parts
-	for (auto joint : joints) {
-		joint->Update();
-	}
-
-	for (auto part : bodySegments)
+	for (int i = bodySegments.size() - 1; i >= 0; i--) {
+		auto part = bodySegments[i];
 		part->Update();
 
+		if (!part->IsAlive()) {
+			if (part == head)
+				head.reset();
+			part->Destroy();
+			bodySegments[i].reset();
+			bodySegments.erase(bodySegments.begin() + i);
+		}
+	}
 
-	if (health <= 0)
+
+	if (health <= 0 || !head)
 		alive = false;
 
 }
 
 void Creature::Draw() {
-	if (!bodySegments.size())
+	if (!bodySegments.size() || !head)
 		return;
 
-	head->Draw();
 
-	for (auto joint : joints)
-		joint->Draw();
+	for (auto part : bodySegments)
+		part->Draw();
+
 }
 
 
 void Creature::ApplyForce(b2Vec2 force) {
+	if (!head)
+		return;
+
 	this->head->GetBody()->ApplyForce(force, this->head->GetBody()->GetPosition(), true);
 }
 
-
-void Creature::AddJoint(shared_ptr<Joint> newJoint) {
-	joints.push_back(newJoint);
-}
-
 void Creature::DestroyAllJoints() {
-	for (auto joint : joints)
-		joint->Destroy();
-	joints.clear();
+
 }
 
 

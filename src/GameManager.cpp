@@ -132,7 +132,8 @@ namespace GameManager {
 				agents[i]->Update();
 
 				if (!agents[i]->IsAlive()) {
-					agents[i]->DestroyAllJoints();
+					//agents[i]->DestroyAllJoints();
+					cout << "agent dead"<< endl;
 
 					vector<shared_ptr<BodyPart>> agentParts = agents[i]->GetAllParts();
 					looseObjects.insert(looseObjects.end(), agentParts.begin(), agentParts.end());
@@ -142,8 +143,15 @@ namespace GameManager {
 				}
 			}
 
-			for (auto object : looseObjects)
+			for (int i = looseObjects.size() - 1; i >= 0; i--) {
+				auto object = looseObjects[i];
+
 				object->Update();
+
+				if (!object->IsAlive()) {
+					looseObjects.erase(looseObjects.begin() + i);
+				}
+			}
 
 
 			for (int i = objectsOutsideBorder.size() - 1; i >= 0; i--) {

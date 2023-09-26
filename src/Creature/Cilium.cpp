@@ -25,8 +25,6 @@ Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> pare
 	b2Vec2 jointPos = parentPart->GetEdgePoint(-angleOnParent + parentPart->GetBody()->GetAngle());
 
 	shared_ptr<Joint> newJoint = make_shared<Joint>(Joint(jointInfo, jointPos, body, parentPart->GetBody()));
-	if (shared_ptr<Creature> creaturePtr = creature.lock())
-		creaturePtr->AddJoint(newJoint);
 	this->parentJoint = newJoint;
 }
 

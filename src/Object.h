@@ -38,6 +38,7 @@ class Object : public enable_shared_from_this<Object> {
 
 		virtual void Update();
 		virtual void Draw();
+		virtual void Destroy();
 
 		void ApplyForce(b2Vec2 force);
 

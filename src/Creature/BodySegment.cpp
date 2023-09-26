@@ -55,8 +55,6 @@ BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, 
 	b2Vec2 jointPos = parent->GetEdgePoint(-angleOnParent + parent->GetBody()->GetAngle());
 
 	shared_ptr<Joint> newJoint = make_shared<Joint>(Joint(jointInfo, jointPos, body, parent->GetBody()));
-	if (shared_ptr<Creature> creaturePtr = creature.lock())
-		creaturePtr->AddJoint(newJoint);
 	this->parentJoint = newJoint;
 }
 
@@ -102,11 +100,5 @@ bool BodySegment::childAngleValid(int angle) {
 
 void BodySegment::Draw() {
 	Object::Draw();
-
-	for (auto child : children) {
-		if (!child.expired())
-			child.lock()->Draw();
-	}
-
 }
 

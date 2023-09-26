@@ -4,8 +4,8 @@
 
 #include "../Object.h"
 #include "../Util.h"
-
-#include "BodySegment.h"
+#include "../GameManager.h"
+#include "Joint.h"
 
 
 BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, NerveInfo &nerveInfo) : Object() {
@@ -13,6 +13,11 @@ BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, Ner
 	this->nerveInfo = nerveInfo;
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
+
+	this->maxHealth = 5;
+	this->health = maxHealth;
+	this->maxEnergy = 5;
+	this->energy = maxEnergy;
 }
 
 BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : Object(pos, pixelSize, angle, color, shapeType) {
@@ -20,6 +25,11 @@ BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixel
 	this->creature = parentCreature;
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
+
+	this->maxHealth = 5;
+	this->health = maxHealth;
+	this->maxEnergy = 5;
+	this->energy = maxEnergy;
 }
 
 
@@ -39,11 +49,20 @@ b2Vec2 BodyPart::GetPosOnParent(shared_ptr<BodyPart> otherObject, float angleOnO
 
 
 void BodyPart::Update() {
+	if (parentJoint && parentJoint->IsBroken())
+		parentJoint.reset();
 
+	if (health <= 0)
+		alive = false;
 }
 
 void BodyPart::Draw() {
 	Object::Draw();
+
+}
+
+void BodyPart::Destroy() {
+	GameManager::world.DestroyBody(this->body);
 }
 
 
@@ -53,6 +72,10 @@ b2Body *BodyPart::GetBody() {
 
 weak_ptr<Creature> BodyPart::GetParentCreature() {
 	return creature;
+}
+
+void BodyPart::TakeDamage(double amount) {
+	this->health -= amount;
 }
 
 bool BodyPart::CanAddChild() {

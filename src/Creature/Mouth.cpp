@@ -63,8 +63,6 @@ Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parent
 	b2Vec2 jointPos = parentPart->GetEdgePoint(-angleOnParent + parentPart->GetBody()->GetAngle());
 
 	shared_ptr<Joint> newJoint = make_shared<Joint>(Joint(jointInfo, jointPos, body, parentPart->GetBody()));
-	if (shared_ptr<Creature> creaturePtr = creature.lock())
-		creaturePtr->AddJoint(newJoint);
 	this->parentJoint = newJoint;
 }
 
@@ -108,12 +106,9 @@ void Mouth::Update() {
 			continue;
 
 		if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(otherObject)) {
-			if (creature.lock() == bodyPart->GetParentCreature().lock()) {
-				continue;
-			}
-
-			if (!bodyPart->GetParentCreature().expired())
-				bodyPart->GetParentCreature().lock()->TakeDamage(1);
+			cout << "doing damage to " << bodyPart->GetType() << endl;
+			bodyPart->TakeDamage(5);
+			break;
 		}
 
 		cout << "mouth colliding with " << otherObject->GetType() << endl;

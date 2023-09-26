@@ -105,6 +105,10 @@ void Object::Draw() {
 	al_draw_line(0, 0, 0, -pixelSize.y / 2, al_map_rgb(255, 255, 255), 2);
 }
 
+void Object::Destroy() {
+	GameManager::world.DestroyBody(this->body);
+}
+
 
 void Object::ApplyForce(b2Vec2 force) {
 	body->ApplyForce(force, body->GetPosition(), true);

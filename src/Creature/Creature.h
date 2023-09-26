@@ -36,7 +36,6 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		b2Vec2 startingPos;
 		string genes;
 		vector<shared_ptr<BodyPart>> bodySegments;
-		vector<shared_ptr<Joint>> joints;
 		shared_ptr<BodySegment> head;
 
 		struct CurrentGenes {
@@ -67,7 +66,6 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		void Draw();
 		void ApplyForce(b2Vec2 force);
 
-		void AddJoint(shared_ptr<Joint> newJoint);
 		void DestroyAllJoints();
 		void AddPart(shared_ptr<BodyPart> part);
 

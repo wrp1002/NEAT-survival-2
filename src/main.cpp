@@ -128,7 +128,7 @@ int main() {
 
 	cout << genes << endl;
 
-	for (int i = 0; i < 2; i++) CreateRandomAgent();
+	for (int i = 0; i < 100; i++) CreateRandomAgent();
 
 	al_start_timer(GameManager::timer);
 
