@@ -25,16 +25,19 @@ Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> pare
 	b2Vec2 jointPos = parentPart->GetEdgePoint(-angleOnParent + parentPart->GetBody()->GetAngle());
 
 	shared_ptr<Joint> newJoint = make_shared<Joint>(Joint(jointInfo, jointPos, body, parentPart->GetBody()));
-	this->parentJoint = newJoint;
+	SetParentJoint(newJoint);
 }
 
 void Cilium::Update() {
+	UpdateJoint();
+
 	if (creature.expired())
 		return;
 
 	this->animationAngle = body->GetAngle() + sin(al_get_time() * currentSpeed);
 
 	this->body->ApplyForce(currentSpeed * b2Vec2(cos(body->GetAngle() - M_PI_2), sin(body->GetAngle() - M_PI_2)), body->GetPosition(), true);
+
 }
 
 void Cilium::Draw() {
@@ -59,6 +62,12 @@ void Cilium::Draw() {
 
 	//al_draw_arc(0, 0, 25, angle, M_PI_2, al_map_rgb(255, 255, 255), 2);
 
+}
+
+void Cilium::UpdateJoint() {
+	BodyPart::UpdateJoint();
+	if (!parentJoint || parentJoint->IsBroken())
+		alive = false;
 }
 
 float Cilium::GetNerveOutput() {

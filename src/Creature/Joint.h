@@ -7,14 +7,18 @@
 #include <box2d/b2_revolute_joint.h>
 #include <box2d/b2_world.h>
 
+#include <memory>
 #include <vector>
 #include <iostream>
+
+#include "../JointUserData.h"
 
 using namespace std;
 
 
-class Joint {
+class Joint : public enable_shared_from_this<Joint> {
 	private:
+		shared_ptr<JointUserData> userData;
 		b2RevoluteJoint *revoluteJoint;
 		b2DistanceJoint *springJoint;
 		vector<b2Joint *> allJoints;
@@ -36,6 +40,7 @@ class Joint {
 
 		Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB);
 		~Joint();
+		void UpdateUserData();
 
 
 		void Update();

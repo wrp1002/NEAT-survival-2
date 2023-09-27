@@ -92,12 +92,12 @@ namespace InfoDisplay {
 
 			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(object)) {
 				infoText.insert(infoText.end(), {
-
+					fmt::format("Energy: {}", bodyPart->GetEnergy())
 				});
 
 				if (shared_ptr<Creature> creature = bodyPart->GetParentCreature().lock()) {
 					infoText.insert(infoText.end(), {
-						"",
+						fmt::format("C-Energy: {}", creature->GetTotalEnergy()),
 						DrawNN(creature->GetNN()),
 					});
 				}

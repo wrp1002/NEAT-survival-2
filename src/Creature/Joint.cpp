@@ -12,6 +12,7 @@
 #include "../Globals.h"
 #include "../Util.h"
 #include "../Camera.h"
+#include "../JointUserData.h"
 
 Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB) {
 	this->broken = false;
@@ -19,6 +20,7 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 	this->shouldDeleteJoints = true;
 	this->revoluteJoint = nullptr;
 	this->springJoint = nullptr;
+	this->userData = make_shared<JointUserData>(JointUserData());
 
 	// joint together
 	b2RevoluteJointDef jointDef;
@@ -30,7 +32,7 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 	jointDef.motorSpeed = jointInfo.motorSpeed;
 	jointDef.enableMotor = jointInfo.enableMotor;
 	jointDef.collideConnected = false;
-	//jointDef.userData.pointer = reinterpret_cast<uintptr_t>(nullptr);
+	jointDef.userData.pointer = reinterpret_cast<uintptr_t>(this->userData.get());
 
 	this->revoluteJoint = (b2RevoluteJoint *)GameManager::world.CreateJoint(&jointDef);
 	allJoints.push_back(revoluteJoint);
@@ -46,6 +48,11 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 		this->springJoint = (b2DistanceJoint *)GameManager::world.CreateJoint(&distanceJointDef);
 		allJoints.push_back(springJoint);
 	}
+}
+
+void Joint::UpdateUserData() {
+	userData->parentObject = shared_from_this();
+	userData->objectType = "Joint";
 }
 
 
@@ -66,6 +73,11 @@ void Joint::Destroy() {
 }
 
 void Joint::RemoveJoint(b2Joint *joint) {
+	if (joint == revoluteJoint)
+		revoluteJoint = nullptr;
+	else if (joint == springJoint)
+		springJoint = nullptr;
+
 	for (int i = allJoints.size() - 1; i >= 0; i--) {
 		if (allJoints[i] == joint) {
 			allJoints.erase(allJoints.begin() + i);
@@ -80,9 +92,12 @@ void Joint::Update() {
 	if (broken)
 		return;
 
-	if (revoluteJoint && JointShouldBreak(revoluteJoint) || springJoint && JointShouldBreak(springJoint)) {
+	if (JointShouldBreak(revoluteJoint) && JointShouldBreak(springJoint)) {
 		Destroy();
 	}
+
+	if (!revoluteJoint && !springJoint)
+		broken = true;
 }
 
 
@@ -135,6 +150,9 @@ bool Joint::IsBroken() {
 }
 
 bool Joint::JointShouldBreak(b2Joint *joint) {
+	if (joint == nullptr)
+		return true;
+
 	b2Vec2 reactionForce = joint->GetReactionForce(Globals::FPS);
 	float forceModuleSq = reactionForce.LengthSquared();
 	float maxForce = 0.02;

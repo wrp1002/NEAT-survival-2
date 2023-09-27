@@ -1,37 +1,27 @@
-#include "Mouth.h"
+#include "Eye.h"
 
 #include "BodyPart.h"
-#include "BodySegment.h"
 #include "Creature.h"
+#include "BodySegment.h"
 
 #include "../Util.h"
+#include "../GameManager.h"
 #include "../Camera.h"
 #include <allegro5/allegro_primitives.h>
-#include <box2d/b2_math.h>
-#include <memory>
 
-#include "../ObjectUserData.h"
-#include "../GameManager.h"
-
-
-Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
+Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
 	BodyPart(
 		parentCreature,
 		color,
 		nerveInfo
 	) {
 
-	this->triggerBiteDamage = false;
-	this->cooldownTimer = 0;
-	this->animationRate = 0.2;
-	this->animationFrame = 0;
-	this->animationState = 0;
-	this->polymorphic_id = "Mouth";
-	this->biting = false;
+	this->polymorphic_id = "Eye";
 
 	this->shapeType = SHAPE_TYPES::RECT;
-	this->pixelSize = b2Vec2(15, 10);
+	this->pixelSize = b2Vec2(10, 100);
 	this->worldSize = Util::pixelsToMeters(this->pixelSize);
+	this->seesObject = false;
 
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;
@@ -50,7 +40,7 @@ Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parent
 
 	fixtureDef.shape = &rectShapeDef;
 	fixtureDef.isSensor = true;
-	fixtureDef.density = 1.0f;
+	fixtureDef.density = 0.01f;
 	fixtureDef.friction = 0.3f;
 	fixtureDef.restitution = 0.5f;
 	fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
@@ -61,35 +51,19 @@ Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parent
 
 	// joint together
 	b2Vec2 jointPos = parentPart->GetEdgePoint(-angleOnParent + parentPart->GetBody()->GetAngle());
-
 	shared_ptr<Joint> newJoint = make_shared<Joint>(Joint(jointInfo, jointPos, body, parentPart->GetBody()));
 	SetParentJoint(newJoint);
 }
 
-void Mouth::Update() {
-	if (!parentJoint)
-		alive = false;
 
+void Eye::Update() {
 	UpdateJoint();
 
 	if (creature.expired())
 		return;
 
-	if (animationState > 0.1) {
-		animationFrame += animationRate;
-		animationState = abs(sin(animationFrame));
-		return;
-	}
+	seesObject = false;
 
-	if (cooldownTimer > 0)
-		cooldownTimer--;
-
-	if (!biting)
-		return;
-
-	biting = false;
-
-	// Animation is over. trigger bite
 	for (b2ContactEdge* ce = body->GetContactList(); ce; ce = ce->next) {
 		b2Contact* contact = ce->contact;
 		if (!contact->IsTouching())
@@ -108,20 +82,23 @@ void Mouth::Update() {
 		if (!otherObject)
 			continue;
 
+		if (otherObject->GetType() == "Eye")
+			continue;
+
 		if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(otherObject)) {
 			if (bodyPart->GetParentCreature().lock() == this->GetParentCreature().lock())
 				continue;
+		}
 
-			cout << "doing damage to " << bodyPart->GetType() << endl;
-			bodyPart->TakeDamage(5);
-			break;
+		if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(otherObject)) {
+			seesObject = true;
 		}
 
 	}
-
 }
 
-void Mouth::Draw() {
+
+void Eye::Draw() {
 	//Object::Draw();
 
 	float angle = body->GetAngle();
@@ -139,33 +116,28 @@ void Mouth::Draw() {
 
 	al_use_transform(&t);
 
-	al_draw_filled_triangle(0, 0, 10, -5, 15 * animationState, 20, al_map_rgb(255, 0, 0));
-	al_draw_filled_triangle(0, 0, -10, -5, -15 * animationState, 20, al_map_rgb(255, 0, 0));
+	ALLEGRO_COLOR drawColor = al_map_rgba(50, 50, 50, 50);
+	if (seesObject)
+		drawColor = al_map_rgba(255, 255, 255, 50);
 
-	//al_draw_arc(0, 0, 25, angle, M_PI_2, al_map_rgb(255, 255, 255), 2);
+	al_draw_line(0, 0, 0, pixelSize.y * 2, drawColor, pixelSize.x * 2);
+	al_draw_filled_circle(0, 0, 10, al_map_rgb(255, 255, 255));
+	al_draw_filled_circle(0, 5, 5, color);
 
 }
 
 
-void Mouth::UpdateJoint() {
+void Eye::UpdateJoint() {
 	BodyPart::UpdateJoint();
 	if (!parentJoint || parentJoint->IsBroken())
 		alive = false;
 }
 
 
-float Mouth::GetNerveOutput() {
-	return 0;
+float Eye::GetNerveOutput() {
+	return seesObject;
 }
 
-void Mouth::SetNerveInput(float val) {
-	if (val > 0 && CanBite()) {
-		biting = true;
-		animationState = 0.15;
-		cooldownTimer = biteCooldown;
-	}
-}
+void Eye::SetNerveInput(float val) {
 
-bool Mouth::CanBite() {
-	return cooldownTimer <= 0;
 }

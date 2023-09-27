@@ -23,6 +23,7 @@ class Mouth : public BodyPart {
 
 		void Update();
 		void Draw();
+		void UpdateJoint();
 
 
 		float GetNerveOutput();

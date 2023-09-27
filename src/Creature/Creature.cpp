@@ -53,7 +53,7 @@ Creature::Creature(string genes, b2Vec2 pos) {
 
 	nn = make_shared<NEAT>(NEAT(inputLabels, outputLabels));
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 30; i++)
 		nn->MutateAddConnection();
 }
 
@@ -84,8 +84,9 @@ void Creature::Update() {
 		inputs.push_back(0);
 
 	for (auto part : bodySegments) {
-		int index = part->GetNerveOutputIndex();
+		int index = part->GetNerveInputIndex();
 		float val = part->GetNerveOutput();
+		//cout << "input " << val << " at " << index << endl;
 
 		inputs[index] += val;
 	}
@@ -98,7 +99,7 @@ void Creature::Update() {
 		// Outputs
 		vector<double> output = nn->GetOutputs();
 		for (auto part : bodySegments) {
-			int index = part->GetNerveInputIndex();
+			int index = part->GetNerveOutputIndex();
 			float val = output[index];
 
 			part->SetNerveInput(val);
@@ -111,9 +112,10 @@ void Creature::Update() {
 
 		if (!part->IsAlive()) {
 			if (part == head)
-				head.reset();
+				head = nullptr;
+
 			part->Destroy();
-			bodySegments[i].reset();
+			bodySegments[i] = nullptr;
 			bodySegments.erase(bodySegments.begin() + i);
 		}
 	}
@@ -143,7 +145,8 @@ void Creature::ApplyForce(b2Vec2 force) {
 }
 
 void Creature::DestroyAllJoints() {
-
+	for (auto part : bodySegments)
+		part->DestroyJoint();
 }
 
 
@@ -181,6 +184,14 @@ vector<shared_ptr<BodyPart>> Creature::GetAllParts() {
 
 shared_ptr<NEAT> Creature::GetNN() {
 	return nn;
+}
+
+double Creature::GetTotalEnergy() {
+	double total = 0;
+	for (auto part : bodySegments) {
+		total += part->GetEnergy();
+	}
+	return total;
 }
 
 

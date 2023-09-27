@@ -19,7 +19,7 @@ class Cilium : public BodyPart {
 
 	void Update();
 	void Draw();
-
+	void UpdateJoint();
 
 	float GetNerveOutput();
 	void SetNerveInput(float val);

@@ -11,6 +11,7 @@
 #include "Joint.h"
 #include "Cilium.h"
 #include "Mouth.h"
+#include "Eye.h"
 
 #include "../Util.h"
 
@@ -71,15 +72,14 @@ void Creature::ApplyGenes(string genes) {
 
 						shared_ptr<BodyPart> newPart;
 
-						if (partType == 9) {
+						if (partType == 9)
 							CreateCilium(gene, currentGenes, parentObjects, symmetryMap, symmetryID);
-						}
-						else if (partType == 8) {
+						else if (partType == 8)
 							CreateMouth(gene, currentGenes, parentObjects, symmetryMap, symmetryID);
-						}
-						else if (partType < 8) {
+						else if (partType == 7)
+							CreateEye(gene, currentGenes, parentObjects, symmetryMap, symmetryID);
+						else if (partType < 7)
 							CreateBodySegment(gene, currentGenes, parentObjects, symmetryMap, symmetryID);
-						}
 
 						symmetryID++;
 						selectedParentID = symmetryID - 1;
@@ -293,6 +293,67 @@ void Creature::CreateCilium(string gene, CurrentGenes &currentGenes, vector<shar
 		nerveInfo.outputIndex = (nerveInfo.outputIndex + extraOutputCount / 2) % (baseOutputs + extraOutputCount);
 
 		newPart = make_shared<Cilium>(Cilium(shared_from_this(), dynamic_pointer_cast<BodySegment>(parentObjects[1]), b2Vec2(currentGenes.width, currentGenes.height), al_map_rgb(255, 0, 0), Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-currentGenes.angleOffset), jointInfo, nerveInfo));
+
+		AddPart(newPart);
+		parentObjects[1]->AddChild(newPart, angleOnParent);
+	}
+
+	symmetryMap[symmetryID].push_back((newPart));
+}
+
+
+void Creature::CreateEye(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID) {
+	Joint::JointInfo jointInfo;
+	jointInfo.useSpring = false;
+	jointInfo.enableMotor = false;
+	jointInfo.maxMotorTorque = 0;
+	jointInfo.motorSpeed = 0;
+	jointInfo.enableLimit = true;
+	jointInfo.angleLimit = 0.01;
+
+	BodyPart::NerveInfo nerveInfo;
+	nerveInfo.inputEnabled = true;
+	nerveInfo.outputEnabled = false;
+	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
+	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+
+	cout << "eye " << nerveInfo.inputIndex << " " << nerveInfo.outputIndex << endl;
+
+	int angleOnParent = parentObjects[0]->GetValidChildAngle(currentGenes.childAngleGene);
+	shared_ptr<BodyPart> newPart = make_shared<Eye>(Eye(
+		shared_from_this(),
+		dynamic_pointer_cast<BodySegment>(parentObjects[0]),
+		b2Vec2(currentGenes.width, currentGenes.height),
+		al_map_rgb(currentGenes.r, currentGenes.g, currentGenes.b),
+		Util::DegreesToRadians(angleOnParent),
+		Util::DegreesToRadians(currentGenes.angleOffset),
+		jointInfo,
+		nerveInfo
+	));
+
+	AddPart(newPart);
+	parentObjects[0]->AddChild(newPart, angleOnParent);
+	symmetryMap[symmetryID].push_back((newPart));
+
+	// Don't do symmetry if angle is down
+	if (angleOnParent != 270)
+		angleOnParent = (180 - angleOnParent + 360) % 360;
+
+	if (parentObjects[1]->childAngleValid(angleOnParent)) {
+		nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
+		nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+		cout << "eye " << nerveInfo.inputIndex << " " << nerveInfo.outputIndex << endl;
+
+		newPart = make_shared<Eye>(Eye(
+			shared_from_this(),
+			dynamic_pointer_cast<BodySegment>(parentObjects[1]),
+			b2Vec2(currentGenes.width, currentGenes.height),
+			al_map_rgb(currentGenes.r, currentGenes.g, currentGenes.b),
+			Util::DegreesToRadians(angleOnParent),
+			Util::DegreesToRadians(-currentGenes.angleOffset),
+			jointInfo,
+			nerveInfo
+		));
 
 		AddPart(newPart);
 		parentObjects[1]->AddChild(newPart, angleOnParent);

@@ -27,7 +27,6 @@
 #include <string>
 
 
-#include "Creature/BodyPart.h"
 #include "GameManager.h"
 #include "Camera.h"
 #include "Globals.h"
@@ -64,7 +63,7 @@ void CreateRandomAgent() {
 
 
 int main() {
-	srand(100);
+	srand(1841);
 
 	bool done = false;
 	bool redraw = true;
@@ -121,7 +120,7 @@ int main() {
 	genes += string() + "00" + "19999990000000";
 	genes += string() + "02" + "00000000000000";
 
-	genes += string() + "02" + "80000000000000";
+	genes += string() + "02" + "8" + "0034000000000";
 
 	shared_ptr<Creature> playerCreature = GameManager::CreateAgent(genes, b2Vec2(0, 0));
 	playerCreature->SetAsPlayer(true);

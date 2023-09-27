@@ -19,11 +19,12 @@
 
 #include "Creature/BodyPart.h"
 #include "Globals.h"
-#include "UserInput.h"
 #include "Util.h"
 #include "Camera.h"
 #include "ObjectUserData.h"
-#include "ContactListener.h"
+
+#include "Event_Listeners/ContactListener.h"
+#include "Event_Listeners/JointDestructionListener.h"
 
 #include "UI/Toolbar.h"
 
@@ -59,8 +60,11 @@ namespace GameManager {
 		paused = false;
 
 		MyContactListener *contactListener = new MyContactListener;
+		JointDestructionListener *jointDestructionListener = new JointDestructionListener;
+
 
 		world.SetContactListener(contactListener);
+		world.SetDestructionListener(jointDestructionListener);
 
 		worldBorder = CreateWorldBorder();
 
@@ -132,8 +136,7 @@ namespace GameManager {
 				agents[i]->Update();
 
 				if (!agents[i]->IsAlive()) {
-					//agents[i]->DestroyAllJoints();
-					cout << "agent dead"<< endl;
+					agents[i]->DestroyAllJoints();
 
 					vector<shared_ptr<BodyPart>> agentParts = agents[i]->GetAllParts();
 					looseObjects.insert(looseObjects.end(), agentParts.begin(), agentParts.end());

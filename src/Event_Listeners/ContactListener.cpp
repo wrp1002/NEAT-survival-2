@@ -1,8 +1,8 @@
 #include "ContactListener.h"
 #include <box2d/b2_world_callbacks.h>
 
-#include "GameManager.h"
-#include "UserInput.h"
+#include "../GameManager.h"
+#include "../UserInput.h"
 
 #include <iostream>
 

@@ -47,6 +47,26 @@ b2Vec2 BodyPart::GetPosOnParent(shared_ptr<BodyPart> otherObject, float angleOnO
 	return Util::metersToPixels(pos);
 }
 
+void BodyPart::UpdateJoint() {
+	if (!this->parentJoint)
+		return;
+
+	this->parentJoint->Update();
+}
+
+void BodyPart::SetParentJoint(shared_ptr<Joint> newJoint) {
+	this->parentJoint = newJoint;
+	newJoint->UpdateUserData();
+}
+
+void BodyPart::DestroyJoint() {
+	if (!parentJoint)
+		return;
+
+	parentJoint->Destroy();
+	parentJoint = nullptr;
+}
+
 
 void BodyPart::Update() {
 	if (parentJoint && parentJoint->IsBroken())
@@ -62,6 +82,7 @@ void BodyPart::Draw() {
 }
 
 void BodyPart::Destroy() {
+	cout << "DESTROY!" << endl;
 	GameManager::world.DestroyBody(this->body);
 }
 
@@ -117,3 +138,7 @@ void BodyPart::SetNerveInput(float val) {
 	parentJoint->SetSpeed(val);
 }
 
+
+double BodyPart::GetEnergy() {
+	return energy;
+}

@@ -39,6 +39,10 @@ class BodyPart : public Object {
 		virtual void Draw();
 		virtual void Destroy();
 
+		virtual void UpdateJoint();
+		void SetParentJoint(shared_ptr<Joint> newJoint);
+		void DestroyJoint();
+
 		b2Body *GetBody();
 		weak_ptr<Creature> GetParentCreature();
 
@@ -53,5 +57,7 @@ class BodyPart : public Object {
 		int GetNerveOutputIndex();
 		int GetNerveInputIndex();
 		virtual void SetNerveInput(float val);
+
+		double GetEnergy();
 };
 
