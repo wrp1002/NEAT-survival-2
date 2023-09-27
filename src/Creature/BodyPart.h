@@ -23,8 +23,9 @@ class BodyPart : public Object {
 
 	protected:
 		NerveInfo nerveInfo;
-		weak_ptr<Creature> creature;
 		shared_ptr<Joint> parentJoint;
+		weak_ptr<Creature> creature;
+		weak_ptr<BodyPart> parentPart;
 
 		float health, maxHealth;
 		float energy, maxEnergy;

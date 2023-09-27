@@ -212,7 +212,7 @@ void Creature::CreateMouth(string gene, CurrentGenes &currentGenes, vector<share
 	jointInfo.maxMotorTorque = 0;
 	jointInfo.motorSpeed = 0;
 	jointInfo.enableLimit = true;
-	jointInfo.angleLimit = 0.1;
+	jointInfo.angleLimit = 0.01;
 
 	BodyPart::NerveInfo nerveInfo;
 	nerveInfo.inputEnabled = true;

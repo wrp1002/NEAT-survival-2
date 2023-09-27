@@ -22,6 +22,7 @@ Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart
 	this->pixelSize = b2Vec2(10, 100);
 	this->worldSize = Util::pixelsToMeters(this->pixelSize);
 	this->seesObject = false;
+	this->parentPart = parentPart;
 
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;

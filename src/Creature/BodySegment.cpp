@@ -47,6 +47,7 @@ BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, 
 
 	this->angleOnParent = Util::RadiansToDegrees(angleOnParent);
 	this->polymorphic_id = "BodySegment";
+	this->parentPart = parent;
 
 	SetValidAngles(pixelSize);
 

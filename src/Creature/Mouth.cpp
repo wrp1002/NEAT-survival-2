@@ -28,6 +28,7 @@ Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parent
 	this->animationState = 0;
 	this->polymorphic_id = "Mouth";
 	this->biting = false;
+	this->parentPart = parentPart;
 
 	this->shapeType = SHAPE_TYPES::RECT;
 	this->pixelSize = b2Vec2(15, 10);

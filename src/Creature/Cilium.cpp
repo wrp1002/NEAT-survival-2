@@ -20,6 +20,7 @@ Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> pare
 	this->polymorphic_id = "Cilium";
 	this->maxSpeed = 2;
 	this->currentSpeed = 0;
+	this->parentPart = parentPart;
 
 	// joint together
 	b2Vec2 jointPos = parentPart->GetEdgePoint(-angleOnParent + parentPart->GetBody()->GetAngle());
