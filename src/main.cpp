@@ -63,7 +63,7 @@ void CreateRandomAgent() {
 
 
 int main() {
-	srand(1841);
+	srand(time(0));
 
 	bool done = false;
 	bool redraw = true;

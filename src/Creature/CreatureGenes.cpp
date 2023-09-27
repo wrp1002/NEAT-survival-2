@@ -241,8 +241,8 @@ void Creature::CreateMouth(string gene, CurrentGenes &currentGenes, vector<share
 		angleOnParent = (180 - angleOnParent + 360) % 360;
 
 	if (parentObjects[1]->childAngleValid(angleOnParent)) {
-		nerveInfo.inputIndex = (nerveInfo.inputIndex + extraInputCount / 2) % (baseInputs + extraInputCount);
-		nerveInfo.outputIndex = (nerveInfo.outputIndex + extraOutputCount / 2) % (baseOutputs + extraOutputCount);
+		nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
+		nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
 
 		newPart = make_shared<Mouth>(Mouth(
 			shared_from_this(),
@@ -273,7 +273,7 @@ void Creature::CreateCilium(string gene, CurrentGenes &currentGenes, vector<shar
 
 	BodyPart::NerveInfo nerveInfo;
 	nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+	nerveInfo.outputEnabled = false;
 	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
 	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
 
@@ -289,8 +289,8 @@ void Creature::CreateCilium(string gene, CurrentGenes &currentGenes, vector<shar
 		angleOnParent = (180 - angleOnParent + 360) % 360;
 
 	if (parentObjects[1]->childAngleValid(angleOnParent)) {
-		nerveInfo.inputIndex = (nerveInfo.inputIndex + extraInputCount / 2) % (baseInputs + extraInputCount);
-		nerveInfo.outputIndex = (nerveInfo.outputIndex + extraOutputCount / 2) % (baseOutputs + extraOutputCount);
+		nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
+		nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
 
 		newPart = make_shared<Cilium>(Cilium(shared_from_this(), dynamic_pointer_cast<BodySegment>(parentObjects[1]), b2Vec2(currentGenes.width, currentGenes.height), al_map_rgb(255, 0, 0), Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-currentGenes.angleOffset), jointInfo, nerveInfo));
 
@@ -312,8 +312,8 @@ void Creature::CreateEye(string gene, CurrentGenes &currentGenes, vector<shared_
 	jointInfo.angleLimit = 0.01;
 
 	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = true;
-	nerveInfo.outputEnabled = false;
+	nerveInfo.inputEnabled = false;
+	nerveInfo.outputEnabled = true;
 	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
 	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
 
