@@ -16,8 +16,7 @@
 #include <memory>
 #include <iostream>
 
-#include "../GameManager.h"
-#include "../Util.h"
+#include "../../Util.h"
 #include "../Object.h"
 #include "BodyPart.h"
 #include "Creature.h"

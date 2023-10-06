@@ -17,12 +17,11 @@
 #include "Joint.h"
 #include "Mouth.h"
 
-#include "../GameManager.h"
-#include "../ObjectFactory.h"
-#include "../Globals.h"
-#include "../Util.h"
+#include "../../ObjectFactory.h"
+#include "../../Globals.h"
+#include "../../Util.h"
 
-#include "../NEAT/NEAT.h"
+#include "../../NEAT/NEAT.h"
 
 using namespace std;
 

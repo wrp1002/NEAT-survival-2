@@ -1,9 +1,8 @@
 #include "Object.h"
-#include "UI/Camera.h"
-#include "ObjectUserData.h"
-#include "Util.h"
+
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/color.h>
+
 #include <box2d/b2_circle_shape.h>
 #include <box2d/b2_collision.h>
 #include <box2d/b2_fixture.h>
@@ -11,11 +10,15 @@
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_shape.h>
 
+#include "../UI/Camera.h"
+#include "ObjectUserData.h"
+#include "../Util.h"
+
 #include <cstdint>
 #include <iostream>
 #include <memory>
 
-#include "GameManager.h"
+#include "../GameManager.h"
 
 using namespace std;
 

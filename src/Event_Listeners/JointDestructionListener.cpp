@@ -1,7 +1,7 @@
 #include "JointDestructionListener.h"
-#include "../JointUserData.h"
+#include "../Objects/JointUserData.h"
 
-#include "../Creature/Joint.h"
+#include "../Objects/Creature/Joint.h"
 
 #include <iostream>
 

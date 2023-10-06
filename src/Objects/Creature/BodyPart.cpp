@@ -2,9 +2,8 @@
 
 #include <box2d/b2_math.h>
 
-#include "../Object.h"
-#include "../Util.h"
-#include "../GameManager.h"
+#include "../../Util.h"
+#include "../../GameManager.h"
 #include "Joint.h"
 
 

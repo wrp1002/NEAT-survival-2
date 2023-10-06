@@ -8,10 +8,10 @@
 #include <box2d/b2_revolute_joint.h>
 #include <cstdint>
 
-#include "../GameManager.h"
-#include "../Globals.h"
-#include "../Util.h"
-#include "../UI/Camera.h"
+#include "../../GameManager.h"
+#include "../../Globals.h"
+#include "../../Util.h"
+#include "../../UI/Camera.h"
 #include "../JointUserData.h"
 
 Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB) {

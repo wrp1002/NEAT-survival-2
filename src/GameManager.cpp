@@ -17,13 +17,12 @@
 #include <fmt/format.h>
 #include <memory>
 
-#include "Creature/BodyPart.h"
+#include "Objects/Creature/BodyPart.h"
 #include "Globals.h"
 #include "Util.h"
 #include "UI/Camera.h"
-#include "ObjectUserData.h"
-#include "NEAT/NEAT.h"
-#include "Egg.h"
+#include "Objects/ObjectUserData.h"
+#include "Objects/Egg.h"
 #include "ObjectFactory.h"
 
 #include "Event_Listeners/ContactListener.h"

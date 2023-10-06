@@ -4,14 +4,14 @@
 #include "BodySegment.h"
 #include "Creature.h"
 
-#include "../Util.h"
-#include "../UI/Camera.h"
+#include "../../Util.h"
+#include "../../UI/Camera.h"
 #include <allegro5/allegro_primitives.h>
 #include <box2d/b2_math.h>
 #include <memory>
 
 #include "../ObjectUserData.h"
-#include "../GameManager.h"
+#include "../../GameManager.h"
 
 
 Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Creature/Creature.h"
+#include "Objects/Creature/Creature.h"
 #include <box2d/b2_body.h>
 #include <box2d/b2_math.h>
 #include <box2d/b2_world.h>
