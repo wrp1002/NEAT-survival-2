@@ -28,6 +28,7 @@
 
 
 #include "GameManager.h"
+#include "ObjectFactory.h"
 #include "Camera.h"
 #include "Globals.h"
 #include "UserInput.h"
@@ -78,6 +79,7 @@ int main() {
 	UserInput::Init();
 	Toolbar::Init(GameManager::display);
 	InfoDisplay::Init(GameManager::event_queue);
+	ObjectFactory::Init();
 
 
 	string genes = "";

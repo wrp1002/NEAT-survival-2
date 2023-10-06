@@ -70,6 +70,12 @@ namespace Toolbar {
 
 			ALLEGRO_END_OF_MENU,
 
+			ALLEGRO_START_OF_MENU("Selected Object", 600),
+				{"Destroy", BUTTON_IDS::SELECTED_OBJECT_DESTROY, 0, NULL },
+				{"Make Egg", BUTTON_IDS::SELECTED_OBJECT_MAKE_EGG, 0, NULL },
+
+			ALLEGRO_END_OF_MENU,
+
 			ALLEGRO_END_OF_MENU
 		};
 
@@ -178,6 +184,22 @@ namespace Toolbar {
 			case BUTTON_IDS::SEARCH_LOWEST_HEALTH:
 				//AgentSearch<double>(false, &Agent::GetHealth);
 				break;
+
+			case BUTTON_IDS::SELECTED_OBJECT_DESTROY: {
+				if (shared_ptr<Object> selectedObject = InfoDisplay::selectedObject.lock())
+					selectedObject->Kill();
+				break;
+			}
+			case BUTTON_IDS::SELECTED_OBJECT_MAKE_EGG: {
+				if (shared_ptr<Object> selectedObject = InfoDisplay::selectedObject.lock()) {
+					if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(selectedObject)) {
+						if (shared_ptr<Creature> parentCreature = bodyPart->GetParentCreature().lock()) {
+							parentCreature->MakeEgg();
+						}
+					}
+				}
+				break;
+			}
 		}
 	}
 
