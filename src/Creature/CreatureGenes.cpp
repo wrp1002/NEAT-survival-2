@@ -118,14 +118,14 @@ void Creature::ApplyGenes(string genes) {
 void Creature::CreateHead(string gene, CurrentGenes &currentGenes, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID) {
 	cout << "Creating head" << endl;
 	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+	nerveInfo.inputEnabled = false;
+	nerveInfo.outputEnabled = false;
+	nerveInfo.inputIndex = 0;
+	nerveInfo.outputIndex = 0;
 
 	float angle = GetNextGene(gene, 0, 3) * 360;
 
-	this->head = make_shared<BodySegment>(BodySegment(
+	shared_ptr<BodySegment> newPart = make_shared<BodySegment>(BodySegment(
 		shared_from_this(),
 		b2Vec2(currentGenes.width, currentGenes.height),
 		al_map_rgb(currentGenes.r, currentGenes.g, currentGenes.b),

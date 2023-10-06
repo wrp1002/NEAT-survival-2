@@ -18,6 +18,7 @@
 #include "Mouth.h"
 
 #include "../GameManager.h"
+#include "../ObjectFactory.h"
 #include "../Globals.h"
 #include "../Util.h"
 
@@ -46,7 +47,7 @@ Creature::Creature(string genes, b2Vec2 pos) {
 	vector<string> outputLabels = {
 
 	};
-	for (int i = 0; i < extraInputCount; i++)
+	for (int i = 0; i < extraOutputCount; i++)
 		outputLabels.push_back("out" + to_string(i));
 
 	this->baseInputs = inputLabels.size() - extraInputCount;
@@ -56,6 +57,22 @@ Creature::Creature(string genes, b2Vec2 pos) {
 
 	for (int i = 0; i < 30; i++)
 		nn->MutateAddConnection();
+}
+
+Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn) : Creature(genes, pos) {
+	this->genes = genes;
+	this->startingPos = pos;
+	this->alive = true;
+	this->isPlayer = false;
+	this->nn = nn;
+
+	this->maxHealth = 5;
+	this->health = maxHealth;
+	this->maxEnergy = 10;
+	this->energy = maxEnergy;
+
+	this->baseInputs = nn->GetInputsCount() - extraInputCount;
+	this->baseOutputs = nn->GetOutputsCount() - extraOutputCount;
 }
 
 Creature::~Creature() {
@@ -160,6 +177,12 @@ void Creature::TakeDamage(double amount) {
 	this->health -= amount;
 }
 
+void Creature::MakeEgg() {
+	string eggGenes = GetMutatedGenes();
+	shared_ptr<NEAT> eggNN = GetMutatedNN();
+	ObjectFactory::CreateEgg(eggGenes, Util::metersToPixels(this->head.lock()->GetPos()), eggNN);
+}
+
 
 bool Creature::IsAlive() {
 	return alive;
@@ -177,6 +200,28 @@ float Creature::GetNextGene(string &gene, int wholeDigits, int decimalDigits) {
 	int delta = wholeDigits + decimalDigits;
 	gene = gene.substr(delta, gene.size() - delta);
 	return val;
+}
+
+string Creature::GetMutatedGenes() {
+	string newGenes = "";
+	for (int i = 0; i < genes.size(); i++) {
+		if (Util::Random() <= Globals::GENE_MUTATE_CHANCE)
+			newGenes += to_string(rand() % 10);
+		else if (i % Globals::GENE_LENGTH == 0 && Util::Random() <= Globals::GENE_CREATE_CHANCE) {
+			cout << "Adding new gene!!!!!!" << endl;
+			for (int j = 0; j < Globals::GENE_LENGTH; j++)
+				newGenes += to_string(rand() % 10);
+		}
+		else
+			newGenes += genes[i];
+	}
+	return newGenes;
+}
+
+shared_ptr<NEAT> Creature::GetMutatedNN() {
+	shared_ptr<NEAT> newNN = nn->Copy();
+	newNN -> Mutate();
+	return newNN;
 }
 
 vector<shared_ptr<BodyPart>> Creature::GetAllParts() {

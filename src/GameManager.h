@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 
+class Egg;
+
 using namespace std;
 
 
@@ -28,6 +30,7 @@ namespace GameManager {
 	extern b2Body *worldBorder;
 
 	extern vector<shared_ptr<Creature>> agents;
+	extern vector<shared_ptr<Egg>> eggs;
 	extern vector<shared_ptr<Object>> looseObjects;
 	extern vector<weak_ptr<Object>> objectsOutsideBorder;
 

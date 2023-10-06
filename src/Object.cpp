@@ -114,6 +114,10 @@ void Object::ApplyForce(b2Vec2 force) {
 	body->ApplyForce(force, body->GetPosition(), true);
 }
 
+void Object::Kill() {
+	alive = false;
+}
+
 
 // Raycast from a point from this angle towards the object to find collision point on edge
 b2Vec2 Object::GetEdgePoint(float angle) {

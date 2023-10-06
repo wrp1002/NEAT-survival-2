@@ -22,6 +22,9 @@
 #include "Util.h"
 #include "Camera.h"
 #include "ObjectUserData.h"
+#include "NEAT/NEAT.h"
+#include "Egg.h"
+#include "ObjectFactory.h"
 
 #include "Event_Listeners/ContactListener.h"
 #include "Event_Listeners/JointDestructionListener.h"
@@ -48,6 +51,7 @@ namespace GameManager {
 	b2Body *worldBorder;
 
 	vector<shared_ptr<Creature>> agents;
+	vector<shared_ptr<Egg>> eggs;
 	vector<shared_ptr<Object>> looseObjects;
 	vector<weak_ptr<Object>> objectsOutsideBorder;
 
@@ -152,7 +156,27 @@ namespace GameManager {
 				object->Update();
 
 				if (!object->IsAlive()) {
+					object->Destroy();
 					looseObjects.erase(looseObjects.begin() + i);
+				}
+			}
+
+			for (int i = eggs.size() - 1; i >= 0; i--) {
+				auto egg = eggs[i];
+
+				egg->Update();
+
+				if (!egg->IsAlive()) {
+					egg->Destroy();
+					eggs.erase(eggs.begin() + i);
+					continue;
+				}
+
+				if (egg->ShouldHatch()) {
+					ObjectFactory::CreateAgent(egg->GetGenes(), Util::metersToPixels(egg->GetPos()), egg->GetNN());
+					egg->Destroy();
+					eggs.erase(eggs.begin() + i);
+					continue;
 				}
 			}
 
@@ -179,6 +203,9 @@ namespace GameManager {
 
 		for (auto agent : agents)
 			agent->Draw();
+
+		for (auto egg : eggs)
+			egg->Draw();
 
 		bool drawWorldBorder = true;
 

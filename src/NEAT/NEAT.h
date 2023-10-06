@@ -36,6 +36,8 @@ private:
 	void _RemoveNode(vector<shared_ptr<Node>>* nodes, shared_ptr<Node> nodeToRemove);
 
 public:
+	static shared_ptr<NEAT> RandomNN(vector<string> inputLabels, vector<string> outputLabels, int mutations);
+
 	NEAT(vector<string> inputLabels, vector<string> outputLabels);
 	NEAT();
 	~NEAT();
@@ -64,4 +66,6 @@ public:
 	void MutateRemoveNode();
 
 	int GetCurrentNodeID();
+	int GetInputsCount();
+	int GetOutputsCount();
 };

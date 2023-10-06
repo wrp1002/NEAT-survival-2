@@ -49,6 +49,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 
 	public:
 		Creature(string genes, b2Vec2 pos);
+		Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn);
 		~Creature();
 		void Init();
 
@@ -72,9 +73,12 @@ class Creature : public std::enable_shared_from_this<Creature> {
 
 		void TakeDamage(double amount);
 		void DistributeEnergy(double amount);
+		void MakeEgg();
 
 		float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);
 		float GetNextGene(string &gene, int wholeDigits, int decimalDigits);
+		string GetMutatedGenes();
+		shared_ptr<NEAT> GetMutatedNN();
 
 		shared_ptr<NEAT> GetNN();
 		vector<shared_ptr<BodyPart>> GetAllParts();

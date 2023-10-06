@@ -19,6 +19,13 @@ void NEAT::_RemoveNode(vector<shared_ptr<Node>>* nodes, shared_ptr<Node> nodeToR
 	}
 }
 
+shared_ptr<NEAT> NEAT::RandomNN(vector<string> inputLabels, vector<string> outputLabels, int mutations) {
+	shared_ptr<NEAT> newNN = make_shared<NEAT>(NEAT(inputLabels, outputLabels));
+	for (int i = 0; i < mutations; i++)
+		newNN->MutateAddConnection();
+	return newNN;
+}
+
 NEAT::NEAT(vector<string> inputLabels, vector<string> outputLabels) {
 	for (string label : inputLabels) {
 		shared_ptr<Node> inputNode = make_shared<Node>(Node(0, float(inputNodes.size()) / inputLabels.size(), Node::INPUT, currentNodeID, label));
@@ -363,3 +370,10 @@ int NEAT::GetCurrentNodeID() {
 	return currentNodeID;
 }
 
+int NEAT::GetInputsCount() {
+	return inputNodes.size();
+}
+
+int NEAT::GetOutputsCount() {
+	return outputNodes.size();
+}
