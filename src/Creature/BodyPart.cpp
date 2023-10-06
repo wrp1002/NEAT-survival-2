@@ -69,8 +69,9 @@ void BodyPart::DestroyJoint() {
 
 
 void BodyPart::Update() {
-	if (parentJoint && parentJoint->IsBroken())
+	if (parentJoint && parentJoint->IsBroken()) {
 		parentJoint.reset();
+	}
 
 	if (health <= 0)
 		alive = false;
@@ -82,7 +83,6 @@ void BodyPart::Draw() {
 }
 
 void BodyPart::Destroy() {
-	cout << "DESTROY!" << endl;
 	GameManager::world.DestroyBody(this->body);
 }
 

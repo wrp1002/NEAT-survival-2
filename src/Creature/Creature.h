@@ -36,7 +36,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		b2Vec2 startingPos;
 		string genes;
 		vector<shared_ptr<BodyPart>> bodySegments;
-		shared_ptr<BodySegment> head;
+		weak_ptr<BodySegment> head;
 
 		struct CurrentGenes {
 			int r = 100, g = 100, b = 100;

@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 #include <unordered_map>
 
 #include "BodyPart.h"
@@ -111,8 +112,8 @@ void Creature::Update() {
 		part->Update();
 
 		if (!part->IsAlive()) {
-			if (part == head)
-				head = nullptr;
+			if (!head.expired() && part == head.lock())
+				head.reset();
 
 			part->Destroy();
 			bodySegments[i] = nullptr;
@@ -121,13 +122,13 @@ void Creature::Update() {
 	}
 
 
-	if (health <= 0 || !head)
+	if (health <= 0 || head.expired())
 		alive = false;
 
 }
 
 void Creature::Draw() {
-	if (!bodySegments.size() || !head)
+	if (!bodySegments.size() || head.expired())
 		return;
 
 
@@ -138,13 +139,13 @@ void Creature::Draw() {
 
 
 void Creature::ApplyForce(b2Vec2 force) {
-	if (!head)
-		return;
-
-	this->head->GetBody()->ApplyForce(force, this->head->GetBody()->GetPosition(), true);
+	if (shared_ptr<BodySegment> headPtr = head.lock()) {
+		headPtr->GetBody()->ApplyForce(force, headPtr->GetBody()->GetPosition(), true);
+	}
 }
 
 void Creature::DestroyAllJoints() {
+	cout << "Destroy all joints!" << endl;
 	for (auto part : bodySegments)
 		part->DestroyJoint();
 }

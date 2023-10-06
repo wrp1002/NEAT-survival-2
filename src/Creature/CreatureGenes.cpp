@@ -20,7 +20,7 @@ using namespace std;
 
 void Creature::ApplyGenes(string genes) {
 	CurrentGenes currentGenes;
-	this->head = nullptr;
+	this->head.reset();;
 	int symmetryID = 0;
 	int selectedParentID = 0;
 	unordered_map<int, vector<shared_ptr<BodyPart>>> symmetryMap;
@@ -56,7 +56,7 @@ void Creature::ApplyGenes(string genes) {
 			// parentID(1)
 			case 2: {
 				cout << "Creating new object" << endl;
-				if (!head) {
+				if (head.expired()) {
 					CreateHead(gene, currentGenes, symmetryMap, symmetryID);
 					symmetryID++;
 				}
@@ -105,7 +105,7 @@ void Creature::ApplyGenes(string genes) {
 		}
 	}
 
-	if (!this->head) {
+	if (this->head.expired()) {
 		cout << "uh oh no head. time to crash" << endl;
 		CreateHead("0000000000000000", currentGenes, symmetryMap, symmetryID);
 		symmetryID++;
@@ -134,10 +134,11 @@ void Creature::CreateHead(string gene, CurrentGenes &currentGenes, unordered_map
 		Util::DegreesToRadians(angle),
 		nerveInfo
 	));
-	AddPart(head);
+	AddPart(newPart);
+	this->head = newPart;
 
 	for (int i = 0; i < 2; i++)
-		symmetryMap[symmetryID].push_back(head);
+		symmetryMap[symmetryID].push_back(newPart);
 }
 
 void Creature::CreateBodySegment(string gene, CurrentGenes &currentGenes, vector<shared_ptr<BodyPart>> &parentObjects, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID) {
