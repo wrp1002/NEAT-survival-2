@@ -30,37 +30,16 @@
 #include "GameManager.h"
 #include "ObjectFactory.h"
 #include "Camera.h"
-#include "Globals.h"
 #include "UserInput.h"
 #include "Util.h"
 #include "UI/Font.h"
 #include "UI/Toolbar.h"
 #include "UI/InfoDisplay.h"
-#include "ObjectUserData.h"
 
 using namespace std;
 
 const int boxSize = 25;
 const int groundWidth = 600;
-
-
-void CreateRandomAgent() {
-	string genes = "";
-	for (int i = 0; i < 50; i++) {
-		string gene = "";
-		for (int j = 0; j < 16; j++) {
-			gene += to_string(rand() % 10);
-		}
-		cout << "adding gene:" << gene << endl;
-		genes += gene;
-	}
-
-	cout << genes << endl;
-
-	float angle = Util::RandomDir();
-	int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
-	GameManager::CreateAgent(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist));
-}
 
 
 int main() {
@@ -129,7 +108,8 @@ int main() {
 
 	cout << genes << endl;
 
-	for (int i = 0; i < 100; i++) CreateRandomAgent();
+	for (int i = 0; i < 100; i++)
+		ObjectFactory::CreateEgg();
 
 	al_start_timer(GameManager::timer);
 
