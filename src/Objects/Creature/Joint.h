@@ -11,7 +11,7 @@
 #include <vector>
 #include <iostream>
 
-#include "../JointUserData.h"
+#include "../UserData/JointUserData.h"
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 #include "JointDestructionListener.h"
-#include "../Objects/JointUserData.h"
+#include "../Objects/UserData/JointUserData.h"
 
 #include "../Objects/Creature/Joint.h"
 

@@ -21,7 +21,7 @@
 #include "Globals.h"
 #include "Util.h"
 #include "UI/Camera.h"
-#include "Objects/ObjectUserData.h"
+#include "Objects/UserData/ObjectUserData.h"
 #include "Objects/Egg.h"
 #include "ObjectFactory.h"
 
