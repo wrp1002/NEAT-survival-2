@@ -41,6 +41,7 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 	if (jointInfo.useSpring) {
 		b2DistanceJointDef distanceJointDef;
 		distanceJointDef.Initialize(bodyA, bodyB, bodyA->GetPosition(), bodyB->GetPosition());
+		distanceJointDef.userData.pointer = reinterpret_cast<uintptr_t>(this->userData.get());
 		float frequencyHz = 4.0f;
 		float dampingRatio = 0.5f;
 		b2LinearStiffness(distanceJointDef.stiffness, distanceJointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
@@ -81,6 +82,7 @@ void Joint::RemoveJoint(b2Joint *joint) {
 	for (int i = allJoints.size() - 1; i >= 0; i--) {
 		if (allJoints[i] == joint) {
 			allJoints.erase(allJoints.begin() + i);
+			break;
 		}
 	}
 	if (allJoints.size() == 0)
