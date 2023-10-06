@@ -12,7 +12,7 @@
 
 #include "GameManager.h"
 #include "ObjectUserData.h"
-#include "Camera.h"
+#include "UI/Camera.h"
 
 using namespace std;
 

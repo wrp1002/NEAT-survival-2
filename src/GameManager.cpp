@@ -20,7 +20,7 @@
 #include "Creature/BodyPart.h"
 #include "Globals.h"
 #include "Util.h"
-#include "Camera.h"
+#include "UI/Camera.h"
 #include "ObjectUserData.h"
 #include "NEAT/NEAT.h"
 #include "Egg.h"

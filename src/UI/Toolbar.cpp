@@ -5,7 +5,7 @@
 #include <fmt/core.h>
 #include <memory>
 
-#include "../Camera.h"
+#include "../UI/Camera.h"
 #include "InfoDisplay.h"
 #include "../GameManager.h"
 

@@ -1,5 +1,5 @@
 #include "Object.h"
-#include "Camera.h"
+#include "UI/Camera.h"
 #include "ObjectUserData.h"
 #include "Util.h"
 #include <allegro5/allegro_primitives.h>

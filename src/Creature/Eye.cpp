@@ -6,7 +6,7 @@
 
 #include "../Util.h"
 #include "../GameManager.h"
-#include "../Camera.h"
+#include "../UI/Camera.h"
 #include <allegro5/allegro_primitives.h>
 
 Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :

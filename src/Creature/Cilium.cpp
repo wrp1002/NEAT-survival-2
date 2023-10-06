@@ -2,7 +2,7 @@
 #include "BodyPart.h"
 
 #include "../Util.h"
-#include "../Camera.h"
+#include "../UI/Camera.h"
 #include <box2d/b2_math.h>
 
 Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :

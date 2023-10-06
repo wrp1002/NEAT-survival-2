@@ -5,7 +5,7 @@
 #include "Creature.h"
 
 #include "../Util.h"
-#include "../Camera.h"
+#include "../UI/Camera.h"
 #include <allegro5/allegro_primitives.h>
 #include <box2d/b2_math.h>
 #include <memory>

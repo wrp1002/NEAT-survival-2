@@ -29,7 +29,7 @@
 
 #include "GameManager.h"
 #include "ObjectFactory.h"
-#include "Camera.h"
+#include "UI/Camera.h"
 #include "UserInput.h"
 #include "Util.h"
 #include "UI/Font.h"
