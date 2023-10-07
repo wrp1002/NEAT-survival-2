@@ -112,6 +112,10 @@ void Object::Destroy() {
 	GameManager::world.DestroyBody(this->body);
 }
 
+void Object::Print() {
+	cout << polymorphic_id << " selected " << this << endl;
+}
+
 
 void Object::ApplyForce(b2Vec2 force) {
 	body->ApplyForce(force, body->GetPosition(), true);

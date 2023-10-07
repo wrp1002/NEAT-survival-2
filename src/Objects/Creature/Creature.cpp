@@ -31,10 +31,12 @@ Creature::Creature(string genes, b2Vec2 pos) {
 	this->alive = true;
 	this->isPlayer = false;
 
-	this->maxHealth = 5;
-	this->health = maxHealth;
-	this->maxEnergy = 10;
+	this->maxEnergy = 100;
 	this->energy = maxEnergy;
+
+	this->eggHatchTimer = 0;
+	this->geneMutationCoef = 0;
+	this->nnMutationCoef = 0;
 
 	vector<string> inputLabels = {
 		"const",
@@ -65,8 +67,10 @@ Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn) : Creature(gen
 	this->isPlayer = false;
 	this->nn = nn;
 
-	this->maxHealth = 5;
-	this->health = maxHealth;
+	this->eggHatchTimer = 0;
+	this->geneMutationCoef = 0;
+	this->nnMutationCoef = 0;
+
 	this->maxEnergy = 10;
 	this->energy = maxEnergy;
 
@@ -138,7 +142,7 @@ void Creature::Update() {
 	}
 
 
-	if (health <= 0 || head.expired())
+	if (head.expired())
 		alive = false;
 
 }
@@ -160,6 +164,13 @@ void Creature::ApplyForce(b2Vec2 force) {
 	}
 }
 
+void Creature::PrintInfo() {
+	cout << "Selected creature " << this << endl;
+	cout << "Parts: " << bodySegments.size() << endl;
+	cout << "Energy: " << energy << " / " << maxEnergy << endl;
+	cout << "EggHatchTimer: " << eggHatchTimer << "  geneMutationCoef: " << geneMutationCoef << "  nnMutationCoef: " << nnMutationCoef << endl;
+}
+
 void Creature::DestroyAllJoints() {
 	cout << "Destroy all joints!" << endl;
 	for (auto part : bodySegments)
@@ -173,7 +184,7 @@ void Creature::AddPart(shared_ptr<BodyPart> part) {
 }
 
 void Creature::TakeDamage(double amount) {
-	this->health -= amount;
+
 }
 
 void Creature::MakeEgg() {
@@ -206,7 +217,7 @@ string Creature::GetMutatedGenes() {
 	for (int i = 0; i < genes.size(); i++) {
 		if (Util::Random() <= Globals::GENE_MUTATE_CHANCE)
 			newGenes += to_string(rand() % 10);
-		else if (i % Globals::GENE_LENGTH == 0 && Util::Random() <= Globals::GENE_CREATE_CHANCE) {
+		else if (i % Globals::GENE_LENGTH == 0 && Util::Random() <= Globals::GENE_CREATE_CHANCE * geneMutationCoef) {
 			cout << "Adding new gene!!!!!!" << endl;
 			for (int j = 0; j < Globals::GENE_LENGTH; j++)
 				newGenes += to_string(rand() % 10);

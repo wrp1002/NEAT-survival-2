@@ -23,13 +23,18 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		static const int extraInputCount = 10;
 		static const int extraOutputCount = 10;
 		static const int geneLength = 16;
+		static const int maxEggHatchTimer = 300;
+
 		int baseInputs;
 		int baseOutputs;
 		bool alive;
 		bool isPlayer;
 
-		double health, maxHealth;
 		double energy, maxEnergy;
+
+		int eggHatchTimer;
+		float geneMutationCoef;
+		float nnMutationCoef;
 
 
 		shared_ptr<NEAT> nn;
@@ -67,6 +72,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		void Update();
 		void Draw();
 		void ApplyForce(b2Vec2 force);
+		void PrintInfo();
 
 		void DestroyAllJoints();
 		void AddPart(shared_ptr<BodyPart> part);

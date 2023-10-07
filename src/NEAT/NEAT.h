@@ -30,7 +30,7 @@ private:
 
 	const unsigned MUTATE_ADD_CONNECTION_TRIES = 10;
 
-	const double MUTATE_COEF = 1.0;
+	double MUTATE_COEF;
 
 
 	void _RemoveNode(vector<shared_ptr<Node>>* nodes, shared_ptr<Node> nodeToRemove);
@@ -38,7 +38,7 @@ private:
 public:
 	static shared_ptr<NEAT> RandomNN(vector<string> inputLabels, vector<string> outputLabels, int mutations);
 
-	NEAT(vector<string> inputLabels, vector<string> outputLabels);
+	NEAT(vector<string> inputLabels, vector<string> outputLabels, float mutate_coef=1.0);
 	NEAT();
 	~NEAT();
 
@@ -64,6 +64,7 @@ public:
 	void MutateAddConnection();
 	void MutateAddNode();
 	void MutateRemoveNode();
+	void SetMutateCoef(float val);
 
 	int GetCurrentNodeID();
 	int GetInputsCount();

@@ -18,6 +18,7 @@ namespace Globals {
 
 	const int GENE_LENGTH = 16;
 	const float GENE_MUTATE_CHANCE = 0.01;
-	const float GENE_CREATE_CHANCE = 0.01;
+	const float GENE_CREATE_CHANCE = 0.001;
+	const float GENE_DELETE_CHANCE = 0.001;
 
 }

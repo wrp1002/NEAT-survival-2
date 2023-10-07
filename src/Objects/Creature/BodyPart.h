@@ -39,6 +39,7 @@ class BodyPart : public Object {
 		virtual void Update();
 		virtual void Draw();
 		virtual void Destroy();
+		virtual void Print();
 
 		virtual void UpdateJoint();
 		void SetParentJoint(shared_ptr<Joint> newJoint);

@@ -13,6 +13,7 @@
 #include "Mouth.h"
 #include "Eye.h"
 
+#include "../../NEAT/NEAT.h"
 #include "../../Util.h"
 
 using namespace std;
@@ -28,7 +29,17 @@ void Creature::ApplyGenes(string genes) {
 	int instructionTypes = 5;
 	int maxSize = 50;
 
-	for (int i = 0; i < genes.size(); i += geneLength) {
+	int headerSize = geneLength * 2;
+	string headerGenes = genes.substr(0, headerSize);
+
+	eggHatchTimer = GetNextGene(headerGenes, 0, 3) * maxEggHatchTimer;
+	geneMutationCoef = GetNextGene(headerGenes, 0, 3);
+	nnMutationCoef = GetNextGene(headerGenes, 0, 3);
+
+	nn->SetMutateCoef(nnMutationCoef);
+
+
+	for (int i = headerSize; i < genes.size(); i += geneLength) {
 		string gene = genes.substr(i, geneLength);
 		cout << endl;
 		cout << gene << endl;

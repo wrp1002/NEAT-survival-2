@@ -26,7 +26,9 @@ shared_ptr<NEAT> NEAT::RandomNN(vector<string> inputLabels, vector<string> outpu
 	return newNN;
 }
 
-NEAT::NEAT(vector<string> inputLabels, vector<string> outputLabels) {
+NEAT::NEAT(vector<string> inputLabels, vector<string> outputLabels, float mutate_coef) {
+	this->MUTATE_COEF = mutate_coef;
+
 	for (string label : inputLabels) {
 		shared_ptr<Node> inputNode = make_shared<Node>(Node(0, float(inputNodes.size()) / inputLabels.size(), Node::INPUT, currentNodeID, label));
 		AddNode(inputNode);
@@ -364,6 +366,10 @@ void NEAT::MutateRemoveNode() {
 
 	shared_ptr<Node> node = hiddenNodes[rand() % hiddenNodes.size()];
 	RemoveNode(node);
+}
+
+void NEAT::SetMutateCoef(float val) {
+	this->MUTATE_COEF = val;
 }
 
 int NEAT::GetCurrentNodeID() {

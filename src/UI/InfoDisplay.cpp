@@ -277,6 +277,8 @@ namespace InfoDisplay {
 
 	void SelectObject(weak_ptr<Object> obj) {
 		selectedObject = obj;
+		if (obj.lock())
+			obj.lock()->Print();
 	}
 
 	b2Vec2 CalculateNodePos(shared_ptr<Node> node) {

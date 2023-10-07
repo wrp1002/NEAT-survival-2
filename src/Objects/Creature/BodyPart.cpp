@@ -85,6 +85,13 @@ void BodyPart::Destroy() {
 	GameManager::world.DestroyBody(this->body);
 }
 
+void BodyPart::Print() {
+	Object::Print();
+	if (shared_ptr<Creature> parentCreature = creature.lock()) {
+		parentCreature->PrintInfo();
+	}
+}
+
 
 b2Body *BodyPart::GetBody() {
 	return this->body;
