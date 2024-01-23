@@ -104,6 +104,33 @@ namespace GameManager {
 		al_uninstall_keyboard();
 	}
 
+	void Reset() {
+		cout << "Resetting sim..." << endl;
+
+		for (int i = agents.size() - 1; i >= 0; i--) {
+			agents[i]->DestroyAllJoints();
+			vector<shared_ptr<BodyPart>> agentParts = agents[i]->GetAllParts();
+			looseObjects.insert(looseObjects.end(), agentParts.begin(), agentParts.end());
+			agents.erase(agents.begin() + i);
+		}
+
+		for (int i = looseObjects.size() - 1; i >= 0; i--) {
+			looseObjects[i]->Destroy();
+		}
+		looseObjects.clear();
+
+		for (int i = eggs.size() - 1; i >= 0; i--) {
+			eggs[i]->Destroy();
+		}
+		eggs.clear();
+
+		objectsOutsideBorder.clear();
+
+
+		// Create new eggs
+		for (int i = 0; i < 10; i++) ObjectFactory::CreateEgg();
+	}
+
 	b2Body *CreateWorldBorder() {
 		ObjectUserData *objectUserData = new ObjectUserData();
 		objectUserData->objectType = "border";
@@ -145,7 +172,6 @@ namespace GameManager {
 					looseObjects.insert(looseObjects.end(), agentParts.begin(), agentParts.end());
 
 					agents.erase(agents.begin() + i);
-
 				}
 			}
 
@@ -172,7 +198,7 @@ namespace GameManager {
 				}
 
 				if (egg->ShouldHatch()) {
-					ObjectFactory::CreateAgent(egg->GetGenes(), Util::metersToPixels(egg->GetPos()), egg->GetNN());
+					ObjectFactory::CreateAgent(egg->GetGenes(), Util::metersToPixels(egg->GetPos()), egg->GetNN(), egg->GetEnergy());
 					egg->Destroy();
 					eggs.erase(eggs.begin() + i);
 					continue;
@@ -194,6 +220,9 @@ namespace GameManager {
 
 			simTicks++;
 		}
+
+		if (agents.size() == 0)
+			Reset();
 	}
 
 	void Draw() {
@@ -226,7 +255,7 @@ namespace GameManager {
 		shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes, pos));
 		creature->Init();
 		agents.push_back(creature);
-		cout << agents.size() << endl;
+		//cout << agents.size() << endl;
 		return creature;
 	}
 

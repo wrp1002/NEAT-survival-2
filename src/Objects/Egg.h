@@ -20,14 +20,17 @@ class Egg : public Object {
 		int hatchTimer;
 		int generation;
 
+		double energy;
+
 
 	public:
-		Egg(string genes, shared_ptr<NEAT> nn, double health, double energy, int generation, b2Vec2 pos);
+		Egg(string genes, shared_ptr<NEAT> nn, double energy, int generation, b2Vec2 pos);
 
 		void Update();
 		void Draw();
 
 		bool ShouldHatch();
+		double GetEnergy();
 
 		string GetGenes();
 		shared_ptr<NEAT> GetNN();

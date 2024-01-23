@@ -15,6 +15,7 @@ namespace Toolbar {
 		enum IDS {
 			EXIT,
 			TOGGLE_INFO_DISPLAY,
+			RESET_SIM,
 
 			SEARCH_RANDOM,
 			SEARCH_HIGHEST_KILLS,

@@ -13,10 +13,10 @@ BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, Ner
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
 
-	this->maxHealth = 5;
+	this->maxHealth = 10;
 	this->health = maxHealth;
-	this->maxEnergy = 5;
-	this->energy = maxEnergy;
+
+	this->energyUsage = 0;
 }
 
 BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : Object(pos, pixelSize, angle, color, shapeType) {
@@ -25,10 +25,10 @@ BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixel
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
 
-	this->maxHealth = 5;
+	this->maxHealth = 20;
 	this->health = maxHealth;
-	this->maxEnergy = 5;
-	this->energy = maxEnergy;
+
+	this->energyUsage = 0;
 }
 
 
@@ -87,9 +87,9 @@ void BodyPart::Destroy() {
 
 void BodyPart::Print() {
 	Object::Print();
-	if (shared_ptr<Creature> parentCreature = creature.lock()) {
-		parentCreature->PrintInfo();
-	}
+	cout << "Nerve Info:" << endl;
+	cout << "inputEnabled: " << nerveInfo.inputEnabled << "   inputIndex: " << nerveInfo.inputIndex << endl;
+	cout << "outputEnabled: " << nerveInfo.outputEnabled << "   outputIndex: " << nerveInfo.outputIndex << endl;
 }
 
 
@@ -101,8 +101,11 @@ weak_ptr<Creature> BodyPart::GetParentCreature() {
 	return creature;
 }
 
-void BodyPart::TakeDamage(double amount) {
+double BodyPart::TakeDamage(double amount) {
+	amount = min(amount, health);
 	this->health -= amount;
+
+	return amount;
 }
 
 bool BodyPart::CanAddChild() {
@@ -122,6 +125,15 @@ void BodyPart::AddChild(shared_ptr<BodyPart> child, int angle) {
 }
 
 
+bool BodyPart::NerveInputEnabled() {
+	return this->nerveInfo.inputEnabled;
+}
+
+bool BodyPart::NerveOutputEnabled() {
+	return this->nerveInfo.outputEnabled;
+}
+
+
 float BodyPart::GetNerveOutput() {
 	if (!parentJoint)
 		return 0;
@@ -134,7 +146,7 @@ int BodyPart::GetNerveOutputIndex() {
 }
 
 int BodyPart::GetNerveInputIndex() {
-	return nerveInfo.inputIndex;
+	return this->nerveInfo.inputIndex;
 }
 
 void BodyPart::SetNerveInput(float val) {
@@ -145,6 +157,6 @@ void BodyPart::SetNerveInput(float val) {
 }
 
 
-double BodyPart::GetEnergy() {
-	return energy;
+double BodyPart::GetEnergyUsage() {
+	return energyUsage + 0.001;
 }

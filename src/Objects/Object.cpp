@@ -71,7 +71,7 @@ Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, i
 }
 
 void Object::UpdateObjectUserData() {
-	cout << "update object data " << polymorphic_id << endl;
+	//cout << "update object data " << polymorphic_id << endl;
 	objectUserData->parentObject = shared_from_this();
 	objectUserData->objectType = polymorphic_id;
 }

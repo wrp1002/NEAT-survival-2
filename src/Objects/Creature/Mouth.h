@@ -9,7 +9,7 @@ using namespace std;
 
 class Mouth : public BodyPart {
 	private:
-		static const int biteCooldown = 50;
+		static const int biteCooldown = 20;
 
 		bool biting;
 		bool triggerBiteDamage;

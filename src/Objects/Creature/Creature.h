@@ -23,6 +23,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		static const int extraInputCount = 10;
 		static const int extraOutputCount = 10;
 		static const int geneLength = 16;
+		static const int minEggHatchTimer = 200;
 		static const int maxEggHatchTimer = 300;
 
 		int baseInputs;
@@ -31,6 +32,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		bool isPlayer;
 
 		double energy, maxEnergy;
+		double energyUsage;
 
 		int eggHatchTimer;
 		float geneMutationCoef;
@@ -54,7 +56,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 
 	public:
 		Creature(string genes, b2Vec2 pos);
-		Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn);
+		Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy);
 		~Creature();
 		void Init();
 
@@ -77,6 +79,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		void DestroyAllJoints();
 		void AddPart(shared_ptr<BodyPart> part);
 
+		void AddEnergy(double amount);
 		void TakeDamage(double amount);
 		void DistributeEnergy(double amount);
 		void MakeEgg();
@@ -89,6 +92,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		shared_ptr<NEAT> GetNN();
 		vector<shared_ptr<BodyPart>> GetAllParts();
 		bool IsAlive();
+		double GetUsableEnergy();
 		double GetTotalEnergy();
 
 		// player control functions

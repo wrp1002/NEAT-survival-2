@@ -1,5 +1,6 @@
 #pragma once
 
+#include <box2d/b2_math.h>
 #include <box2d/box2d.h>
 
 namespace Util {
@@ -24,6 +25,7 @@ namespace Util {
 	int RandomSign();
 	float RandomNormal();
 	double Round(double num);
+	b2Vec2 RandomWorldPosPX();
 
 	void ResetTransform();
 }

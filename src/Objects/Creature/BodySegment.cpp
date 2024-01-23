@@ -63,6 +63,7 @@ void BodySegment::AddChild(shared_ptr<BodyPart> child, int angle) {
 	for (int i = validChildAngles.size() - 1; i >= 0; i--) {
 		if (validChildAngles[i] == angle) {
 			validChildAngles.erase(validChildAngles.begin() + i);
+			break;
 		}
 	}
 }
@@ -102,6 +103,6 @@ void BodySegment::Draw() {
 	Object::Draw();
 
 	al_draw_arc(0, 0, 5, 0, (health / maxHealth) * M_PI * 2, al_map_rgb(30, 255, 30), 5);
-	al_draw_arc(0, 0, 10, 0, (energy / maxEnergy) * M_PI * 2, al_map_rgb(30, 30, 255), 5);
+	//al_draw_arc(0, 0, 10, 0, (energy / maxEnergy) * M_PI * 2, al_map_rgb(30, 30, 255), 5);
 }
 

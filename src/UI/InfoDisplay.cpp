@@ -27,7 +27,7 @@ namespace InfoDisplay {
 		InfoDisplay::event_queue = event_queue;
 
 		weak_ptr<Object> selectedObject;
-		screenSize = b2Vec2(400, 600);
+		screenSize = b2Vec2(500, 600);
 		mousePos = b2Vec2(0, 0);
 	}
 
@@ -92,12 +92,12 @@ namespace InfoDisplay {
 
 			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(object)) {
 				infoText.insert(infoText.end(), {
-					fmt::format("Energy: {}", bodyPart->GetEnergy())
+					fmt::format("Energy: {}", 0)
 				});
 
 				if (shared_ptr<Creature> creature = bodyPart->GetParentCreature().lock()) {
 					infoText.insert(infoText.end(), {
-						fmt::format("C-Energy: {}", creature->GetTotalEnergy()),
+						fmt::format("C-Energy: {}", creature->GetUsableEnergy()),
 						DrawNN(creature->GetNN()),
 					});
 				}
@@ -277,8 +277,15 @@ namespace InfoDisplay {
 
 	void SelectObject(weak_ptr<Object> obj) {
 		selectedObject = obj;
-		if (obj.lock())
+		if (shared_ptr<Object> objPtr = obj.lock()) {
 			obj.lock()->Print();
+
+			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(objPtr)) {
+				if (shared_ptr<Creature> creature = bodyPart->GetParentCreature().lock()) {
+					creature->PrintInfo();
+				}
+			}
+		}
 	}
 
 	b2Vec2 CalculateNodePos(shared_ptr<Node> node) {

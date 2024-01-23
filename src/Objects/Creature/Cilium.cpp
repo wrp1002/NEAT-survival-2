@@ -35,10 +35,19 @@ void Cilium::Update() {
 	if (creature.expired())
 		return;
 
+	double requestedEnergy = 0.005 * currentSpeed;
+
+	// Not enough energy, so do nothing
+	if (creature.lock()->GetUsableEnergy() < requestedEnergy) {
+		energyUsage = 0;
+		return;
+	}
+
 	this->animationAngle = body->GetAngle() + sin(al_get_time() * currentSpeed);
 
 	this->body->ApplyForce(currentSpeed * b2Vec2(cos(body->GetAngle() - M_PI_2), sin(body->GetAngle() - M_PI_2)), body->GetPosition(), true);
 
+	this->energyUsage = requestedEnergy;
 }
 
 void Cilium::Draw() {

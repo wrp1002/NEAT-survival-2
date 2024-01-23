@@ -24,6 +24,7 @@ namespace Toolbar {
 					ALLEGRO_END_OF_MENU,
 
 				{ "Show Info Display", BUTTON_IDS::TOGGLE_INFO_DISPLAY, 0, NULL },
+				{ "Reset Sim", BUTTON_IDS::RESET_SIM, 0, NULL },
 				{ "E&xit", BUTTON_IDS::EXIT, 0, NULL },
 			ALLEGRO_END_OF_MENU,
 
@@ -98,6 +99,12 @@ namespace Toolbar {
 				//done = true;
 				break;
 			}
+			case BUTTON_IDS::RESET_SIM: {
+				GameManager::Reset();
+				break;
+			}
+
+
 			case BUTTON_IDS::SPEED_DECREASE: {
 				GameManager::DecreaseSpeed();
 				break;

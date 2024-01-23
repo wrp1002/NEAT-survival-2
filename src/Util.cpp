@@ -90,6 +90,12 @@ double Util::Round(double num) {
 	return double(int(num * 100) / 100);
 }
 
+b2Vec2 Util::RandomWorldPosPX() {
+	float angle = Util::RandomDir();
+	int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
+	return b2Vec2(cos(angle) * dist, sin(angle) * dist);
+}
+
 
 void Util::ResetTransform() {
 	ALLEGRO_TRANSFORM identityTransform;

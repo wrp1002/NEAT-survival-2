@@ -33,6 +33,7 @@ Creature::Creature(string genes, b2Vec2 pos) {
 
 	this->maxEnergy = 100;
 	this->energy = maxEnergy;
+	this->energyUsage = 0;
 
 	this->eggHatchTimer = 0;
 	this->geneMutationCoef = 0;
@@ -60,7 +61,7 @@ Creature::Creature(string genes, b2Vec2 pos) {
 		nn->MutateAddConnection();
 }
 
-Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn) : Creature(genes, pos) {
+Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy) : Creature(genes, pos) {
 	this->genes = genes;
 	this->startingPos = pos;
 	this->alive = true;
@@ -71,8 +72,9 @@ Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn) : Creature(gen
 	this->geneMutationCoef = 0;
 	this->nnMutationCoef = 0;
 
-	this->maxEnergy = 10;
-	this->energy = maxEnergy;
+	this->maxEnergy = 300;
+	this->energy = energy;
+	this->energyUsage = 0;
 
 	this->baseInputs = nn->GetInputsCount() - extraInputCount;
 	this->baseOutputs = nn->GetOutputsCount() - extraOutputCount;
@@ -105,10 +107,11 @@ void Creature::Update() {
 		inputs.push_back(0);
 
 	for (auto part : bodySegments) {
+		if (!part->NerveOutputEnabled())
+			continue;
+
 		int index = part->GetNerveInputIndex();
 		float val = part->GetNerveOutput();
-		//cout << "input " << val << " at " << index << endl;
-
 		inputs[index] += val;
 	}
 
@@ -119,17 +122,28 @@ void Creature::Update() {
 	if (!isPlayer) {
 		// Outputs
 		vector<double> output = nn->GetOutputs();
+
 		for (auto part : bodySegments) {
+			if (!part->NerveInputEnabled())
+				continue;
+
 			int index = part->GetNerveOutputIndex();
 			float val = output[index];
-
 			part->SetNerveInput(val);
+		}
+
+		bool wantsEgg = output[0] || energy >= 200;
+		if (wantsEgg && energy >= 50) {
+			MakeEgg();
 		}
 	}
 
 	for (int i = bodySegments.size() - 1; i >= 0; i--) {
 		auto part = bodySegments[i];
 		part->Update();
+
+		double energyUsage = part->GetEnergyUsage();
+		this->energy -= energyUsage;
 
 		if (!part->IsAlive()) {
 			if (!head.expired() && part == head.lock())
@@ -143,6 +157,9 @@ void Creature::Update() {
 
 
 	if (head.expired())
+		alive = false;
+
+	if (energy <= 0)
 		alive = false;
 
 }
@@ -166,13 +183,17 @@ void Creature::ApplyForce(b2Vec2 force) {
 
 void Creature::PrintInfo() {
 	cout << "Selected creature " << this << endl;
+	cout << "DNA: " << endl << endl << genes << endl << endl;
 	cout << "Parts: " << bodySegments.size() << endl;
 	cout << "Energy: " << energy << " / " << maxEnergy << endl;
 	cout << "EggHatchTimer: " << eggHatchTimer << "  geneMutationCoef: " << geneMutationCoef << "  nnMutationCoef: " << nnMutationCoef << endl;
+
+	for (auto part : bodySegments)
+		part->Print();
 }
 
 void Creature::DestroyAllJoints() {
-	cout << "Destroy all joints!" << endl;
+	//cout << "Destroy all joints!" << endl;
 	for (auto part : bodySegments)
 		part->DestroyJoint();
 }
@@ -183,14 +204,25 @@ void Creature::AddPart(shared_ptr<BodyPart> part) {
 	part->UpdateObjectUserData();
 }
 
+void Creature::AddEnergy(double amount) {
+	this->energy += amount;
+}
+
 void Creature::TakeDamage(double amount) {
 
 }
 
 void Creature::MakeEgg() {
+	double eggEnergy = energy / 2.0;
+	this->energy -= eggEnergy;
+
 	string eggGenes = GetMutatedGenes();
 	shared_ptr<NEAT> eggNN = GetMutatedNN();
-	ObjectFactory::CreateEgg(eggGenes, Util::metersToPixels(this->head.lock()->GetPos()), eggNN);
+	b2Vec2 eggPos = Util::metersToPixels(this->head.lock()->GetPos());
+	float eggDir = this->head.lock()->GetBody()->GetAngle() + M_PI / 2;
+	eggPos += 200 * b2Vec2(cos(eggDir), sin(eggDir));
+
+	ObjectFactory::CreateEgg(eggGenes, eggPos, eggNN, eggEnergy);
 }
 
 
@@ -242,10 +274,15 @@ shared_ptr<NEAT> Creature::GetNN() {
 	return nn;
 }
 
+double Creature::GetUsableEnergy() {
+	return this->energy;
+}
+
+// TODO: total energy + health
 double Creature::GetTotalEnergy() {
 	double total = 0;
 	for (auto part : bodySegments) {
-		total += part->GetEnergy();
+		total += 0;
 	}
 	return total;
 }

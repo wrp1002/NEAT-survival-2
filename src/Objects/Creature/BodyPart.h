@@ -18,7 +18,7 @@ class BodyPart : public Object {
 			bool inputEnabled;
 			bool outputEnabled;
 			int inputIndex;
-			bool outputIndex;
+			int outputIndex;
 		};
 
 	protected:
@@ -27,8 +27,8 @@ class BodyPart : public Object {
 		weak_ptr<Creature> creature;
 		weak_ptr<BodyPart> parentPart;
 
-		float health, maxHealth;
-		float energy, maxEnergy;
+		double health, maxHealth;
+		double energyUsage;
 
 		static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
@@ -48,18 +48,21 @@ class BodyPart : public Object {
 		b2Body *GetBody();
 		weak_ptr<Creature> GetParentCreature();
 
-		void TakeDamage(double amount);
+		double TakeDamage(double amount);
 
 		virtual bool CanAddChild();
 		virtual bool childAngleValid(int angle);
 		virtual int GetValidChildAngle(int angleGene);
 		virtual void AddChild(shared_ptr<BodyPart> child, int angle);
 
+		bool NerveInputEnabled();
+		bool NerveOutputEnabled();
 		virtual float GetNerveOutput();
 		int GetNerveOutputIndex();
 		int GetNerveInputIndex();
 		virtual void SetNerveInput(float val);
 
-		double GetEnergy();
+		double GetEnergyUsage();
+
 };
 

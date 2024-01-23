@@ -23,10 +23,12 @@ namespace ObjectFactory {
 	string GetRandomGenes(int length);
 
 	shared_ptr<Egg> CreateEgg();
-	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn);
+	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy);
 
 	shared_ptr<Creature> CreateAgent();
 	shared_ptr<Creature> CreateAgent(string genes, b2Vec2 pos);
-	shared_ptr<Creature> CreateAgent(string genes, b2Vec2 pos, shared_ptr<NEAT> nn);
+	shared_ptr<Creature> CreateAgent(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy);
+
+	shared_ptr<NEAT> RandomNN();
 
 }

@@ -23,7 +23,7 @@ Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parent
 
 	this->triggerBiteDamage = false;
 	this->cooldownTimer = 0;
-	this->animationRate = 0.2;
+	this->animationRate = 0.4;
 	this->animationFrame = 0;
 	this->animationState = 0;
 	this->polymorphic_id = "Mouth";
@@ -31,7 +31,7 @@ Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parent
 	this->parentPart = parentPart;
 
 	this->shapeType = SHAPE_TYPES::RECT;
-	this->pixelSize = b2Vec2(15, 10);
+	this->pixelSize = b2Vec2(20, 20);
 	this->worldSize = Util::pixelsToMeters(this->pixelSize);
 
 	b2BodyDef bodyDef;
@@ -72,6 +72,12 @@ void Mouth::Update() {
 		alive = false;
 
 	UpdateJoint();
+
+	if (CanBite()) {
+		biting = true;
+		animationState = 0.15;
+		cooldownTimer = biteCooldown;
+	}
 
 	if (creature.expired())
 		return;
@@ -114,7 +120,10 @@ void Mouth::Update() {
 				continue;
 
 			cout << "doing damage to " << bodyPart->GetType() << endl;
-			bodyPart->TakeDamage(5);
+			double energyGained = bodyPart->TakeDamage(10);
+
+			this->GetParentCreature().lock()->AddEnergy(energyGained);
+
 			break;
 		}
 

@@ -38,6 +38,7 @@ namespace GameManager {
 	void Init();
 	void InitAllegro();
 	void Shutdown();
+	void Reset();
 	b2Body * CreateWorldBorder();
 
 	void Update();

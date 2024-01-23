@@ -81,7 +81,7 @@ void MyContactListener::HandleBorderBeginContact(b2Contact *contact) {
 void MyContactListener::HandleBorderEndContact(ObjectUserData *userData1, ObjectUserData *userData2) {
 	ObjectUserData *userData;
 
-	cout << "border end collision" << endl;
+	//cout << "border end collision" << endl;
 	if (userData1->objectType == "border")
 		userData = userData2;
 	else if (userData2->objectType == "border")

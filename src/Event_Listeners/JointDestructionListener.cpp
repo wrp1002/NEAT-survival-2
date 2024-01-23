@@ -9,7 +9,7 @@ using namespace std;
 
 void JointDestructionListener::SayGoodbye(b2Joint* joint) {
 	// remove all references to joint.
-	cout << "joint break!" << endl;
+	//cout << "joint break!" << endl;
 
 	JointUserData *userData = reinterpret_cast<JointUserData *>(joint->GetUserData().pointer);
 
@@ -30,5 +30,5 @@ void JointDestructionListener::SayGoodbye(b2Joint* joint) {
 }
 
 void JointDestructionListener::SayGoodbye(b2Fixture* fixture) {
-	cout << "fixture break" << endl;
+	//cout << "fixture break" << endl;
 }
