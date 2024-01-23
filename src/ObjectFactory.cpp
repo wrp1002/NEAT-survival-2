@@ -53,7 +53,7 @@ namespace  ObjectFactory {
 
 		float angle = Util::RandomDir();
 		int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
-		double energy = 100;
+		double energy = 200;
 
 		return CreateEgg(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist), NEAT::RandomNN(inputLabels, outputLabels, 10), energy);
 	}

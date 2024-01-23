@@ -18,7 +18,6 @@ Egg::Egg(string genes, shared_ptr<NEAT> nn, double energy, int generation, b2Vec
 	this->generation = generation;
 	this->polymorphic_id = "Egg";
 	this->energy = energy;
-	cout << "creat egg with " << energy << endl;
 
 	this->hatchTimer = rand() % 100;
 	int forceAmount = 20;

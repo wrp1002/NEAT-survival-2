@@ -54,6 +54,9 @@ namespace GameManager {
 	vector<shared_ptr<Object>> looseObjects;
 	vector<weak_ptr<Object>> objectsOutsideBorder;
 
+	double extraEnergy;
+
+
 	void Init() {
 		InitAllegro();
 
@@ -61,6 +64,7 @@ namespace GameManager {
 		positionIterations = 2;
 		speed = 1;
 		paused = false;
+		extraEnergy = 0;
 
 		MyContactListener *contactListener = new MyContactListener;
 		JointDestructionListener *jointDestructionListener = new JointDestructionListener;
@@ -128,7 +132,7 @@ namespace GameManager {
 
 
 		// Create new eggs
-		for (int i = 0; i < 10; i++) ObjectFactory::CreateEgg();
+		for (int i = 0; i < 250; i++) ObjectFactory::CreateEgg();
 	}
 
 	b2Body *CreateWorldBorder() {
@@ -166,6 +170,8 @@ namespace GameManager {
 				agents[i]->Update();
 
 				if (!agents[i]->IsAlive()) {
+					extraEnergy += agents[i]->GetTotalEnergy();
+
 					agents[i]->DestroyAllJoints();
 
 					vector<shared_ptr<BodyPart>> agentParts = agents[i]->GetAllParts();
@@ -221,7 +227,7 @@ namespace GameManager {
 			simTicks++;
 		}
 
-		if (agents.size() == 0)
+		if (agents.size() + eggs.size() == 0)
 			Reset();
 	}
 
@@ -332,6 +338,27 @@ namespace GameManager {
 
 	bool IsPaused() {
 		return paused;
+	}
+
+	unsigned int GetTotalEnergy() {
+		int total = 0;
+
+		total += extraEnergy;
+
+		for (auto agent : agents)
+			total += agent->GetTotalEnergy();
+
+		for (auto egg : eggs) {
+			total += egg->GetEnergy();
+		}
+
+		for (auto obj : looseObjects) {
+			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(obj)) {
+				total += bodyPart->GetHealth();
+			}
+		}
+
+		return total;
 	}
 
 }

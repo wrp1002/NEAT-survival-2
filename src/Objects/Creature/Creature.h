@@ -34,6 +34,8 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		double energy, maxEnergy;
 		double energyUsage;
 
+		double waste;
+
 		int eggHatchTimer;
 		float geneMutationCoef;
 		float nnMutationCoef;
@@ -82,6 +84,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		void AddEnergy(double amount);
 		void TakeDamage(double amount);
 		void DistributeEnergy(double amount);
+		double DistributeHealth(double amount);
 		void MakeEgg();
 
 		float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);

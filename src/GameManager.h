@@ -34,6 +34,8 @@ namespace GameManager {
 	extern vector<shared_ptr<Object>> looseObjects;
 	extern vector<weak_ptr<Object>> objectsOutsideBorder;
 
+	extern double extraEnergy;
+
 
 	void Init();
 	void InitAllegro();
@@ -58,4 +60,6 @@ namespace GameManager {
 	void ResetSpeed();
 	void IncreaseSpeed();
 	void DecreaseSpeed();
+
+	unsigned int GetTotalEnergy();
 }

@@ -86,6 +86,11 @@ Creature::~Creature() {
 
 void Creature::Init() {
 	ApplyGenes();
+
+	double energyToHealth = this->energy / 2.0;
+	this->energy -= energyToHealth;
+	double leftover = this->DistributeHealth(energyToHealth);
+	this->AddEnergy(leftover);
 }
 
 void Creature::ApplyGenes() {
@@ -144,6 +149,7 @@ void Creature::Update() {
 
 		double energyUsage = part->GetEnergyUsage();
 		this->energy -= energyUsage;
+		this->waste += energyUsage;
 
 		if (!part->IsAlive()) {
 			if (!head.expired() && part == head.lock())
@@ -210,6 +216,19 @@ void Creature::AddEnergy(double amount) {
 
 void Creature::TakeDamage(double amount) {
 
+}
+
+void Creature::DistributeEnergy(double amount) {
+
+}
+
+double Creature::DistributeHealth(double amount) {
+	double leftover = 0;
+	double amountPerPart = amount / double(this->bodySegments.size());
+	for (auto part : this->bodySegments) {
+		leftover += part->SetHealth(amountPerPart);
+	}
+	return leftover;
 }
 
 void Creature::MakeEgg() {
@@ -281,9 +300,13 @@ double Creature::GetUsableEnergy() {
 // TODO: total energy + health
 double Creature::GetTotalEnergy() {
 	double total = 0;
-	for (auto part : bodySegments) {
-		total += 0;
-	}
+
+	total += this->energy;
+	total += this->waste;
+
+	for (auto part : bodySegments)
+		total += part->GetHealth();
+
 	return total;
 }
 

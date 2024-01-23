@@ -120,9 +120,9 @@ void Mouth::Update() {
 				continue;
 
 			cout << "doing damage to " << bodyPart->GetType() << endl;
-			double energyGained = bodyPart->TakeDamage(10);
+			//double energyGained = bodyPart->TakeDamage(10);
 
-			this->GetParentCreature().lock()->AddEnergy(energyGained);
+			//this->GetParentCreature().lock()->AddEnergy(energyGained);
 
 			break;
 		}

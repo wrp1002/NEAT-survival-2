@@ -13,8 +13,8 @@ BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, Ner
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
 
-	this->maxHealth = 10;
-	this->health = maxHealth;
+	this->maxHealth = 20;
+	this->health = 1;
 
 	this->energyUsage = 0;
 }
@@ -26,7 +26,7 @@ BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixel
 	this->color = color;
 
 	this->maxHealth = 20;
-	this->health = maxHealth;
+	this->health = 1;
 
 	this->energyUsage = 0;
 }
@@ -157,6 +157,20 @@ void BodyPart::SetNerveInput(float val) {
 }
 
 
+double BodyPart::SetHealth(double amount) {
+	double extra = 0;
+	this->health = amount;
+	if (health > maxHealth) {
+		extra = health - maxHealth;
+		health -= extra;
+	}
+	return extra;
+}
+
 double BodyPart::GetEnergyUsage() {
 	return energyUsage + 0.001;
+}
+
+double BodyPart::GetHealth() {
+	return health;
 }

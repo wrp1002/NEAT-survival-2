@@ -91,7 +91,6 @@ void Creature::ApplyGenes(string genes) {
 							CreateEye(gene, currentGenes, parentObjects, symmetryMap, symmetryID);
 						else if (partType < 7) {
 							CreateBodySegment(gene, currentGenes, parentObjects, symmetryMap, symmetryID);
-							energy -= 10;
 						}
 
 						symmetryID++;

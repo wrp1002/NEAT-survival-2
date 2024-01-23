@@ -80,7 +80,7 @@ namespace InfoDisplay {
 			fmt::format("Speed: {}x", GameManager::speed),
 			fmt::format("R Time: {}", GameManager::GetSimTimeStr()),
 
-			//fmt::format("Total En: {:.2f}", GameManager::GetTotalEnergy()),
+			fmt::format("Total En: {}", GameManager::GetTotalEnergy()),
 		});
 
 
@@ -92,12 +92,12 @@ namespace InfoDisplay {
 
 			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(object)) {
 				infoText.insert(infoText.end(), {
-					fmt::format("Energy: {}", 0)
+					fmt::format("Health: {:.2}", bodyPart->GetHealth())
 				});
 
 				if (shared_ptr<Creature> creature = bodyPart->GetParentCreature().lock()) {
 					infoText.insert(infoText.end(), {
-						fmt::format("C-Energy: {}", creature->GetUsableEnergy()),
+						fmt::format("C-Energy: {:.2}", creature->GetUsableEnergy()),
 						DrawNN(creature->GetNN()),
 					});
 				}

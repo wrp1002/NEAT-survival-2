@@ -62,7 +62,10 @@ class BodyPart : public Object {
 		int GetNerveInputIndex();
 		virtual void SetNerveInput(float val);
 
+		double SetHealth(double amount);
+
 		double GetEnergyUsage();
+		double GetHealth();
 
 };
 
