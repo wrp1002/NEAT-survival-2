@@ -1,5 +1,6 @@
 #include "Camera.h"
 
+#include <Box2D/Common/b2Math.h>
 #include <allegro5/transformations.h>
 #include <Box2D/Box2D.h>
 
@@ -96,6 +97,17 @@ namespace Camera {
 		return b2Vec2(
 			pos.x + Globals::SCREEN_WIDTH  / 2.0 - Globals::SCREEN_WIDTH  / 2.0 / zoom + screenPos.x / zoom,
 			pos.y + Globals::SCREEN_HEIGHT / 2.0 - Globals::SCREEN_HEIGHT / 2.0 / zoom + screenPos.y / zoom
+		);
+	}
+
+	bool ShouldDrawObject(b2Vec2 objectPos) {
+		b2Vec2 cameraPos = CalculatePos();
+
+		return (
+			objectPos.x > cameraPos.x - Globals::SCREEN_WIDTH / 2.0 / zoom &&
+			objectPos.x < cameraPos.x + Globals::SCREEN_WIDTH + Globals::SCREEN_WIDTH / 2.0 / zoom &&
+			objectPos.y > cameraPos.y - Globals::SCREEN_HEIGHT / 2.0 / zoom  &&
+			objectPos.y < cameraPos.y + Globals::SCREEN_HEIGHT + Globals::SCREEN_HEIGHT / 2.0 / zoom
 		);
 	}
 }

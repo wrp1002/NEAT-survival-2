@@ -1,5 +1,6 @@
 #include "Creature.h"
 
+#include <Box2D/Common/b2Math.h>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 
@@ -308,6 +309,9 @@ double Creature::GetTotalEnergy() {
 	return total;
 }
 
+b2Vec2 Creature::GetHeadPosPX() {
+	return Util::metersToPixels(this->head.lock()->GetPos());
+}
 
 void Creature::SetBiting(bool val) {
 	for (auto part : bodySegments) {

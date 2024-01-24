@@ -11,17 +11,22 @@ namespace SimStats {
 	high_resolution_clock::time_point updateStart;
 	high_resolution_clock::time_point drawStart;
 
+	int lastDrawnObjectCount;
+
+
+
 	void Init() {
 		lastPhysicsTime = 0;
 		lastUpdateTime = 0;
 		lastDrawTime = 0;
-
+		lastDrawnObjectCount = 0;
 	}
 
 	void ResetTimes() {
 		lastPhysicsTime = 0;
 		lastUpdateTime = 0;
 		lastDrawTime = 0;
+		lastDrawnObjectCount = 0;
 	}
 
 	void StartUpdateTimer() {
@@ -50,11 +55,19 @@ namespace SimStats {
 		lastDrawTime = ms_int.count();
 	}
 
+	void ResetDrawnObjectCount() {
+		lastDrawnObjectCount = 0;
+	}
+	void IncrementDrawnObjectCount() {
+		lastDrawnObjectCount++;
+	}
+
 
 	void Draw() {
 		Font::DrawText("arial.ttf", 16, fmt::format("Draw: {}ms", lastDrawTime), 10, 0);
 		Font::DrawText("arial.ttf", 16, fmt::format("Update: {}ms", lastUpdateTime), 10, 16);
 		Font::DrawText("arial.ttf", 16, fmt::format("Physics: {}ms", lastPhysicsTime), 10, 32);
+		Font::DrawText("arial.ttf", 16, fmt::format("Drawn Objects: {}", lastDrawnObjectCount), 10, 48);
 	}
 
 }

@@ -156,6 +156,10 @@ b2Vec2 Object::GetPos() {
 	return body->GetPosition();
 }
 
+b2Vec2 Object::GetPosPX() {
+	return Util::metersToPixels(body->GetPosition());
+}
+
 string Object::GetType() {
 	return polymorphic_id;
 }

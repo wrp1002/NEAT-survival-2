@@ -39,6 +39,7 @@ class Object : public enable_shared_from_this<Object> {
 
 		b2Vec2 GetEdgePoint(float angle);
 		b2Vec2 GetPos();
+		b2Vec2 GetPosPX();
 		string GetType();
 
 		bool IsAlive();

@@ -1,4 +1,5 @@
 #pragma once
+#include <Box2D/Common/b2Math.h>
 #include <allegro5/allegro.h>
 
 #include <Box2D/Box2D.h>
@@ -24,5 +25,6 @@ namespace Camera {
 
 	b2Vec2 CalculatePos();
 	b2Vec2 ScreenPos2WorldPos(b2Vec2 screenPos);
+	bool ShouldDrawObject(b2Vec2 objectPos);
 };
 

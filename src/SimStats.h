@@ -20,6 +20,9 @@ namespace SimStats {
 	extern high_resolution_clock::time_point updateStart;
 	extern high_resolution_clock::time_point drawStart;
 
+	extern int lastDrawnObjectCount;
+
+
 	void Init();
 
 	void ResetTimes();
@@ -31,6 +34,9 @@ namespace SimStats {
 	void EndUpdateTimer();
 	void EndPhysicsTimer();
 	void EndDrawTimer();
+
+	void ResetDrawnObjectCount();
+	void IncrementDrawnObjectCount();
 
 	void Draw();
 

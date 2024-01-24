@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BodyPart.h"
+#include <Box2D/Common/b2Math.h>
 #include <allegro5/transformations.h>
 #include <Box2D/Box2D.h>
 
@@ -95,6 +96,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		bool IsAlive();
 		double GetUsableEnergy();
 		double GetTotalEnergy();
+		b2Vec2 GetHeadPosPX();
 
 		// player control functions
 		void SetBiting(bool val);

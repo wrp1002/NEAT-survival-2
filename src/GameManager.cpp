@@ -1,5 +1,6 @@
 #include "GameManager.h"
 
+#include <Box2D/Common/b2Math.h>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_native_dialog.h>
@@ -241,14 +242,29 @@ namespace GameManager {
 	}
 
 	void Draw() {
-		for (auto object : looseObjects)
-			object->Draw();
+		SimStats::ResetDrawnObjectCount();
 
-		for (auto agent : agents)
-			agent->Draw();
+		for (auto object : looseObjects) {
+			if (Camera::ShouldDrawObject(object->GetPosPX())) {
+				object->Draw();
+				SimStats::IncrementDrawnObjectCount();
+			}
+		}
 
-		for (auto egg : eggs)
-			egg->Draw();
+		for (auto agent : agents) {
+			b2Vec2 pos = agent->GetHeadPosPX();
+			if (Camera::ShouldDrawObject(pos)) {
+				agent->Draw();
+				SimStats::IncrementDrawnObjectCount();
+			}
+		}
+
+		for (auto egg : eggs) {
+			if (Camera::ShouldDrawObject(egg->GetPosPX())) {
+				egg->Draw();
+				SimStats::IncrementDrawnObjectCount();
+			}
+		}
 
 		bool drawWorldBorder = true;
 
