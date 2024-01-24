@@ -1,7 +1,6 @@
 #pragma once
 
-#include <box2d/b2_math.h>
-#include <box2d/box2d.h>
+#include <Box2D/Box2D.h>
 
 namespace Util {
 	b2Vec2 metersToPixels(float xMeters, float yMeters);

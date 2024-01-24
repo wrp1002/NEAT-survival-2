@@ -9,9 +9,9 @@ using namespace std;
 
 void JointDestructionListener::SayGoodbye(b2Joint* joint) {
 	// remove all references to joint.
-	//cout << "joint break!" << endl;
+	cout << "joint break!" << endl;
 
-	JointUserData *userData = reinterpret_cast<JointUserData *>(joint->GetUserData().pointer);
+	JointUserData *userData = reinterpret_cast<JointUserData *>(joint->GetUserData());
 
 	if (!userData) {
 		cout << "missing joint user data!" << endl;

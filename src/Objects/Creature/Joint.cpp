@@ -2,10 +2,7 @@
 
 #include <allegro5/allegro_primitives.h>
 
-#include <box2d/b2_distance_joint.h>
-#include <box2d/b2_joint.h>
-#include <box2d/b2_math.h>
-#include <box2d/b2_revolute_joint.h>
+#include <Box2D/Box2D.h>
 #include <cstdint>
 
 #include "../../GameManager.h"
@@ -32,7 +29,8 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 	jointDef.motorSpeed = jointInfo.motorSpeed;
 	jointDef.enableMotor = jointInfo.enableMotor;
 	jointDef.collideConnected = false;
-	jointDef.userData.pointer = reinterpret_cast<uintptr_t>(this->userData.get());
+	//jointDef.userData.pointer = reinterpret_cast<uintptr_t>(this->userData.get());
+	jointDef.userData = (void*)this->userData.get();
 
 	this->revoluteJoint = (b2RevoluteJoint *)GameManager::world.CreateJoint(&jointDef);
 	allJoints.push_back(revoluteJoint);
@@ -41,10 +39,11 @@ Joint::Joint(JointInfo jointInfo, b2Vec2 jointPos, b2Body *bodyA, b2Body *bodyB)
 	if (jointInfo.useSpring) {
 		b2DistanceJointDef distanceJointDef;
 		distanceJointDef.Initialize(bodyA, bodyB, bodyA->GetPosition(), bodyB->GetPosition());
-		distanceJointDef.userData.pointer = reinterpret_cast<uintptr_t>(this->userData.get());
+		//distanceJointDef.userData.pointer = reinterpret_cast<uintptr_t>(this->userData.get());
+		distanceJointDef.userData = (void*)this->userData.get();
 		float frequencyHz = 4.0f;
 		float dampingRatio = 0.5f;
-		b2LinearStiffness(distanceJointDef.stiffness, distanceJointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
+		//b2LinearStiffness(distanceJointDef.stiffness, distanceJointDef.damping, frequencyHz, dampingRatio, jointDef.bodyA, jointDef.bodyB);
 
 		this->springJoint = (b2DistanceJoint *)GameManager::world.CreateJoint(&distanceJointDef);
 		allJoints.push_back(springJoint);

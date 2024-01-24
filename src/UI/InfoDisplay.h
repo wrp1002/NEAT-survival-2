@@ -4,7 +4,7 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/color.h>
 
-#include <box2d/b2_math.h>
+#include <Box2D/Box2D.h>
 #include <iostream>
 #include <string>
 #include <typeinfo>

@@ -6,17 +6,14 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
 
-#include <box2d/b2_body.h>
-#include <box2d/b2_circle_shape.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_math.h>
+#include <Box2D/Box2D.h>
 
-#include <box2d/b2_world.h>
 #include <cstdint>
 #include <iostream>
 #include <fmt/format.h>
 #include <memory>
 
+#include "SimStats.h"
 #include "Objects/Creature/BodyPart.h"
 #include "Globals.h"
 #include "Util.h"
@@ -48,6 +45,7 @@ namespace GameManager {
 	b2Vec2 gravity(0.0, 0.0);
 	b2World world(gravity);
 	b2Body *worldBorder;
+	b2ThreadPoolTaskExecutor executor;
 
 	vector<shared_ptr<Creature>> agents;
 	vector<shared_ptr<Egg>> eggs;
@@ -110,6 +108,9 @@ namespace GameManager {
 
 	void Reset() {
 		cout << "Resetting sim..." << endl;
+		simTicks = 0;
+		simStartTime = al_get_time();
+		SimStats::Init();
 
 		for (int i = agents.size() - 1; i >= 0; i--) {
 			agents[i]->DestroyAllJoints();
@@ -132,7 +133,7 @@ namespace GameManager {
 
 
 		// Create new eggs
-		for (int i = 0; i < 250; i++) ObjectFactory::CreateEgg();
+		for (int i = 0; i < 400; i++) ObjectFactory::CreateEgg();
 	}
 
 	b2Body *CreateWorldBorder() {
@@ -142,7 +143,8 @@ namespace GameManager {
 		b2BodyDef bodyDef;
 		bodyDef.position = b2Vec2(0, 0);
 		bodyDef.type = b2_staticBody;
-		bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		//bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		bodyDef.userData = (void*)objectUserData;
 
 		b2Body *body = world.CreateBody(&bodyDef);
 
@@ -152,7 +154,8 @@ namespace GameManager {
 		b2FixtureDef fixtureDef;
 		fixtureDef.shape = &shapeDef;
 		fixtureDef.isSensor = true;
-		fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		//fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		bodyDef.userData = (void*)objectUserData;
 
 		body->CreateFixture(&fixtureDef);
 
@@ -164,7 +167,11 @@ namespace GameManager {
 			return;
 
 		for (int i = 0; i < speed; i++) {
-			GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations);
+			SimStats::StartPhysicsTimer();
+			GameManager::world.Step(Globals::FPS, velocityIterations, positionIterations, GameManager::executor);
+			SimStats::EndPhysicsTimer();
+
+			SimStats::StartUpdateTimer();
 
 			for (int i = agents.size() - 1; i >= 0; i--) {
 				agents[i]->Update();
@@ -223,6 +230,8 @@ namespace GameManager {
 					continue;
 				}
 			}
+
+			SimStats::EndUpdateTimer();
 
 			simTicks++;
 		}

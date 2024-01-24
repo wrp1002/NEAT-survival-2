@@ -3,12 +3,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/color.h>
 
-#include <box2d/b2_circle_shape.h>
-#include <box2d/b2_collision.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_math.h>
-#include <box2d/b2_polygon_shape.h>
-#include <box2d/b2_shape.h>
+#include <Box2D/Box2D.h>
 
 #include "../UI/Camera.h"
 #include "UserData/ObjectUserData.h"
@@ -53,7 +48,8 @@ Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, i
 	bodyDef.angle = angle;
 	bodyDef.linearDamping = 0.1;
 	bodyDef.angularDamping = 0.1;
-	bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	//bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	bodyDef.userData = (void*)this->objectUserData.get();
 
 	this->body = GameManager::world.CreateBody(&bodyDef);
 
@@ -65,7 +61,8 @@ Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, i
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.3f;
 	fixtureDef.restitution = 0.5f;
-	fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	//fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	fixtureDef.userData = (void*)this->objectUserData.get();
 
 	body->CreateFixture(&fixtureDef);
 }

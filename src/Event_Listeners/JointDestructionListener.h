@@ -1,5 +1,4 @@
-#include <box2d/b2_joint.h>
-#include <box2d/b2_world_callbacks.h>
+#include <Box2D/Box2D.h>
 
 class JointDestructionListener : public b2DestructionListener {
     public:

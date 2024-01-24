@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Objects/Creature/Creature.h"
-#include <box2d/b2_body.h>
-#include <box2d/b2_math.h>
-#include <box2d/b2_world.h>
+#include <Box2D/Box2D.h>
 
 #include <vector>
 #include <memory>
@@ -25,6 +23,7 @@ namespace GameManager {
 	extern ALLEGRO_EVENT_QUEUE *event_queue;
 	extern ALLEGRO_TIMER *timer;
 
+	extern b2ThreadPoolTaskExecutor executor;
 	extern b2Vec2 gravity;
 	extern b2World world;
 	extern b2Body *worldBorder;

@@ -3,9 +3,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_primitives.h>
 
-#include <box2d/b2_math.h>
-#include <box2d/b2_world.h>
-#include <box2d/box2d.h>
+#include <Box2D/Box2D.h>
 
 #include <iostream>
 #include <memory>
@@ -269,7 +267,7 @@ string Creature::GetMutatedGenes() {
 		if (Util::Random() <= Globals::GENE_MUTATE_CHANCE)
 			newGenes += to_string(rand() % 10);
 		else if (i % Globals::GENE_LENGTH == 0 && Util::Random() <= Globals::GENE_CREATE_CHANCE * geneMutationCoef) {
-			cout << "Adding new gene!!!!!!" << endl;
+			//cout << "Adding new gene!!!!!!" << endl;
 			for (int j = 0; j < Globals::GENE_LENGTH; j++)
 				newGenes += to_string(rand() % 10);
 		}

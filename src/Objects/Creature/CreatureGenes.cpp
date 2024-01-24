@@ -1,8 +1,7 @@
 #include "BodyPart.h"
 #include "Creature.h"
 
-#include <box2d/b2_body.h>
-#include <box2d/b2_math.h>
+#include <Box2D/Box2D.h>
 #include <memory>
 #include <unordered_map>
 #include <iostream>
@@ -317,8 +316,8 @@ void Creature::CreateCilium(string gene, CurrentGenes &currentGenes, vector<shar
 	jointInfo.angleLimit = 0.1;
 
 	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
+	nerveInfo.inputEnabled = true; //int(GetNextGene(gene, 1, 0)) % 2 == 0;
+	nerveInfo.outputEnabled = true; //int(GetNextGene(gene, 1, 0)) % 2 == 0;
 	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
 	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
 

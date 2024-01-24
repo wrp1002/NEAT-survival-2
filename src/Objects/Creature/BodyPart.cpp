@@ -1,6 +1,6 @@
 #include "BodyPart.h"
 
-#include <box2d/b2_math.h>
+#include <Box2D/Box2D.h>
 
 #include "../../Util.h"
 #include "../../GameManager.h"

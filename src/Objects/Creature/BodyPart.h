@@ -1,7 +1,7 @@
 #pragma once
 
 #include <allegro5/color.h>
-#include <box2d/b2_math.h>
+#include <Box2D/Box2D.h>
 
 #include <memory>
 #include <string>

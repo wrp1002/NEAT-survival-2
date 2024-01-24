@@ -2,10 +2,8 @@
 
 #include "BodyPart.h"
 #include <allegro5/transformations.h>
-#include <box2d/b2_joint.h>
-#include <box2d/b2_math.h>
-#include <box2d/b2_world.h>
-#include <box2d/b2_world_callbacks.h>
+#include <Box2D/Box2D.h>
+
 #include <string>
 #include <vector>
 #include <memory>

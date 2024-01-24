@@ -1,6 +1,6 @@
 #pragma once
 
-#include <box2d/b2_math.h>
+#include <Box2D/Box2D.h>
 #include <string>
 
 using namespace std;
@@ -9,7 +9,7 @@ namespace Globals {
 	const int SCREEN_WIDTH = 1600;
 	const int SCREEN_HEIGHT = 1200;
 
-	const int WORLD_SIZE_PX = 10000;
+	const int WORLD_SIZE_PX = 20000;
 
 	const float scaling = 100; // some number. Probably something like 100 will do for Box2D.
 	const float FPS = 1.0 / 30.0;

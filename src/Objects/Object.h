@@ -2,14 +2,7 @@
 
 #include <allegro5/color.h>
 
-#include <box2d/b2_body.h>
-#include <box2d/b2_circle_shape.h>
-#include <box2d/b2_common.h>
-#include <box2d/b2_math.h>
-#include <box2d/b2_polygon_shape.h>
-#include <box2d/b2_shape.h>
-#include <box2d/b2_world.h>
-#include <box2d/box2d.h>
+#include <Box2D/Box2D.h>
 
 #include <memory>
 #include <string>

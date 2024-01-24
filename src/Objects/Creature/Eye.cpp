@@ -36,7 +36,8 @@ Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart
 	bodyDef.angle = parentPart->GetBody()->GetAngle() - (angleOffset + angleOnParent) - M_PI_2;
 	bodyDef.linearDamping = 0.1;
 	bodyDef.angularDamping = 0.1;
-	bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	//bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	bodyDef.userData = (void*)this->objectUserData.get();
 
 	this->body = GameManager::world.CreateBody(&bodyDef);
 
@@ -45,7 +46,8 @@ Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart
 	fixtureDef.density = 0.01f;
 	fixtureDef.friction = 0.3f;
 	fixtureDef.restitution = 0.5f;
-	fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	//fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
+	bodyDef.userData = (void*)this->objectUserData.get();
 
 	body->CreateFixture(&fixtureDef);
 
@@ -73,8 +75,8 @@ void Eye::Update() {
 
 		shared_ptr<Object> otherObject;
 
-		ObjectUserData *userDataA = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetUserData().pointer);
-		ObjectUserData *userDataB = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetUserData().pointer);
+		ObjectUserData *userDataA = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetUserData());
+		ObjectUserData *userDataB = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetUserData());
 
 		if (userDataA && userDataA->parentObject.lock() && userDataA->parentObject.lock().get() != this)
 			otherObject = userDataA->parentObject.lock();

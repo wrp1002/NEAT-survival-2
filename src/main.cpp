@@ -3,18 +3,7 @@
 
 #include <allegro5/keycodes.h>
 #include <allegro5/transformations.h>
-#include <box2d/b2_block_allocator.h>
-#include <box2d/b2_body.h>
-#include <box2d/b2_circle_shape.h>
-#include <box2d/b2_common.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_joint.h>
-#include <box2d/b2_math.h>
-#include <box2d/b2_revolute_joint.h>
-#include <box2d/b2_weld_joint.h>
-#include <box2d/b2_world.h>
-#include <box2d/box2d.h>
-#include <box2d/b2_polygon_shape.h>
+#include <Box2D/Box2D.h>
 
 #include <cmath>
 #include <cstdint>
@@ -28,6 +17,7 @@
 
 
 #include "GameManager.h"
+#include "SimStats.h"
 #include "ObjectFactory.h"
 #include "Objects/Object.h"
 #include "UI/Camera.h"
@@ -65,6 +55,7 @@ int main() {
 
 
 	GameManager::Init();
+	SimStats::Init();
 	Camera::Init();
 	UserInput::Init();
 	Toolbar::Init(GameManager::display);
@@ -235,6 +226,8 @@ int main() {
 
 
 		if (redraw && al_is_event_queue_empty(GameManager::event_queue)) {
+			SimStats::StartDrawTimer();
+
 			redraw = false;
 			lastRedrawTime = al_get_time();
 
@@ -248,7 +241,9 @@ int main() {
 			GameManager::Draw();
 
 			Util::ResetTransform();
-			Font::DrawText("arial.ttf", 16, "string text", 10, 10);
+
+			SimStats::EndDrawTimer();
+			SimStats::Draw();
 
 			al_flip_display();
 		}

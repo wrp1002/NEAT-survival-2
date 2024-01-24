@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 #include <allegro5/transformations.h>
-#include <box2d/b2_math.h>
+#include <Box2D/Box2D.h>
 
 #include "../Globals.h"
 #include "../UserInput.h"

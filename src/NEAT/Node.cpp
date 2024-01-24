@@ -1,6 +1,5 @@
 #include "Node.h"
 
-#include <box2d/b2_math.h>
 
 #include "Connection.h"
 

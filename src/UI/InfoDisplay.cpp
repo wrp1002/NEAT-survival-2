@@ -2,7 +2,7 @@
 
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/display.h>
-#include <box2d/b2_math.h>
+
 #include <fmt/core.h>
 
 #include "Font.h"
@@ -81,6 +81,7 @@ namespace InfoDisplay {
 			fmt::format("R Time: {}", GameManager::GetSimTimeStr()),
 
 			fmt::format("Total En: {}", GameManager::GetTotalEnergy()),
+			fmt::format("Ex En: {:.2f}", GameManager::extraEnergy),
 		});
 
 
@@ -92,12 +93,12 @@ namespace InfoDisplay {
 
 			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(object)) {
 				infoText.insert(infoText.end(), {
-					fmt::format("Health: {:.2}", bodyPart->GetHealth())
+					fmt::format("Health: {:.2f}", bodyPart->GetHealth())
 				});
 
 				if (shared_ptr<Creature> creature = bodyPart->GetParentCreature().lock()) {
 					infoText.insert(infoText.end(), {
-						fmt::format("C-Energy: {:.2}", creature->GetUsableEnergy()),
+						fmt::format("C-Energy: {:.2f}", creature->GetUsableEnergy()),
 						DrawNN(creature->GetNN()),
 					});
 				}

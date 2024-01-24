@@ -1,10 +1,6 @@
 #include "UserInput.h"
 #include "Util.h"
 
-#include <box2d/b2_body.h>
-#include <box2d/b2_circle_shape.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_math.h>
 
 #include <cstdint>
 #include <memory>
@@ -39,7 +35,8 @@ namespace UserInput {
 		b2BodyDef bodyDef;
 		bodyDef.position = b2Vec2_zero;
 		bodyDef.type = b2_staticBody;
-		bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		//bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		bodyDef.userData = (void*)objectUserData;
 
 		b2MouseObject = GameManager::world.CreateBody(&bodyDef);
 
@@ -49,7 +46,8 @@ namespace UserInput {
 		b2FixtureDef fixtureDef;
 		fixtureDef.isSensor = true;
 		fixtureDef.shape = &circleShapeDef;
-		fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		//fixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(objectUserData);
+		bodyDef.userData = (void*)objectUserData;
 
 		b2MouseObject->CreateFixture(&fixtureDef);
 	}

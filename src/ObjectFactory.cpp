@@ -53,9 +53,9 @@ namespace  ObjectFactory {
 
 		float angle = Util::RandomDir();
 		int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
-		double energy = 200;
+		double energy = 400;
 
-		return CreateEgg(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist), NEAT::RandomNN(inputLabels, outputLabels, 10), energy);
+		return CreateEgg(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist), NEAT::RandomNN(inputLabels, outputLabels, 30), energy);
 	}
 
 	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy) {
@@ -77,7 +77,7 @@ namespace  ObjectFactory {
 		shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes, pos));
 		creature->Init();
 		GameManager::agents.push_back(creature);
-		cout << GameManager::agents.size() << endl;
+		//cout << GameManager::agents.size() << endl;
 		return creature;
 	}
 
@@ -85,7 +85,7 @@ namespace  ObjectFactory {
 		shared_ptr<Creature> creature = make_shared<Creature>(Creature(genes, pos, nn, energy));
 		creature->Init();
 		GameManager::agents.push_back(creature);
-		cout << GameManager::agents.size() << endl;
+		//cout << GameManager::agents.size() << endl;
 		return creature;
 	}
 

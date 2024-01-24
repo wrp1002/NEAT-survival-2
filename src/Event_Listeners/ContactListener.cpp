@@ -1,5 +1,5 @@
 #include "ContactListener.h"
-#include <box2d/b2_world_callbacks.h>
+#include <Box2D/Box2D.h>
 
 #include "../GameManager.h"
 #include "../UserInput.h"
@@ -14,8 +14,8 @@ void MyContactListener::BeginContact(b2Contact* contact) {
 		HandleBorderBeginContact(contact);
 	}
 	else {
-		ObjectUserData *userData1 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetBody()->GetUserData().pointer);
-		ObjectUserData *userData2 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetBody()->GetUserData().pointer);
+		ObjectUserData *userData1 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetBody()->GetUserData());
+		ObjectUserData *userData2 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetBody()->GetUserData());
 
 		if (userData1->objectType == "mouse" || userData2->objectType == "mouse")
 			HandleMouseBeginContact(userData1, userData2);
@@ -27,8 +27,8 @@ void MyContactListener::BeginContact(b2Contact* contact) {
 void MyContactListener::EndContact(b2Contact* contact) {
 	b2Body *bodyA = contact->GetFixtureA()->GetBody();
 	b2Body *bodyB = contact->GetFixtureB()->GetBody();
-	ObjectUserData *userData1 = reinterpret_cast<ObjectUserData *>(bodyA->GetUserData().pointer);
-	ObjectUserData *userData2 = reinterpret_cast<ObjectUserData *>(bodyB->GetUserData().pointer);
+	ObjectUserData *userData1 = reinterpret_cast<ObjectUserData *>(bodyA->GetUserData());
+	ObjectUserData *userData2 = reinterpret_cast<ObjectUserData *>(bodyB->GetUserData());
 
 
 	if (!userData1 || !userData2) {
@@ -51,6 +51,23 @@ void MyContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* im
 
 }
 
+bool MyContactListener::BeginContactImmediate(b2Contact* contact, uint32 threadIndex) {
+    // Call BeginContact for every contact.
+    return true;
+}
+bool MyContactListener::EndContactImmediate(b2Contact* contact, uint32 threadIndex) {
+    // Call EndContact for every contact.
+    return true;
+}
+bool MyContactListener::PreSolveImmediate(b2Contact* contact, const b2Manifold* oldManifold, uint32 threadIndex) {
+    // Never call PreSolve
+    return false;
+}
+bool MyContactListener::PostSolveImmediate(b2Contact* contact, const b2ContactImpulse* impulse, uint32 threadIndex) {
+    // Never call PostSolve
+    return false;
+}
+
 
 
 
@@ -58,14 +75,14 @@ void MyContactListener::PostSolve(b2Contact* contact, const b2ContactImpulse* im
 void MyContactListener::HandleBorderBeginContact(b2Contact *contact) {
 	weak_ptr<Object> obj;
 	if (contact->GetFixtureA()->GetBody() == GameManager::worldBorder) {
-		uintptr_t ptr = contact->GetFixtureB()->GetBody()->GetUserData().pointer;
-		ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
+		//uintptr_t ptr = contact->GetFixtureB()->GetBody()->GetUserData();
+		ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetBody()->GetUserData());
 		if (userData)
 			obj = userData->parentObject;
 	}
 	else if (contact->GetFixtureB()->GetBody() == GameManager::worldBorder) {
-		uintptr_t ptr = contact->GetFixtureA()->GetBody()->GetUserData().pointer;
-		ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(ptr);
+		//uintptr_t ptr = contact->GetFixtureA()->GetBody()->GetUserData();
+		ObjectUserData *userData = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetBody()->GetUserData());
 		if (userData)
 			obj = userData->parentObject;
 	}
@@ -94,6 +111,7 @@ void MyContactListener::HandleBorderEndContact(ObjectUserData *userData1, Object
 }
 
 void MyContactListener::HandleMouseBeginContact(ObjectUserData *userData1, ObjectUserData *userData2) {
+	cout << "mouse contact!" << endl;
 	ObjectUserData *mouseData = nullptr;
 	ObjectUserData *otherObj = nullptr;
 

@@ -1,9 +1,8 @@
 #pragma once
-#include <box2d/b2_body.h>
+#include <Box2D/Box2D.h>
 #include <unordered_map>
 #include <memory>
 
-#include <box2d/b2_math.h>
 
 class Object;
 
