@@ -19,18 +19,18 @@ private:
 	int currentNodeID = 0;
 
 	//const double PROBABILITY_MUTATE_REMOVE_CONNECTION = 0.1;
-	const double PROBABILITY_MUTATE_WEIGHT_SHIFT = 0.25;
-	const double PROBABILITY_MUTATE_WEIGHT_RANDOM = 0.1;
+	const float PROBABILITY_MUTATE_WEIGHT_SHIFT = 0.25;
+	const float PROBABILITY_MUTATE_WEIGHT_RANDOM = 0.1;
 
-	const double PROBABILITY_MUTATE_TOGGLE = 0.2;
-	const double PROBABILITY_MUTATE_ADD_CONNECTION = 0.15;
+	const float PROBABILITY_MUTATE_TOGGLE = 0.2;
+	const float PROBABILITY_MUTATE_ADD_CONNECTION = 0.15;
 
-	const double PROBABILITY_MUTATE_ADD_NODE = 0.1;
-	const double PROBABILITY_MUTATE_REMOVE_NODE = 0.1;
+	const float PROBABILITY_MUTATE_ADD_NODE = 0.1;
+	const float PROBABILITY_MUTATE_REMOVE_NODE = 0.1;
 
 	const unsigned MUTATE_ADD_CONNECTION_TRIES = 10;
 
-	double MUTATE_COEF;
+	//float MUTATE_COEF;
 
 
 	void _RemoveNode(vector<shared_ptr<Node>>* nodes, shared_ptr<Node> nodeToRemove);
@@ -60,11 +60,10 @@ public:
 	bool ConnectionExists(shared_ptr<Connection> connection);
 	bool ConnectionExists(shared_ptr<Node> from, shared_ptr<Node> to);
 
-	void Mutate();
+	void Mutate(float MUTATE_COEF);
 	void MutateAddConnection();
 	void MutateAddNode();
 	void MutateRemoveNode();
-	void SetMutateCoef(float val);
 
 	int GetCurrentNodeID();
 	int GetInputsCount();

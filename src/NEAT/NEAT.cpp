@@ -27,8 +27,6 @@ shared_ptr<NEAT> NEAT::RandomNN(vector<string> inputLabels, vector<string> outpu
 }
 
 NEAT::NEAT(vector<string> inputLabels, vector<string> outputLabels, float mutate_coef) {
-	this->MUTATE_COEF = mutate_coef;
-
 	for (string label : inputLabels) {
 		shared_ptr<Node> inputNode = make_shared<Node>(Node(0, float(inputNodes.size()) / inputLabels.size(), Node::INPUT, currentNodeID, label));
 		AddNode(inputNode);
@@ -278,7 +276,7 @@ bool NEAT::ConnectionExists(shared_ptr<Node> from, shared_ptr<Node> to) {
 	return false;
 }
 
-void NEAT::Mutate() {
+void NEAT::Mutate(float MUTATE_COEF) {
 	for (auto connection : connections) {
 		if (Util::Random() < PROBABILITY_MUTATE_TOGGLE * MUTATE_COEF) {
 			connection->ToggleEnabled();
@@ -366,10 +364,6 @@ void NEAT::MutateRemoveNode() {
 
 	shared_ptr<Node> node = hiddenNodes[rand() % hiddenNodes.size()];
 	RemoveNode(node);
-}
-
-void NEAT::SetMutateCoef(float val) {
-	this->MUTATE_COEF = val;
 }
 
 int NEAT::GetCurrentNodeID() {

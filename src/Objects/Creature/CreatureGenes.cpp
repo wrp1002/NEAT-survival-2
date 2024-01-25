@@ -32,14 +32,17 @@ void Creature::ApplyGenes(string genes) {
 	string headerGenes = genes.substr(0, headerSize);
 
 	eggHatchTimer = GetNextGene(headerGenes, 0, 3) * maxEggHatchTimer + minEggHatchTimer;
-	geneMutationCoef = GetNextGene(headerGenes, 0, 3);
-	nnMutationCoef = GetNextGene(headerGenes, 0, 3);
+	geneMutationCoef = GetNextGene(headerGenes, 1, 3);
+	nnMutationCoef = GetNextGene(headerGenes, 1, 3);
 
-	nn->SetMutateCoef(nnMutationCoef);
 
 
 	for (int i = headerSize; i < genes.size(); i += geneLength) {
 		string gene = genes.substr(i, geneLength);
+		if (gene.size() != geneLength) {
+			//cout << "what happened here??" << endl;
+			continue;
+		}
 		//cout << endl;
 		//cout << gene << endl;
 		int instructionType = int(GetNextGene(gene, 2, 0)) % instructionTypes;

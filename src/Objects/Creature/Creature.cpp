@@ -68,8 +68,8 @@ Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy)
 	this->nn = nn;
 
 	this->eggHatchTimer = 0;
-	this->geneMutationCoef = 0;
-	this->nnMutationCoef = 0;
+	this->geneMutationCoef = 1;
+	this->nnMutationCoef = 1;
 
 	this->maxEnergy = 300;
 	this->energy = energy;
@@ -265,8 +265,10 @@ float Creature::GetNextGene(string &gene, int wholeDigits, int decimalDigits) {
 string Creature::GetMutatedGenes() {
 	string newGenes = "";
 	for (int i = 0; i < genes.size(); i++) {
-		if (Util::Random() <= Globals::GENE_MUTATE_CHANCE)
+		if (Util::Random() <= Globals::GENE_MUTATE_CHANCE * geneMutationCoef) {
+			//cout << "mutating gene!" << endl;
 			newGenes += to_string(rand() % 10);
+		}
 		else if (i % Globals::GENE_LENGTH == 0 && Util::Random() <= Globals::GENE_CREATE_CHANCE * geneMutationCoef) {
 			//cout << "Adding new gene!!!!!!" << endl;
 			for (int j = 0; j < Globals::GENE_LENGTH; j++)
@@ -280,7 +282,7 @@ string Creature::GetMutatedGenes() {
 
 shared_ptr<NEAT> Creature::GetMutatedNN() {
 	shared_ptr<NEAT> newNN = nn->Copy();
-	newNN -> Mutate();
+	newNN -> Mutate(this->nnMutationCoef);
 	return newNN;
 }
 
