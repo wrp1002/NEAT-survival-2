@@ -29,6 +29,8 @@ class Egg : public Object {
 		void Update();
 		void Draw();
 
+		void AddEnergy(double amount);
+
 		bool ShouldHatch();
 		double GetEnergy();
 

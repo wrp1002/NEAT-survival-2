@@ -49,6 +49,7 @@ namespace GameManager {
 	void ClearAgents();
 
 	void AddObject(shared_ptr<Object> newObject);
+	void AddFood(double value);
 
 	double GetSimTime();
 	string GetSimTimeStr();

@@ -7,6 +7,7 @@
 class Egg;
 class Creature;
 class NEAT;
+class LiveObject;
 
 using namespace std;
 
@@ -21,6 +22,8 @@ namespace ObjectFactory {
 	void Init();
 
 	string GetRandomGenes(int length);
+
+	shared_ptr<LiveObject> CreateFood(double health);
 
 	shared_ptr<Egg> CreateEgg();
 	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy);

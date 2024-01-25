@@ -205,6 +205,12 @@ namespace GameManager {
 
 				egg->Update();
 
+				double eggEnergy = 5;
+				if (extraEnergy > eggEnergy && rand() % 10 == 0) {
+					egg->AddEnergy(eggEnergy);
+					extraEnergy -= eggEnergy;
+				}
+
 				if (!egg->IsAlive()) {
 					egg->Destroy();
 					eggs.erase(eggs.begin() + i);
@@ -230,6 +236,13 @@ namespace GameManager {
 					objectsOutsideBorder.erase(objectsOutsideBorder.begin() + i);
 					continue;
 				}
+			}
+
+
+			double foodValue = 100.0;
+			if (rand() % 2 == 0 && extraEnergy > foodValue) {
+				AddFood(foodValue);
+				extraEnergy -= foodValue;
 			}
 
 			SimStats::EndUpdateTimer();
@@ -296,6 +309,10 @@ namespace GameManager {
 
 	void AddObject(shared_ptr<Object> newObject) {
 		looseObjects.push_back(newObject);
+	}
+
+	void AddFood(double value) {
+		ObjectFactory::CreateFood(value);
 	}
 
 

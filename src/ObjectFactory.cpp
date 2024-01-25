@@ -47,13 +47,27 @@ namespace  ObjectFactory {
 	}
 
 
+	shared_ptr<LiveObject> CreateFood(double health) {
+		float angle = Util::RandomDir();
+		int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
+		if (rand() % 10 == 0)
+			dist += Globals::WORLD_SIZE_PX;
+
+		shared_ptr<LiveObject> newFood = make_shared<LiveObject>(LiveObject(b2Vec2(cos(angle) * dist, sin(angle) * dist), b2Vec2(75, 75), 0, al_map_rgb(255, 0, 255), 1, health));
+		newFood->UpdateObjectUserData();
+		GameManager::looseObjects.push_back(newFood);
+		GameManager::objectsOutsideBorder.push_back(newFood);
+		return newFood;
+	}
+
+
 	shared_ptr<Egg> CreateEgg() {
 		string genes = GetRandomGenes(50);
 		//cout << genes << endl;
 
 		float angle = Util::RandomDir();
 		int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
-		double energy = 400;
+		double energy = 300;
 
 		return CreateEgg(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist), NEAT::RandomNN(inputLabels, outputLabels, 30), energy);
 	}

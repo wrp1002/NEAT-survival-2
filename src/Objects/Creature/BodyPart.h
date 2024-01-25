@@ -6,13 +6,13 @@
 #include <memory>
 #include <string>
 
-#include "../Object.h"
+#include "../LiveObject.h"
 
 class BodySegment;
 class Creature;
 class Joint;
 
-class BodyPart : public Object {
+class BodyPart : public LiveObject {
 	public:
 		struct NerveInfo {
 			bool inputEnabled;
@@ -27,7 +27,6 @@ class BodyPart : public Object {
 		weak_ptr<Creature> creature;
 		weak_ptr<BodyPart> parentPart;
 
-		double health, maxHealth;
 		double energyUsage;
 
 		static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
@@ -48,8 +47,6 @@ class BodyPart : public Object {
 		b2Body *GetBody();
 		weak_ptr<Creature> GetParentCreature();
 
-		double TakeDamage(double amount);
-
 		virtual bool CanAddChild();
 		virtual bool childAngleValid(int angle);
 		virtual int GetValidChildAngle(int angleGene);
@@ -65,7 +62,6 @@ class BodyPart : public Object {
 		double SetHealth(double amount);
 
 		double GetEnergyUsage();
-		double GetHealth();
 
 };
 

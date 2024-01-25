@@ -37,6 +37,11 @@ void Egg::Draw() {
 }
 
 
+void Egg::AddEnergy(double amount) {
+	this->energy += amount;
+}
+
+
 bool Egg::ShouldHatch() {
 	return hatchTimer <= 0;
 }

@@ -13,6 +13,8 @@
 #include "../NEAT/Node.h"
 #include "../NEAT/Connection.h"
 
+#include "../Objects/Egg.h"
+
 namespace InfoDisplay {
 	ALLEGRO_DISPLAY* display;
 	ALLEGRO_FONT *font;
@@ -102,8 +104,14 @@ namespace InfoDisplay {
 						DrawNN(creature->GetNN()),
 					});
 				}
-
-
+			}
+			else if (shared_ptr<Egg> egg = dynamic_pointer_cast<Egg>(object)) {
+				infoText.push_back(fmt::format("Energy: {:.2f}", egg->GetEnergy()));
+			}
+			else if (shared_ptr<LiveObject> bodyPart = dynamic_pointer_cast<LiveObject>(object)) {
+				infoText.insert(infoText.end(), {
+					fmt::format("Health: {:.2f}", bodyPart->GetHealth())
+				});
 			}
 
 		}

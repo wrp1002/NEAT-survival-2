@@ -23,7 +23,6 @@
 #include "UI/Camera.h"
 #include "UserInput.h"
 #include "Util.h"
-#include "UI/Font.h"
 #include "UI/Toolbar.h"
 #include "UI/InfoDisplay.h"
 

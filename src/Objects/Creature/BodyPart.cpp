@@ -7,27 +7,23 @@
 #include "Joint.h"
 
 
-BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, NerveInfo &nerveInfo) : Object() {
+BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, NerveInfo &nerveInfo) : LiveObject() {
 	this->creature = parentCreature;
 	this->nerveInfo = nerveInfo;
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
 
 	this->maxHealth = 20;
-	this->health = 1;
-
 	this->energyUsage = 0;
 }
 
-BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : Object(pos, pixelSize, angle, color, shapeType) {
+BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : LiveObject(pos, pixelSize, angle, color, shapeType, 1) {
 	this->nerveInfo = nerveInfo;
 	this->creature = parentCreature;
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
 
 	this->maxHealth = 20;
-	this->health = 1;
-
 	this->energyUsage = 0;
 }
 
@@ -101,13 +97,6 @@ weak_ptr<Creature> BodyPart::GetParentCreature() {
 	return creature;
 }
 
-double BodyPart::TakeDamage(double amount) {
-	amount = min(amount, health);
-	this->health -= amount;
-
-	return amount;
-}
-
 bool BodyPart::CanAddChild() {
 	return false;
 }
@@ -171,6 +160,3 @@ double BodyPart::GetEnergyUsage() {
 	return energyUsage + 0.001;
 }
 
-double BodyPart::GetHealth() {
-	return health;
-}
