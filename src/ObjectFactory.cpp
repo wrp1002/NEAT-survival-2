@@ -1,5 +1,6 @@
 #include "ObjectFactory.h"
 
+#include <Box2D/Common/b2Math.h>
 #include <iostream>
 #include <memory>
 #include <vector>

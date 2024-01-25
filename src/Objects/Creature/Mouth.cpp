@@ -121,7 +121,15 @@ void Mouth::Update() {
 			if (bodyPart->GetParentCreature().lock() == this->GetParentCreature().lock())
 				continue;
 
-			cout << "doing damage to " << bodyPart->GetType() << endl;
+			//cout << "doing damage to " << bodyPart->GetType() << endl;
+			double energyGained = bodyPart->TakeDamage(10);
+
+			this->GetParentCreature().lock()->AddEnergy(energyGained);
+
+			break;
+		}
+		else if (shared_ptr<LiveObject> bodyPart = dynamic_pointer_cast<LiveObject>(otherObject)) {
+			//cout << "doing damage to " << bodyPart->GetType() << endl;
 			double energyGained = bodyPart->TakeDamage(10);
 
 			this->GetParentCreature().lock()->AddEnergy(energyGained);

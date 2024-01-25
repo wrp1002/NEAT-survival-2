@@ -9,7 +9,7 @@ using namespace std;
 
 void JointDestructionListener::SayGoodbye(b2Joint* joint) {
 	// remove all references to joint.
-	cout << "joint break!" << endl;
+	//cout << "joint break!" << endl;
 
 	JointUserData *userData = reinterpret_cast<JointUserData *>(joint->GetUserData());
 
@@ -18,7 +18,7 @@ void JointDestructionListener::SayGoodbye(b2Joint* joint) {
 		return;
 	}
 
-	cout << userData->objectType << endl;
+	//cout << userData->objectType << endl;
 
 	if (userData->parentObject.expired())
 		return;

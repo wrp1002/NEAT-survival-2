@@ -92,10 +92,13 @@ void Eye::Update() {
 		if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(otherObject)) {
 			if (bodyPart->GetParentCreature().lock() == this->GetParentCreature().lock())
 				continue;
-		}
 
-		if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(otherObject)) {
 			seesObject = true;
+			break;
+		}
+		else if (shared_ptr<LiveObject> bodyPart = dynamic_pointer_cast<LiveObject>(otherObject)) {
+			seesObject = true;
+			break;
 		}
 
 	}
