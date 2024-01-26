@@ -11,6 +11,11 @@ LiveObject::LiveObject(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR 
 	this->health = health;
 }
 
+void LiveObject::Update() {
+	if (health <= 0)
+		alive = false;
+}
+
 double LiveObject::TakeDamage(double amount) {
 	amount = min(amount, health);
 	this->health -= amount;

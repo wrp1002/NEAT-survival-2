@@ -61,6 +61,7 @@ Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart
 
 
 void Eye::Update() {
+	LiveObject::Update();
 	UpdateJoint();
 
 	if (creature.expired())

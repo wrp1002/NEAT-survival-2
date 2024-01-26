@@ -14,6 +14,7 @@
 #include <fmt/format.h>
 #include <memory>
 
+#include "Objects/LiveObject.h"
 #include "SimStats.h"
 #include "Objects/Creature/BodyPart.h"
 #include "Globals.h"
@@ -178,7 +179,7 @@ namespace GameManager {
 				agents[i]->Update();
 
 				if (!agents[i]->IsAlive()) {
-					extraEnergy += agents[i]->GetTotalEnergy();
+					extraEnergy += agents[i]->GetUsableEnergy() + agents[i]->GetWaste();
 
 					agents[i]->DestroyAllJoints();
 
@@ -195,6 +196,10 @@ namespace GameManager {
 				object->Update();
 
 				if (!object->IsAlive()) {
+					if (shared_ptr<LiveObject> liveObj = dynamic_pointer_cast<LiveObject>(object)) {
+						extraEnergy += liveObj->GetHealth();
+					}
+
 					object->Destroy();
 					looseObjects.erase(looseObjects.begin() + i);
 				}
@@ -238,6 +243,8 @@ namespace GameManager {
 				}
 			}
 
+
+			//if (GetTotalEnergy() < 70000) extraEnergy += 30000;
 
 			double foodValue = 100.0;
 			if (rand() % 2 == 0 && extraEnergy > foodValue) {
@@ -383,7 +390,7 @@ namespace GameManager {
 	}
 
 	unsigned int GetTotalEnergy() {
-		int total = 0;
+		double total = 0;
 
 		total += extraEnergy;
 
@@ -395,12 +402,12 @@ namespace GameManager {
 		}
 
 		for (auto obj : looseObjects) {
-			if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(obj)) {
+			if (shared_ptr<LiveObject> bodyPart = dynamic_pointer_cast<LiveObject>(obj)) {
 				total += bodyPart->GetHealth();
 			}
 		}
 
-		return total;
+		return int(total);
 	}
 
 }

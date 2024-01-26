@@ -70,6 +70,8 @@ Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parent
 }
 
 void Mouth::Update() {
+	LiveObject::Update();
+
 	if (!parentJoint)
 		alive = false;
 

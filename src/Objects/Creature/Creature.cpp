@@ -151,6 +151,8 @@ void Creature::Update() {
 		this->waste += energyUsage;
 
 		if (!part->IsAlive()) {
+			this->waste += part->GetHealth();
+
 			if (!head.expired() && part == head.lock())
 				head.reset();
 
@@ -296,6 +298,10 @@ shared_ptr<NEAT> Creature::GetNN() {
 
 double Creature::GetUsableEnergy() {
 	return this->energy;
+}
+
+double Creature::GetWaste() {
+	return this->waste;
 }
 
 // TODO: total energy + health

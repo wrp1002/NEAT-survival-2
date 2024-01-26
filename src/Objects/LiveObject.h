@@ -21,10 +21,7 @@ class LiveObject : public Object {
 		LiveObject();
 		LiveObject(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, double health);
 
-		virtual void Update() {
-			if (health <= 0)
-				alive = false;
-		}
+		virtual void Update();
 
 		double TakeDamage(double amount);
 

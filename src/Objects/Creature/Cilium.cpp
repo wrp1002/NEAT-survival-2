@@ -30,6 +30,7 @@ Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> pare
 }
 
 void Cilium::Update() {
+	LiveObject::Update();
 	UpdateJoint();
 
 	if (creature.expired())
