@@ -147,6 +147,12 @@ int main() {
 				InfoDisplay::Toggle();
 			else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE)
 				GameManager::TogglePaused();
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_PGUP)
+				GameManager::IncreaseSpeed();
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_PGDN)
+				GameManager::IncreaseSpeed();
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_HOME)
+				GameManager::ResetSpeed();
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
 			UserInput::SetPressed(ev.keyboard.keycode, false);
@@ -214,12 +220,14 @@ int main() {
 			}
 
 
-			playerCreature->ApplyForce(b2Vec2(
-				(UserInput::IsPressed(ALLEGRO_KEY_RIGHT) - UserInput::IsPressed(ALLEGRO_KEY_LEFT)) * 5,
-				(UserInput::IsPressed(ALLEGRO_KEY_DOWN) - UserInput::IsPressed(ALLEGRO_KEY_UP)) * 5)
-			);
+			if (playerCreature) {
+				playerCreature->ApplyForce(b2Vec2(
+					(UserInput::IsPressed(ALLEGRO_KEY_RIGHT) - UserInput::IsPressed(ALLEGRO_KEY_LEFT)) * 5,
+					(UserInput::IsPressed(ALLEGRO_KEY_DOWN) - UserInput::IsPressed(ALLEGRO_KEY_UP)) * 5)
+				);
 
-			playerCreature->SetBiting(UserInput::IsPressed(ALLEGRO_KEY_B));
+				playerCreature->SetBiting(UserInput::IsPressed(ALLEGRO_KEY_B));
+			}
 
 		}
 
