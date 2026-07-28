@@ -29,10 +29,15 @@ Creature::Creature(string genes, b2Vec2 pos) {
 	this->startingPos = pos;
 	this->alive = true;
 	this->isPlayer = false;
+	this->healing = false;
+	this->updateNN = 0;
 
 	this->maxEnergy = 100;
 	this->energy = maxEnergy;
 	this->energyUsage = 0;
+	this->eggTimer = 0;
+
+	this->strength = 1;
 
 	this->eggHatchTimer = 0;
 	this->geneMutationCoef = 0;
@@ -41,12 +46,15 @@ Creature::Creature(string genes, b2Vec2 pos) {
 	vector<string> inputLabels = {
 		"const",
 		"sin",
+		"energy",
+		"health",
 	};
 	for (int i = 0; i < extraInputCount; i++)
 		inputLabels.push_back("in" + to_string(i));
 
 	vector<string> outputLabels = {
-
+		"wants egg",
+		"wants to heal",
 	};
 	for (int i = 0; i < extraOutputCount; i++)
 		outputLabels.push_back("out" + to_string(i));
@@ -66,8 +74,10 @@ Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy)
 	this->alive = true;
 	this->isPlayer = false;
 	this->nn = nn;
+	this->updateNN = 0;
 
 	this->eggHatchTimer = 0;
+	this->eggTimer = 0;
 	this->geneMutationCoef = 1;
 	this->nnMutationCoef = 1;
 
@@ -101,26 +111,33 @@ void Creature::SetAsPlayer(bool val) {
 }
 
 void Creature::Update() {
-	// Inputs
-	vector<double> inputs = {
-		1.0,
-		sin(al_get_time())
-	};
 
-	for (int i = 0; i < extraInputCount; i++)
-		inputs.push_back(0);
+	updateNN++;
+	if (updateNN == 3) {
+		// Inputs
+		vector<double> inputs = {
+			1.0,
+			sin(al_get_time()),
+			GetUsableEnergy() / 100.0,
+			GetHealth() / GetTotalHealth(),
+		};
 
-	for (auto part : bodySegments) {
-		if (!part->NerveOutputEnabled())
-			continue;
+		for (int i = 0; i < extraInputCount; i++)
+			inputs.push_back(0);
 
-		int index = part->GetNerveInputIndex();
-		float val = part->GetNerveOutput();
-		inputs[index] += val;
+		for (auto part : bodySegments) {
+			if (!part->NerveOutputEnabled())
+				continue;
+
+			int index = part->GetNerveInputIndex();
+			float val = part->GetNerveOutput();
+			inputs[index] += val;
+		}
+
+		// Calculations
+		this->nn->Calculate(inputs);
+		this->updateNN = 0;
 	}
-
-	// Calculations
-	this->nn->Calculate(inputs);
 
 
 	if (!isPlayer) {
@@ -137,8 +154,20 @@ void Creature::Update() {
 		}
 
 		bool wantsEgg = output[0] || energy >= 200;
-		if (wantsEgg && energy >= 50) {
+		if (wantsEgg && energy >= 50 && eggTimer <= 0) {
 			MakeEgg();
+		}
+		eggTimer--;
+
+		healing = output[1] > 0.5;
+		if (healing) {
+			double healAmount = 0.1;
+			if (GetUsableEnergy() > healAmount * 2) {
+				this->waste += healAmount;
+				this->energy -= healAmount * 2;
+				double leftover = this->DistributeHealth(healAmount, true);
+				this->AddEnergy(leftover);
+			}
 		}
 	}
 
@@ -179,6 +208,18 @@ void Creature::Draw() {
 	for (auto part : bodySegments)
 		part->Draw();
 
+	if (healing) {
+		b2Vec2 pos = GetHeadPosPX();
+
+		ALLEGRO_TRANSFORM t;
+		al_identity_transform(&t);
+
+		al_translate_transform(&t, pos.x, pos.y);
+		al_compose_transform(&t, &Camera::transform);
+
+		al_use_transform(&t);
+		al_draw_circle(0, 0, 200, al_map_rgb(255, 0, 0), 2);
+	}
 }
 
 
@@ -223,18 +264,21 @@ void Creature::DistributeEnergy(double amount) {
 
 }
 
-double Creature::DistributeHealth(double amount) {
+double Creature::DistributeHealth(double amount, bool add) {
 	double leftover = 0;
 	double amountPerPart = amount / double(this->bodySegments.size());
 	for (auto part : this->bodySegments) {
-		leftover += part->SetHealth(amountPerPart);
+		leftover += part->SetHealth(amountPerPart + (add ? part->GetHealth() : 0));
 	}
 	return leftover;
 }
 
 void Creature::MakeEgg() {
 	double eggEnergy = energy / 2.0;
+	double eggWaste = energy / 3.0;
 	this->energy -= eggEnergy;
+	this->energy -= eggWaste;
+	this->waste += eggWaste;
 
 	string eggGenes = GetMutatedGenes();
 	shared_ptr<NEAT> eggNN = GetMutatedNN();
@@ -318,7 +362,27 @@ double Creature::GetTotalEnergy() {
 }
 
 b2Vec2 Creature::GetHeadPosPX() {
+	if (head.expired())
+		return b2Vec2(0, 0);
+
 	return Util::metersToPixels(this->head.lock()->GetPos());
+}
+
+double Creature::GetStrength() {
+	return strength;
+}
+
+double Creature::GetHealth() {
+	double total = 0;
+	for (auto part : bodySegments)
+		total += part->GetHealth();
+	return total;
+}
+double Creature::GetTotalHealth() {
+	double total = 0;
+	for (auto part : bodySegments)
+		total += part->GetMaxHealth();
+	return total;
 }
 
 void Creature::SetBiting(bool val) {

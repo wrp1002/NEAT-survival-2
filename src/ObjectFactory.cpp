@@ -22,12 +22,15 @@ namespace  ObjectFactory {
 		inputLabels = {
 			"const",
 			"sin",
+			"energy",
+			"health",
 		};
 		for (int i = 0; i < extraInputCount; i++)
 			inputLabels.push_back("in" + to_string(i));
 
 		outputLabels = {
 			"lay_egg",
+			"heal",
 		};
 		for (int i = 0; i < extraOutputCount; i++)
 			outputLabels.push_back("out" + to_string(i));
@@ -38,7 +41,7 @@ namespace  ObjectFactory {
 		string genes = "";
 		for (int i = 0; i < length; i++) {
 			string gene = "";
-			for (int j = 0; j < 16; j++) {
+			for (int j = 0; j < Globals::GENE_LENGTH; j++) {
 				gene += to_string(rand() % 10);
 			}
 			//cout << "adding gene:" << gene << endl;

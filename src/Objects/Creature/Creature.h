@@ -22,18 +22,26 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		static const int extraInputCount = 10;
 		static const int extraOutputCount = 10;
 		static const int geneLength = 16;
-		static const int minEggHatchTimer = 200;
-		static const int maxEggHatchTimer = 300;
+		static const int minEggHatchTimer = 300;
+		static const int maxEggHatchTimer = 3000;
+		static const int eggTimerStart = 1800;
+
 
 		int baseInputs;
 		int baseOutputs;
 		bool alive;
 		bool isPlayer;
+		bool healing;
+		int eggTimer;
+
+		int updateNN;
 
 		double energy, maxEnergy;
 		double energyUsage;
 
 		double waste;
+
+		double strength;
 
 		int eggHatchTimer;
 		float geneMutationCoef;
@@ -95,8 +103,13 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		vector<shared_ptr<BodyPart>> GetAllParts();
 		bool IsAlive();
 		double GetUsableEnergy();
+		double GetWaste();
 		double GetTotalEnergy();
 		b2Vec2 GetHeadPosPX();
+		double GetStrength();
+
+		double GetHealth();
+		double GetTotalHealth();
 
 		// player control functions
 		void SetBiting(bool val);
