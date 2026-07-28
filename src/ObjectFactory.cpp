@@ -63,24 +63,26 @@ namespace  ObjectFactory {
 
 
 	shared_ptr<Egg> CreateEgg() {
-		string genes = GetRandomGenes(50);
+		string genes = GetRandomGenes(Globals::STARTING_DNA_GENE_LENGTH);
 		//cout << genes << endl;
 
 		float angle = Util::RandomDir();
 		int dist = Globals::WORLD_SIZE_PX * sqrt(Util::Random());
 		double energy = 300;
+		int hatchTimer = rand() % 200;
 
-		return CreateEgg(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist), NEAT::RandomNN(inputLabels, outputLabels, 30), energy);
+		return CreateEgg(genes, b2Vec2(cos(angle) * dist, sin(angle) * dist), NEAT::RandomNN(inputLabels, outputLabels, 30), energy, hatchTimer);
 	}
 
-	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy) {
-		shared_ptr<Egg> newEgg = make_shared<Egg>(Egg(genes, nn, energy, 0, pos));
+	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy, int hatchTimer) {
+		shared_ptr<Egg> newEgg = make_shared<Egg>(Egg(genes, nn, energy, 0, pos, hatchTimer));
 		GameManager::eggs.push_back(newEgg);
+		newEgg->UpdateObjectUserData();
 		return newEgg;
 	}
 
 	shared_ptr<Creature> CreateAgent() {
-		string genes = GetRandomGenes(50);
+		string genes = GetRandomGenes(Globals::STARTING_DNA_GENE_LENGTH);
 		cout << genes << endl;
 
 		float angle = Util::RandomDir();

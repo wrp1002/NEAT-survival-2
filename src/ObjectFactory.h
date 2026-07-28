@@ -26,7 +26,7 @@ namespace ObjectFactory {
 	shared_ptr<LiveObject> CreateFood(double health);
 
 	shared_ptr<Egg> CreateEgg();
-	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy);
+	shared_ptr<Egg> CreateEgg(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy, int hatchTimer);
 
 	shared_ptr<Creature> CreateAgent();
 	shared_ptr<Creature> CreateAgent(string genes, b2Vec2 pos);

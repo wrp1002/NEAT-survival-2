@@ -23,8 +23,9 @@ class LiveObject : public Object {
 
 		virtual void Update();
 
-		double TakeDamage(double amount);
+		virtual double TakeDamage(double amount);
 
 		double GetHealth();
+		double GetMaxHealth();
 };
 

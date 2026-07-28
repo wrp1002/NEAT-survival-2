@@ -26,3 +26,7 @@ double LiveObject::TakeDamage(double amount) {
 double LiveObject::GetHealth() {
 	return health;
 }
+
+double LiveObject::GetMaxHealth() {
+	return maxHealth;
+}

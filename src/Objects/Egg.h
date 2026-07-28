@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "Object.h"
+#include "LiveObject.h"
 
 class NEAT;
 class Creature;
@@ -12,7 +13,7 @@ class Creature;
 using namespace std;
 
 
-class Egg : public Object {
+class Egg : public LiveObject {
 	private:
 		string genes;
 		shared_ptr<NEAT> nn;
@@ -24,12 +25,13 @@ class Egg : public Object {
 
 
 	public:
-		Egg(string genes, shared_ptr<NEAT> nn, double energy, int generation, b2Vec2 pos);
+		Egg(string genes, shared_ptr<NEAT> nn, double energy, int generation, b2Vec2 pos, int hatchTimer);
 
 		void Update();
 		void Draw();
 
 		void AddEnergy(double amount);
+		double TakeDamage(double amount);
 
 		bool ShouldHatch();
 		double GetEnergy();

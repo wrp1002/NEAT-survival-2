@@ -135,7 +135,7 @@ namespace GameManager {
 
 
 		// Create new eggs
-		for (int i = 0; i < 400; i++) ObjectFactory::CreateEgg();
+		for (int i = 0; i < Globals::STARTING_POPULATION; i++) ObjectFactory::CreateEgg();
 	}
 
 	b2Body *CreateWorldBorder() {
@@ -210,20 +210,20 @@ namespace GameManager {
 
 				egg->Update();
 
-				double eggEnergy = 5;
-				if (extraEnergy > eggEnergy && rand() % 10 == 0) {
-					egg->AddEnergy(eggEnergy);
-					extraEnergy -= eggEnergy;
-				}
-
 				if (!egg->IsAlive()) {
 					egg->Destroy();
 					eggs.erase(eggs.begin() + i);
 					continue;
 				}
 
+				double eggEnergy = 0.2 + (agents.size() < Globals::POPULATION_MIN_SAFETY_NET) * 2;
+				if (extraEnergy > eggEnergy && rand() % 10 == 0) {
+					egg->AddEnergy(eggEnergy);
+					extraEnergy -= eggEnergy;
+				}
+
 				if (egg->ShouldHatch()) {
-					ObjectFactory::CreateAgent(egg->GetGenes(), Util::metersToPixels(egg->GetPos()), egg->GetNN(), egg->GetEnergy());
+					ObjectFactory::CreateAgent(egg->GetGenes(), Util::metersToPixels(egg->GetPos()), egg->GetNN(), egg->GetEnergy() + egg->GetHealth());
 					egg->Destroy();
 					eggs.erase(eggs.begin() + i);
 					continue;
@@ -398,7 +398,7 @@ namespace GameManager {
 			total += agent->GetTotalEnergy();
 
 		for (auto egg : eggs) {
-			total += egg->GetEnergy();
+			total += egg->GetEnergy() + egg->GetHealth();
 		}
 
 		for (auto obj : looseObjects) {
