@@ -5,7 +5,9 @@
 #include <Box2D/Box2D.h>
 #include <memory>
 
-class Object;
+using namespace std;
+
+#include "../Objects/Object.h"
 
 namespace Camera {
 	extern ALLEGRO_TRANSFORM transform;
@@ -13,7 +15,7 @@ namespace Camera {
 	extern float zoom;
 	extern float zoomFactor;
 	extern float minZoom;
-	//extern weak_ptr<Object> followObject;
+	extern weak_ptr<Object> followedObject;
 
 	void Init();
 
@@ -21,7 +23,7 @@ namespace Camera {
 	void UpdateZoom(int diff);
 	void ZoomIn();
 	void ZoomOut();
-	//void FollowObject(weak_ptr<Object> obj);
+	void FollowObject(weak_ptr<Object> obj);
 
 	b2Vec2 CalculatePos();
 	b2Vec2 ScreenPos2WorldPos(b2Vec2 screenPos);

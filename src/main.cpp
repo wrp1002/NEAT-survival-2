@@ -172,8 +172,10 @@ int main() {
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-			if (ev.mouse.button == 1)
+			if (ev.mouse.button == 1) {
 				InfoDisplay::SelectObject(UserInput::hoveredObject);
+				Camera::FollowObject(UserInput::hoveredObject);
+			}
 			else if (ev.mouse.button == 2)
 				UserInput::StartDragging(b2Vec2(ev.mouse.x, ev.mouse.y));
 		}

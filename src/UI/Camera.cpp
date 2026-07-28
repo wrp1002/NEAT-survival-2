@@ -9,7 +9,7 @@
 
 
 namespace Camera {
-	//weak_ptr<Object> Camera::followObject;
+	weak_ptr<Object> followedObject;
 	ALLEGRO_TRANSFORM transform;
 	b2Vec2 pos;
 	float zoom;
@@ -77,20 +77,19 @@ namespace Camera {
 	}
 
 	b2Vec2 CalculatePos() {
-		/*
-		if (!followObject.expired()) {
-			pos = followObject.lock()->GetPos() - b2Vec2(Globals::screenWidth, Globals::screenHeight) / 2;
+
+		if (shared_ptr<Object> object = followedObject.lock()) {
+			pos = object->GetPosPX()- b2Vec2(Globals::SCREEN_WIDTH / 2, Globals::SCREEN_HEIGHT / 2);
 			return pos;
 		}
 		else {
-			*/
 			if (!UserInput::isDragging)
 				return pos;
 
 			b2Vec2 calculatedPos = pos;
 			calculatedPos = pos + (1 / zoom) * (UserInput::dragStartPos - UserInput::mousePos);
 			return calculatedPos;
-		//}
+		}
 	}
 
 	b2Vec2 ScreenPos2WorldPos(b2Vec2 screenPos) {
@@ -110,16 +109,15 @@ namespace Camera {
 			objectPos.y < cameraPos.y + Globals::SCREEN_HEIGHT + Globals::SCREEN_HEIGHT / 2.0 / zoom
 		);
 	}
+
+	void FollowObject(weak_ptr<Object> obj) {
+		followedObject = obj;
+	}
 }
 
 
 
 
-
-
-//void Camera::FollowObject(weak_ptr<Object> obj) {
-//	followObject = obj;
-//}
 
 
 
