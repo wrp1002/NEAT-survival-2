@@ -47,6 +47,7 @@ namespace GameManager {
 
 	shared_ptr<Creature> CreateAgent(string genes, b2Vec2 pos);
 	void ClearAgents();
+	shared_ptr<Creature> GetRandomExistingCreature();
 
 	void AddObject(shared_ptr<Object> newObject);
 	void AddFood(double value);

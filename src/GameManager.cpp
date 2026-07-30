@@ -310,6 +310,13 @@ namespace GameManager {
 		return creature;
 	}
 
+	shared_ptr<Creature> GetRandomExistingCreature() {
+		if (agents.size())
+			return agents[rand() % agents.size()];
+		else
+		 	return nullptr;
+	}
+
 	void ClearAgents() {
 		agents.clear();
 	}

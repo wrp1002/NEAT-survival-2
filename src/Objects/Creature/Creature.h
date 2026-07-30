@@ -115,6 +115,7 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		double GetTotalEnergy();
 		b2Vec2 GetHeadPosPX();
 		double GetStrength();
+		weak_ptr<BodySegment> GetHead();
 
 		double GetHealth();
 		double GetTotalHealth();

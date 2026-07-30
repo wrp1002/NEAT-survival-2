@@ -430,6 +430,10 @@ double Creature::GetStrength() {
 	return strength;
 }
 
+weak_ptr<BodySegment> Creature::GetHead() {
+	return head;
+}
+
 double Creature::GetHealth() {
 	double total = 0;
 	for (auto part : bodySegments)

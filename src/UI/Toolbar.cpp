@@ -47,7 +47,7 @@ namespace Toolbar {
 			ALLEGRO_END_OF_MENU,
 
 			ALLEGRO_START_OF_MENU("&Rules", 300),
-				{"Follow Random Agent", 301, 0, NULL },
+				{"Follow Random Agent", BUTTON_IDS::FOLLOW_RANDOM_AGENT, 0, NULL },
 			ALLEGRO_END_OF_MENU,
 
 			ALLEGRO_START_OF_MENU("Sim Speed", 400),
@@ -104,6 +104,17 @@ namespace Toolbar {
 				break;
 			}
 
+			case BUTTON_IDS::FOLLOW_RANDOM_AGENT: {
+				GameRules::ToggleRule(GameRules::RuleName::FOLLOW_RANDOM_AGENT);\
+
+				al_set_menu_item_caption(
+					menu,
+					BUTTON_IDS::FOLLOW_RANDOM_AGENT,
+					(GameRules::IsRuleEnabled(GameRules::FOLLOW_RANDOM_AGENT) ? "✓ Follow Random Agent" : "Follow Random Agent")
+				);
+
+				break;
+			}
 
 			case BUTTON_IDS::SPEED_DECREASE: {
 				GameManager::DecreaseSpeed();

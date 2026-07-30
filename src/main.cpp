@@ -212,13 +212,28 @@ int main() {
 			else {
 				GameManager::Update();
 
-				/*
-				if (Camera::followObject.expired() && GameRules::IsRuleEnabled("FollowRandomAgent")) {
-					shared_ptr<Object> followObj = GameManager::GetRandomAgent();
-					Camera::FollowObject(followObj);
-					InfoDisplay::SelectObject(followObj);
+				if (GameRules::IsRuleEnabled(GameRules::RuleName::FOLLOW_RANDOM_AGENT)) {
+					bool followNew = true;
+
+					if (auto objPtr = Camera::followedObject.lock()) {
+						if (auto bodyPartPtr = dynamic_pointer_cast<BodyPart>(objPtr)) {
+							followNew = bodyPartPtr->GetParentCreature().expired();
+						}
+						else {
+							followNew = false;
+						}
+					}
+
+					if (followNew) {
+						auto randomCreature = GameManager::GetRandomExistingCreature();
+						if (randomCreature) {
+							if (auto followObj = randomCreature->GetHead().lock()) {
+								Camera::FollowObject(followObj);
+								InfoDisplay::SelectObject(followObj);
+							}
+						}
+					}
 				}
-				*/
 			}
 
 
