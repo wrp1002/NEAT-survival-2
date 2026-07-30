@@ -72,6 +72,8 @@ Creature::Creature(string genes, b2Vec2 pos, shared_ptr<NEAT> nn, double energy)
 	this->energy = energy;
 	this->energyUsage = 0;
 
+	this->strength = 1;
+
 	this->baseInputs = nn->GetInputsCount() - extraInputCount;
 	this->baseOutputs = nn->GetOutputsCount() - extraOutputCount;
 }
@@ -87,6 +89,8 @@ void Creature::Init() {
 	this->energy -= energyToHealth;
 	double leftover = this->DistributeHealth(energyToHealth);
 	this->AddEnergy(leftover);
+
+	CalculateStrength();
 }
 
 void Creature::ApplyGenes() {
@@ -175,6 +179,7 @@ void Creature::Update() {
 			part->Destroy();
 			bodySegments[i] = nullptr;
 			bodySegments.erase(bodySegments.begin() + i);
+			CalculateStrength();
 		}
 	}
 
@@ -273,8 +278,24 @@ void Creature::MakeEgg() {
 	float eggDir = this->head.lock()->GetBody()->GetAngle() + M_PI / 2;
 	eggPos += 200 * b2Vec2(cos(eggDir), sin(eggDir));
 
-	ObjectFactory::CreateEgg(eggGenes, eggPos, eggNN, eggEnergy);
+	ObjectFactory::CreateEgg(eggGenes, eggPos, eggNN, eggEnergy, this->eggHatchTimer);
+
+	this->eggTimer = eggTimerStart;
 }
+
+
+void Creature::CalculateStrength() {
+	double newStrengh = 0;
+	for (auto part : bodySegments) {
+		if (shared_ptr<BodySegment> bodySeg = dynamic_pointer_cast<BodySegment>(part)) {
+			b2Vec2 size = bodySeg->GetWorldSize();
+			float val = size.x * size.y * 10;
+			newStrengh += val;
+		}
+	}
+	this->strength = newStrengh;
+}
+
 
 
 bool Creature::IsAlive() {

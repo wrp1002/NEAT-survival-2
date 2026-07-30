@@ -96,6 +96,8 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		void DistributeEnergy(double amount);
 		double DistributeHealth(double amount);
 		void MakeEgg();
+		void CalculateStrength();
+
 
 		float decimalFromSubstring(string str, int wholeDigits, int decimalDigits);
 		float GetNextGene(string &gene, int wholeDigits, int decimalDigits);
