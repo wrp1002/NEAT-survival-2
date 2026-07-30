@@ -19,21 +19,8 @@ namespace  ObjectFactory {
 	vector<string> outputLabels;
 
 	void Init() {
-		inputLabels = {
-			"const",
-			"sin",
-			"energy",
-			"health",
-		};
-		for (int i = 0; i < extraInputCount; i++)
-			inputLabels.push_back("in" + to_string(i));
-
-		outputLabels = {
-			"lay_egg",
-			"heal",
-		};
-		for (int i = 0; i < extraOutputCount; i++)
-			outputLabels.push_back("out" + to_string(i));
+		inputLabels = Creature::GetInputLabels();
+		outputLabels = Creature::GetOutputLabels();
 	}
 
 

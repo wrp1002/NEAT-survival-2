@@ -43,21 +43,8 @@ Creature::Creature(string genes, b2Vec2 pos) {
 	this->geneMutationCoef = 0;
 	this->nnMutationCoef = 0;
 
-	vector<string> inputLabels = {
-		"const",
-		"sin",
-		"energy",
-		"health",
-	};
-	for (int i = 0; i < extraInputCount; i++)
-		inputLabels.push_back("in" + to_string(i));
-
-	vector<string> outputLabels = {
-		"wants egg",
-		"wants to heal",
-	};
-	for (int i = 0; i < extraOutputCount; i++)
-		outputLabels.push_back("out" + to_string(i));
+	vector<string> inputLabels = GetInputLabels();
+	vector<string> outputLabels = GetOutputLabels();
 
 	this->baseInputs = inputLabels.size() - extraInputCount;
 	this->baseOutputs = outputLabels.size() - extraOutputCount;

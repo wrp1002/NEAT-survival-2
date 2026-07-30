@@ -69,6 +69,9 @@ class Creature : public std::enable_shared_from_this<Creature> {
 		~Creature();
 		void Init();
 
+		static const std::vector<std::string>& GetInputLabels();
+		static const std::vector<std::string>& GetOutputLabels();
+
 		void ApplyGenes(string genes);
 		void ApplyGenes();
 		void SetAsPlayer(bool val);
