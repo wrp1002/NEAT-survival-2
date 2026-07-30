@@ -7,9 +7,9 @@
 #include "Joint.h"
 
 
-BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, NerveInfo &nerveInfo) : LiveObject() {
+BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, vector<NerveInfo> &nerveInfo) : LiveObject() {
 	this->creature = parentCreature;
-	this->nerveInfo = nerveInfo;
+	this->nerves = nerveInfo;
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
 
@@ -17,8 +17,8 @@ BodyPart::BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, Ner
 	this->energyUsage = 0;
 }
 
-BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo) : LiveObject(pos, pixelSize, angle, color, shapeType, 1) {
-	this->nerveInfo = nerveInfo;
+BodyPart::BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, vector<NerveInfo> &nerveInfo) : LiveObject(pos, pixelSize, angle, color, shapeType, 1) {
+	this->nerves = nerveInfo;
 	this->creature = parentCreature;
 	this->polymorphic_id = "BodyPart";
 	this->color = color;
@@ -84,8 +84,15 @@ void BodyPart::Destroy() {
 void BodyPart::Print() {
 	Object::Print();
 	cout << "Nerve Info:" << endl;
-	cout << "inputEnabled: " << nerveInfo.inputEnabled << "   inputIndex: " << nerveInfo.inputIndex << endl;
-	cout << "outputEnabled: " << nerveInfo.outputEnabled << "   outputIndex: " << nerveInfo.outputIndex << endl;
+	for (auto info : nerves) {
+		cout << "Nerve Type:     " << info.type << endl;
+		cout << "Input Enabled:  " << info.inputEnabled << endl;
+		cout << "Input Index:    " << info.inputIndex << endl;
+		cout << "Output Enabled: " << info.outputEnabled << endl;
+		cout << "Output Index:   " << info.outputIndex << endl;
+	}
+	//cout << "inputEnabled: " << nerveInfo.inputEnabled << "   inputIndex: " << nerveInfo.inputIndex << endl;
+	//cout << "outputEnabled: " << nerveInfo.outputEnabled << "   outputIndex: " << nerveInfo.outputIndex << endl;
 }
 
 
@@ -113,36 +120,22 @@ void BodyPart::AddChild(shared_ptr<BodyPart> child, int angle) {
 
 }
 
-
-bool BodyPart::NerveInputEnabled() {
-	return this->nerveInfo.inputEnabled;
-}
-
-bool BodyPart::NerveOutputEnabled() {
-	return this->nerveInfo.outputEnabled;
-}
-
-
-float BodyPart::GetNerveOutput() {
+float BodyPart::GetNerveOutput(NerveType type) {
 	if (!parentJoint)
 		return 0;
 
 	return parentJoint->GetAngle();
 }
 
-int BodyPart::GetNerveOutputIndex() {
-	return this->nerveInfo.outputIndex;
-}
-
-int BodyPart::GetNerveInputIndex() {
-	return this->nerveInfo.inputIndex;
-}
-
-void BodyPart::SetNerveInput(float val) {
+void BodyPart::SetNerveInput(NerveType type, float val) {
 	if (!parentJoint)
 		return;
 
 	parentJoint->SetSpeed(val);
+}
+
+vector<NerveInfo>& BodyPart::GetNerves() {
+    return nerves;
 }
 
 

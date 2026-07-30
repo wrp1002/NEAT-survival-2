@@ -22,8 +22,8 @@ class BodySegment : public BodyPart {
 		int angleOnParent;
 
 	public:
-		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle, NerveInfo &nerveInfo);
-		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodyPart> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo);
+		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle, vector<NerveInfo> &nerveInfo);
+		BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodyPart> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, vector<NerveInfo> &nerveInfo);
 
 
 		void Draw();

@@ -5,7 +5,7 @@
 #include "../../UI/Camera.h"
 #include <Box2D/Box2D.h>
 
-Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
+Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, vector<NerveInfo> &nerveInfo) :
 	BodyPart(
 		parentCreature,
 		GetPosOnParent(parentPart, angleOnParent, angleOffset, Util::pixelsToMeters(b2Vec2(10, 10))),
@@ -81,10 +81,10 @@ void Cilium::UpdateJoint() {
 		alive = false;
 }
 
-float Cilium::GetNerveOutput() {
+float Cilium::GetNerveOutput(NerveType type) {
 	return 0;
 }
 
-void Cilium::SetNerveInput(float val) {
-	this->currentSpeed = abs(val) * maxSpeed;
+void Cilium::SetNerveInput(NerveType type, float val) {
+	this->currentSpeed = val * maxSpeed;
 }

@@ -127,15 +127,120 @@ void Creature::ApplyGenes(string genes) {
 
 }
 
+string Creature::MutateGeneParameters(string gene) {
+	int instructionType = int(GetNextGene(gene, 2, 0)) % Globals::GENE_INSTRUCTION_TYPES;
+	string newGene = "";
+	newGene += Util::EncodeGeneValue(instructionType, 2, 0);
+
+	if (instructionType == 0) {
+		int shapeType = int(GetNextGene(gene, 1, 0));
+		float width = GetNextGene(gene, 0, 3);
+		float height = GetNextGene(gene, 0, 3);
+
+		newGene += Util::EncodeGeneValue(shapeType, 1, 0);
+		newGene += Util::EncodeGeneValue(Util::Tweak(width, 0.05f), 0, 3);
+		newGene += Util::EncodeGeneValue(Util::Tweak(height, 0.05f), 0, 3);
+	}
+	else if (instructionType == 1) {
+		float r = GetNextGene(gene, 0, 3);
+		float g = GetNextGene(gene, 0, 3);
+		float b = GetNextGene(gene, 0, 3);
+
+		newGene += Util::EncodeGeneValue(Util::Tweak(r, 0.05f), 0, 3);
+		newGene += Util::EncodeGeneValue(Util::Tweak(g, 0.05f), 0, 3);
+		newGene += Util::EncodeGeneValue(Util::Tweak(b, 0.05f), 0, 3);
+	}
+	// angleOnParent(1), angleOffset(3)
+	else if (instructionType == 3) {
+		int childAngleGene = GetNextGene(gene, 1, 0);
+		float angleOffset = GetNextGene(gene, 0, 3);
+
+		newGene += Util::EncodeGeneValue(Util::Tweak(childAngleGene, 2), 1, 0);
+		newGene += Util::EncodeGeneValue(Util::Tweak(angleOffset, 0.05f), 0, 3);
+	}
+	// parentID(1)
+	else if (instructionType == 4) {
+		int selectedParentID = int(GetNextGene(gene, 2, 0));
+		newGene += Util::EncodeGeneValue(Util::Tweak(selectedParentID, 2), 2, 0);
+	}
+
+	newGene += gene;
+	//cout << gene << " " << gene.length() << " " << newGene << " " << newGene.length() << endl;
+	assert(newGene.length() == Globals::GENE_LENGTH);
+	return newGene;
+}
+
+string Creature::MutateGeneRewrite(string gene) {
+	for (unsigned i = 2; i < gene.length(); i++) {
+		gene[i] = '0' + (rand() % 10);
+	}
+	return gene;
+}
+
+string Creature::GetMutatedGenes() {
+	string newGenes = "";
+
+
+	float headerMutationRate = this->geneMutationRates.headerMutationRate * Globals::mutationProfile.MAX_HEADER_MUTATION_RATE;
+	float parameterMutationRate = this->geneMutationRates.parameterMutationRate * Globals::mutationProfile.MAX_PARAMETER_MUTATION;
+	float instructionMutationRate = this->geneMutationRates.instructionMutationRate * Globals::mutationProfile.MAX_PARAMETER_REWRITE;
+	float duplicationRate = this->geneMutationRates.duplicationRate * Globals::mutationProfile.MAX_DUPLICATION;
+	float deletionRate = this->geneMutationRates.deletionRate * Globals::mutationProfile.MAX_DELETION;
+	float rearrangementRate = this->geneMutationRates.rearrangementRate * Globals::mutationProfile.MAX_MOVE;
+	float randomInsertionRate = this->geneMutationRates.randomInsertionRate * Globals::mutationProfile.MAX_RANDOM_INSERT;
+
+	vector<string> genesToMove;
+	vector<string> genesToDuplicate;
+
+	// Mutate header genes
+	for (int i = 0; i < Globals::HEADER_GENES_COUNT * Globals::GENE_LENGTH; i++) {
+		if (Util::Random() <= headerMutationRate) {
+			newGenes += to_string(rand() % 10);
+		}
+		else
+			newGenes += genes[i];
+	}
+
+	for (unsigned i = Globals::HEADER_GENES_COUNT * Globals::GENE_LENGTH; i < genes.length(); i += Globals::GENE_LENGTH) {
+		string gene = genes.substr(i, Globals::GENE_LENGTH);
+
+		if (Util::Random() <= deletionRate) {
+			// skip gene
+		}
+		else if (Util::Random() <= parameterMutationRate) {
+			newGenes += MutateGeneParameters(gene);
+		}
+		else if (Util::Random() <= instructionMutationRate) {
+			// Rewrite gene parameters
+			newGenes += MutateGeneRewrite(gene);
+		}
+		else if (Util::Random() <= duplicationRate) {
+			// Add to list and also add it now
+			genesToMove.push_back(gene);
+			newGenes += gene;
+		}
+		else if (Util::Random() <= rearrangementRate) {
+			// Add to list and move it later
+			genesToMove.push_back(gene);
+		}
+		else if (Util::Random() <= randomInsertionRate) {
+			// Insert new gene along with current one
+			for (int j = 0; j < Globals::GENE_LENGTH; j++)
+				newGenes += to_string(rand() % 10);
+			newGenes += gene;
+		}
+		else
+			newGenes += gene;
+
+	}
+	return newGenes;
+}
+
 
 
 void Creature::CreateHead(string gene, CurrentGenes &currentGenes, unordered_map<int, vector<shared_ptr<BodyPart>>> &symmetryMap, int &symmetryID) {
 	//cout << "Creating head" << endl;
-	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = false;
-	nerveInfo.outputEnabled = false;
-	nerveInfo.inputIndex = 0;
-	nerveInfo.outputIndex = 0;
+	vector<NerveInfo> headNerves;
 
 	float angle = GetNextGene(gene, 0, 3) * 360;
 
@@ -146,7 +251,7 @@ void Creature::CreateHead(string gene, CurrentGenes &currentGenes, unordered_map
 		currentGenes.shapeType,
 		startingPos,
 		Util::DegreesToRadians(angle),
-		nerveInfo
+		headNerves
 	));
 	AddPart(newPart);
 	this->head = newPart;
@@ -163,10 +268,14 @@ void Creature::CreateHead(string gene, CurrentGenes &currentGenes, unordered_map
 	jointInfo.enableLimit = true;
 	jointInfo.angleLimit = 0.01;
 
-	nerveInfo.inputEnabled = true;
-	nerveInfo.outputEnabled = false;
-	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+	vector<NerveInfo> mouthNerves = {
+		NerveInfo(
+			NerveType::Activation,
+			int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs,
+			int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs
+		)
+	};
+
 
 	int angleOnParent = 90;
 	shared_ptr<BodyPart> newMouth = make_shared<Mouth>(Mouth(
@@ -177,7 +286,7 @@ void Creature::CreateHead(string gene, CurrentGenes &currentGenes, unordered_map
 		Util::DegreesToRadians(angleOnParent),
 		Util::DegreesToRadians(currentGenes.angleOffset),
 		jointInfo,
-		nerveInfo
+		mouthNerves
 	));
 
 	AddPart(newMouth);
@@ -196,12 +305,16 @@ void Creature::CreateBodySegment(string gene, CurrentGenes &currentGenes, vector
 	jointInfo.enableLimit = bool(int(GetNextGene(gene, 1, 0)) % 2);
 	jointInfo.angleLimit = GetNextGene(gene, 0, 3) * M_PI;
 
-	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+	bool inputEnabled = int(GetNextGene(gene, 1, 0)) % 2;
+	bool outputEnabled = int(GetNextGene(gene, 1, 0)) % 2;
 
+	vector<NerveInfo> nerves = {
+		NerveInfo(
+			NerveType::Activation,
+			inputEnabled ? int(GetNextGene(gene, 1, 0)) + baseInputs : -1,
+			outputEnabled ? int(GetNextGene(gene, 1, 0)) + baseOutputs : -1
+		)
+	};
 
 	int angleOnParent = parentObjects[0]->GetValidChildAngle(currentGenes.childAngleGene);
 	//cout << "angleOnParent1: " << angleOnParent << endl;
@@ -214,7 +327,7 @@ void Creature::CreateBodySegment(string gene, CurrentGenes &currentGenes, vector
 		Util::DegreesToRadians(angleOnParent),
 		Util::DegreesToRadians(currentGenes.angleOffset),
 		jointInfo,
-		nerveInfo
+		nerves
 	));
 
 	AddPart(newPart);
@@ -229,8 +342,13 @@ void Creature::CreateBodySegment(string gene, CurrentGenes &currentGenes, vector
 			angleOnParent = (180 - angleOnParent + 360) % 360;
 
 		if (parentObjects[1]->childAngleValid(angleOnParent)) {
-			nerveInfo.inputIndex = (nerveInfo.inputIndex + extraInputCount / 2) % (baseInputs + extraInputCount);
-			nerveInfo.outputIndex = (nerveInfo.outputIndex + extraOutputCount / 2) % (baseOutputs + extraOutputCount);
+			vector<NerveInfo> nerves2 = {
+				NerveInfo(
+					NerveType::Activation,
+					inputEnabled ? int(GetNextGene(gene, 1, 0)) + baseInputs : -1,
+					outputEnabled ? int(GetNextGene(gene, 1, 0)) + baseOutputs : -1
+				)
+			};
 
 			//cout << "angleOnParent2: " << angleOnParent << endl;
 			newPart = make_shared<BodySegment>(BodySegment(
@@ -242,7 +360,7 @@ void Creature::CreateBodySegment(string gene, CurrentGenes &currentGenes, vector
 				Util::DegreesToRadians(angleOnParent),
 				Util::DegreesToRadians(-currentGenes.angleOffset),
 				jointInfo,
-				nerveInfo
+				nerves2
 			));
 			AddPart(newPart);
 			parentObjects[1]->AddChild(newPart, angleOnParent);
@@ -261,11 +379,13 @@ void Creature::CreateMouth(string gene, CurrentGenes &currentGenes, vector<share
 	jointInfo.enableLimit = true;
 	jointInfo.angleLimit = 0.01;
 
-	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = true;
-	nerveInfo.outputEnabled = false;
-	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+	vector<NerveInfo> nerves = {
+		NerveInfo(
+			NerveType::Activation,
+			-1, //int(GetNextGene(gene, 1, 0)) % 2 ? int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs : -1
+			int(GetNextGene(gene, 1, 0)) % 2 ? int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs : -1
+		)
+	};
 
 	int angleOnParent = parentObjects[0]->GetValidChildAngle(currentGenes.childAngleGene);
 	shared_ptr<BodyPart> newPart = make_shared<Mouth>(Mouth(
@@ -276,7 +396,7 @@ void Creature::CreateMouth(string gene, CurrentGenes &currentGenes, vector<share
 		Util::DegreesToRadians(angleOnParent),
 		Util::DegreesToRadians(currentGenes.angleOffset),
 		jointInfo,
-		nerveInfo
+		nerves
 	));
 
 	AddPart(newPart);
@@ -288,8 +408,13 @@ void Creature::CreateMouth(string gene, CurrentGenes &currentGenes, vector<share
 		angleOnParent = (180 - angleOnParent + 360) % 360;
 
 	if (parentObjects[1]->childAngleValid(angleOnParent)) {
-		nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-		nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+		vector<NerveInfo> nerves2 = {
+			NerveInfo(
+				NerveType::Activation,
+				-1, //int(GetNextGene(gene, 1, 0)) % 2 ? int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs : -1
+				int(GetNextGene(gene, 1, 0)) % 2 ? int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs : -1
+			)
+		};
 
 		newPart = make_shared<Mouth>(Mouth(
 			shared_from_this(),
@@ -299,7 +424,7 @@ void Creature::CreateMouth(string gene, CurrentGenes &currentGenes, vector<share
 			Util::DegreesToRadians(angleOnParent),
 			Util::DegreesToRadians(-currentGenes.angleOffset),
 			jointInfo,
-			nerveInfo
+			nerves2
 		));
 
 		AddPart(newPart);
@@ -318,16 +443,26 @@ void Creature::CreateCilium(string gene, CurrentGenes &currentGenes, vector<shar
 	jointInfo.enableLimit = true;
 	jointInfo.angleLimit = 0.1;
 
-	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = true; //int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.outputEnabled = true; //int(GetNextGene(gene, 1, 0)) % 2 == 0;
-	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+	vector<NerveInfo> nerves = {
+		NerveInfo(
+			NerveType::Activation,
+			-1,
+			int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs
+		)
+	};
 
 	int angleOnParent = parentObjects[0]->GetValidChildAngle(currentGenes.childAngleGene);
-	shared_ptr<BodyPart> newPart = make_shared<Cilium>(Cilium(shared_from_this(), dynamic_pointer_cast<BodySegment>(parentObjects[0]), b2Vec2(currentGenes.width, currentGenes.height), al_map_rgb(255, 0, 0), Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(currentGenes.angleOffset), jointInfo, nerveInfo));
+        shared_ptr<BodyPart> newPart = make_shared<Cilium>(
+            Cilium(shared_from_this(),
+                   dynamic_pointer_cast<BodySegment>(parentObjects[0]),
+                   b2Vec2(currentGenes.width, currentGenes.height),
+                   al_map_rgb(255, 0, 0), Util::DegreesToRadians(angleOnParent),
+                   Util::DegreesToRadians(currentGenes.angleOffset), jointInfo,
+                   nerves
+			)
+		);
 
-	AddPart(newPart);
+        AddPart(newPart);
 	parentObjects[0]->AddChild(newPart, angleOnParent);
 	symmetryMap[symmetryID].push_back((newPart));
 
@@ -336,13 +471,24 @@ void Creature::CreateCilium(string gene, CurrentGenes &currentGenes, vector<shar
 		angleOnParent = (180 - angleOnParent + 360) % 360;
 
 	if (parentObjects[1]->childAngleValid(angleOnParent)) {
-		BodyPart::NerveInfo nerveInfo2;
-		nerveInfo2.inputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-		nerveInfo2.outputEnabled = int(GetNextGene(gene, 1, 0)) % 2 == 0;
-		nerveInfo2.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-		nerveInfo2.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+		vector<NerveInfo> nerves2 = {
+		NerveInfo(
+				NerveType::Activation,
+				-1,
+				int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs
+			)
+		};
 
-		newPart = make_shared<Cilium>(Cilium(shared_from_this(), dynamic_pointer_cast<BodySegment>(parentObjects[1]), b2Vec2(currentGenes.width, currentGenes.height), al_map_rgb(255, 0, 0), Util::DegreesToRadians(angleOnParent), Util::DegreesToRadians(-currentGenes.angleOffset), jointInfo, nerveInfo2));
+		newPart = make_shared<Cilium>(
+			Cilium(shared_from_this(),
+					dynamic_pointer_cast<BodySegment>(parentObjects[1]),
+					b2Vec2(currentGenes.width, currentGenes.height),
+					al_map_rgb(255, 0, 0),
+					Util::DegreesToRadians(angleOnParent),
+					Util::DegreesToRadians(-currentGenes.angleOffset),
+					jointInfo, nerves2
+			)
+		);
 
 		AddPart(newPart);
 		parentObjects[1]->AddChild(newPart, angleOnParent);
@@ -378,7 +524,8 @@ void Creature::CreateEye(string gene, CurrentGenes &currentGenes, vector<shared_
 		Util::DegreesToRadians(angleOnParent),
 		Util::DegreesToRadians(currentGenes.angleOffset),
 		jointInfo,
-		nerveInfo
+		nerves,
+		eyeInfo
 	));
 
 	AddPart(newPart);
@@ -390,8 +537,16 @@ void Creature::CreateEye(string gene, CurrentGenes &currentGenes, vector<shared_
 		angleOnParent = (180 - angleOnParent + 360) % 360;
 
 	if (parentObjects[1]->childAngleValid(angleOnParent)) {
-		nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-		nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+		vector<NerveInfo> nerves2 = {
+			NerveInfo(
+				NerveType::Activation,
+				int(GetNextGene(gene, 1, 0)) + baseInputs
+			),
+			NerveInfo(
+				NerveType::Direction,
+				int(GetNextGene(gene, 1, 0)) + baseInputs
+			)
+		};
 		//cout << "eye " << nerveInfo.inputIndex << " " << nerveInfo.outputIndex << endl;
 
 		newPart = make_shared<Eye>(Eye(
@@ -402,7 +557,8 @@ void Creature::CreateEye(string gene, CurrentGenes &currentGenes, vector<shared_
 			Util::DegreesToRadians(angleOnParent),
 			Util::DegreesToRadians(-currentGenes.angleOffset),
 			jointInfo,
-			nerveInfo
+			nerves2,
+			eyeInfo
 		));
 
 		AddPart(newPart);

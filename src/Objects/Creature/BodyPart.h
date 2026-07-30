@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "../LiveObject.h"
 
@@ -12,17 +13,37 @@ class BodySegment;
 class Creature;
 class Joint;
 
-class BodyPart : public LiveObject {
-	public:
-		struct NerveInfo {
-			bool inputEnabled;
-			bool outputEnabled;
-			int inputIndex;
-			int outputIndex;
-		};
+enum NerveType {
+	Activation,
+	Direction
+};
+struct NerveInfo {
+	bool inputEnabled = false;
+	bool outputEnabled = false;
 
+	int inputIndex = -1;
+	int outputIndex = -1;
+
+	NerveType type = NerveType::Activation;
+
+	NerveInfo(
+		NerveType type,
+		int inputIndex = -1,
+		int outputIndex = -1
+	)
+	{
+		this->type = type;
+		this->outputIndex = outputIndex;
+		this->inputIndex = inputIndex;
+
+		outputEnabled = outputIndex >= 0;
+		inputEnabled = inputIndex >= 0;
+	}
+};
+
+class BodyPart : public LiveObject {
 	protected:
-		NerveInfo nerveInfo;
+		vector<NerveInfo> nerves;
 		shared_ptr<Joint> parentJoint;
 		weak_ptr<Creature> creature;
 		weak_ptr<BodyPart> parentPart;
@@ -32,8 +53,8 @@ class BodyPart : public LiveObject {
 		static b2Vec2 GetPosOnParent(shared_ptr<BodyPart> parent, float angleOnObject, float angleOffset, b2Vec2 thisWorldSize);
 
 	public:
-		BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, NerveInfo &nerveInfo);
-		BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, NerveInfo &nerveInfo);
+		BodyPart(shared_ptr<Creature> parentCreature, ALLEGRO_COLOR color, vector<NerveInfo> &nerveInfo);
+		BodyPart(shared_ptr<Creature> parentCreature, b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, int shapeType, vector<NerveInfo> &nerveInfo);
 
 		virtual void Update();
 		virtual void Draw();
@@ -54,10 +75,10 @@ class BodyPart : public LiveObject {
 
 		bool NerveInputEnabled();
 		bool NerveOutputEnabled();
-		virtual float GetNerveOutput();
-		int GetNerveOutputIndex();
-		int GetNerveInputIndex();
-		virtual void SetNerveInput(float val);
+		virtual float GetNerveOutput(NerveType type);
+		virtual void SetNerveInput(NerveType type, float val);
+
+		vector<NerveInfo>& GetNerves();
 
 		double SetHealth(double amount);
 

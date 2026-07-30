@@ -14,7 +14,7 @@
 #include "../../GameManager.h"
 
 
-Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
+Mouth::Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, vector<NerveInfo> &nerveInfo) :
 	BodyPart(
 		parentCreature,
 		color,
@@ -178,11 +178,11 @@ void Mouth::UpdateJoint() {
 }
 
 
-float Mouth::GetNerveOutput() {
+float Mouth::GetNerveOutput(NerveType type) {
 	return 0;
 }
 
-void Mouth::SetNerveInput(float val) {
+void Mouth::SetNerveInput(NerveType type, float val) {
 	if (val > 0 && CanBite()) {
 		biting = true;
 		animationState = 0.15;

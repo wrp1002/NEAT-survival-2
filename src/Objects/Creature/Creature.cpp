@@ -93,6 +93,41 @@ void Creature::Init() {
 	CalculateStrength();
 }
 
+const std::vector<std::string>& Creature::GetInputLabels() {
+    static const std::vector<std::string> labels = [] {
+        std::vector<std::string> l = {
+            "const",
+            "sin",
+            "energy",
+            "health",
+        };
+
+        for (int i = 0; i < extraInputCount; i++)
+            l.push_back("in" + std::to_string(i));
+
+        return l;
+    }();
+
+    return labels;
+}
+
+const std::vector<std::string>& Creature::GetOutputLabels() {
+    static const std::vector<std::string> labels = [] {
+        std::vector<std::string> l = {
+            "wants egg",
+            "wants to heal",
+            "rotate",
+        };
+
+        for (int i = 0; i < extraOutputCount; i++)
+            l.push_back("out" + std::to_string(i));
+
+        return l;
+    }();
+
+    return labels;
+}
+
 void Creature::ApplyGenes() {
 	ApplyGenes(this->genes);
 }
@@ -117,12 +152,19 @@ void Creature::Update() {
 			inputs.push_back(0);
 
 		for (auto part : bodySegments) {
-			if (!part->NerveOutputEnabled())
-				continue;
 
-			int index = part->GetNerveInputIndex();
-			float val = part->GetNerveOutput();
-			inputs[index] += val;
+			for (auto& nerve : part->GetNerves()) {
+
+				if (!nerve.inputEnabled)
+					continue;
+
+				if (nerve.inputIndex < 0)
+					continue;
+
+				float value = part->GetNerveOutput(nerve.type);
+
+				inputs[nerve.inputIndex] += value;
+			}
 		}
 
 		// Calculations
@@ -133,15 +175,23 @@ void Creature::Update() {
 
 	if (!isPlayer) {
 		// Outputs
-		vector<double> output = nn->GetOutputs();
+		vector<double> outputs = nn->GetOutputs();
 
 		for (auto part : bodySegments) {
-			if (!part->NerveInputEnabled())
-				continue;
+			for (auto& nerve : part->GetNerves()) {
+				if (!nerve.outputEnabled)
+					continue;
 
-			int index = part->GetNerveOutputIndex();
-			float val = output[index];
-			part->SetNerveInput(val);
+				if (nerve.outputIndex < 0)
+					continue;
+
+				float value = outputs[nerve.outputIndex];
+
+				part->SetNerveInput(
+					nerve.type,
+					value
+				);
+			}
 		}
 
 		bool wantsEgg = output[0] || energy >= 200;
@@ -396,7 +446,7 @@ double Creature::GetTotalHealth() {
 void Creature::SetBiting(bool val) {
 	for (auto part : bodySegments) {
 		if (shared_ptr<Mouth> mouth = dynamic_pointer_cast<Mouth>(part)) {
-			mouth->SetNerveInput(val);
+			mouth->SetNerveInput(NerveType::Activation, val);
 		}
 	}
 }

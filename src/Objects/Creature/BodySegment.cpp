@@ -20,7 +20,7 @@
 
 using namespace std;
 
-BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle, NerveInfo &nerveInfo) :
+BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, b2Vec2 pos, float angle, vector<NerveInfo> &nerveInfo) :
 				BodyPart(parentCreature, pos, pixelSize, -angle, color, shapeType, nerveInfo) {
 
 	this->parentJoint = nullptr;
@@ -29,7 +29,7 @@ BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, 
 	SetValidAngles(pixelSize);
 }
 
-BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodyPart> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
+BodySegment::BodySegment(shared_ptr<Creature> parentCreature, b2Vec2 pixelSize, ALLEGRO_COLOR color, int shapeType, shared_ptr<BodyPart> parent, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, vector<NerveInfo> &nerveInfo) :
 		BodyPart(
 			parentCreature,
 			GetPosOnParent(parent, angleOnParent, angleOffset, Util::pixelsToMeters(pixelSize)),

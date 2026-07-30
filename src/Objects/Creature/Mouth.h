@@ -19,15 +19,15 @@ class Mouth : public BodyPart {
 		float animationState;
 
 	public:
-		Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo);
+		Mouth(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, vector<NerveInfo> &nerveInfo);
 
 		void Update();
 		void Draw();
 		void UpdateJoint();
 
 
-		float GetNerveOutput();
-		void SetNerveInput(float val);
+		float GetNerveOutput(NerveType type);
+		void SetNerveInput(NerveType type, float val);
 
 		bool CanBite();
 };

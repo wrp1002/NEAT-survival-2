@@ -10,7 +10,7 @@
 #include "../../GameManager.h"
 #include "../../UI/Camera.h"
 
-Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, NerveInfo &nerveInfo) :
+Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart, b2Vec2 pixelSize, ALLEGRO_COLOR color, float angleOnParent, float angleOffset, Joint::JointInfo jointInfo, vector<NerveInfo> &nerveInfo, EyeInfo &eyeInfo) :
 	BodyPart(
 		parentCreature,
 		color,
