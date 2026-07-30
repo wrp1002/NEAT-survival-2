@@ -116,6 +116,10 @@ void Creature::ApplyGenes(string genes) {
 				}
 				break;
 			}
+			case 5: {
+				currentGenes.eyeFov = GetNextGene(gene, 0, 3) * 90;
+				currentGenes.eyeRange = GetNextGene(gene, 0, 3) * 500;
+			}
 		}
 	}
 
@@ -507,11 +511,30 @@ void Creature::CreateEye(string gene, CurrentGenes &currentGenes, vector<shared_
 	jointInfo.enableLimit = true;
 	jointInfo.angleLimit = 0.01;
 
-	BodyPart::NerveInfo nerveInfo;
-	nerveInfo.inputEnabled = false;
-	nerveInfo.outputEnabled = true;
-	nerveInfo.inputIndex = int(GetNextGene(gene, 0, 2) * extraInputCount) + baseInputs;
-	nerveInfo.outputIndex = int(GetNextGene(gene, 0, 2) * extraOutputCount) + baseOutputs;
+	vector<NerveInfo> nerves = {
+		NerveInfo(
+			NerveType::Activation,
+			int(GetNextGene(gene, 1, 0)) + baseInputs
+		),
+
+		NerveInfo(
+			NerveType::Direction,
+			int(GetNextGene(gene, 1, 0)) + baseInputs
+		)
+	};
+
+	/*
+	float range = 200;
+	float fov = 30;
+	int rayCount = 5;
+	float targetHue = 0;
+	*/
+
+	Eye::EyeInfo eyeInfo;
+	eyeInfo.fov = currentGenes.eyeFov;
+	eyeInfo.range = currentGenes.eyeRange;
+	eyeInfo.rayCount = 5;
+	eyeInfo.targetHue = 0;
 
 	//cout << "eye " << nerveInfo.inputIndex << " " << nerveInfo.outputIndex << endl;
 

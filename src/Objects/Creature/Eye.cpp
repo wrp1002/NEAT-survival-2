@@ -20,10 +20,13 @@ Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart
 	this->polymorphic_id = "Eye";
 
 	this->shapeType = SHAPE_TYPES::RECT;
-	this->pixelSize = b2Vec2(10, 100);
+	this->pixelSize = b2Vec2(10, 10);
 	this->worldSize = Util::pixelsToMeters(this->pixelSize);
 	this->seesObject = false;
+	this->visionDirection = 0;
+	this->visionStrength = 0;
 	this->parentPart = parentPart;
+	this->eyeInfo = eyeInfo;
 
 	b2BodyDef bodyDef;
 	b2FixtureDef fixtureDef;
@@ -42,7 +45,7 @@ Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart
 	this->body = GameManager::world.CreateBody(&bodyDef);
 
 	fixtureDef.shape = &rectShapeDef;
-	fixtureDef.isSensor = true;
+	fixtureDef.isSensor = false;
 	fixtureDef.density = 0.01f;
 	fixtureDef.friction = 0.3f;
 	fixtureDef.restitution = 0.5f;
@@ -59,6 +62,52 @@ Eye::Eye(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> parentPart
 	SetParentJoint(newJoint);
 }
 
+void Eye::UpdateVisionValues() {
+    float totalSignal = 0;
+    float weightedDirection = 0;
+
+    if (rayValues.empty())
+        return;
+
+
+    for (int i = 0; i < rayValues.size(); i++) {
+        float value = rayValues[i];
+
+        // Convert ray index into -1 to +1
+        // left = -1, center = 0, right = +1
+        float rayPosition = 0;
+
+        if (rayValues.size() > 1) {
+            rayPosition =
+                (float)i / (rayValues.size() - 1);
+
+            rayPosition =
+                rayPosition * 2.0f - 1.0f;
+        }
+
+
+        totalSignal += value;
+
+        weightedDirection += value * rayPosition;
+    }
+
+
+    // Strength of the thing being seen
+    visionStrength = std::min(totalSignal, 1.0f);
+
+    // Direction weighted by what was seen
+    if (totalSignal > 0) {
+        visionDirection =
+            weightedDirection / totalSignal;
+
+        // make peripheral objects less important
+        visionDirection *= visionStrength;
+    }
+    else
+    {
+        visionDirection = 0;
+    }
+}
 
 void Eye::Update() {
 	LiveObject::Update();
@@ -67,51 +116,72 @@ void Eye::Update() {
 	if (creature.expired())
 		return;
 
-	seesObject = false;
+	if (visionTimer == 0) {
+		rayValues.assign(eyeInfo.rayCount, 0.0f);
 
-	for (b2ContactEdge* ce = body->GetContactList(); ce; ce = ce->next) {
-		b2Contact* contact = ce->contact;
-		if (!contact->IsTouching())
-			continue;
+		float startAngle = -eyeInfo.fov * 0.5f;
+		float step = eyeInfo.rayCount > 1 ? eyeInfo.fov / (eyeInfo.rayCount - 1) : 0;
 
-		shared_ptr<Object> otherObject;
+		for (int i = 0; i < eyeInfo.rayCount; i++) {
 
-		ObjectUserData *userDataA = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetUserData());
-		ObjectUserData *userDataB = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetUserData());
+			float localAngle =
+				Util::DegreesToRadians(
+					startAngle + step * i
+				);
 
-		if (userDataA && userDataA->parentObject.lock() && userDataA->parentObject.lock().get() != this)
-			otherObject = userDataA->parentObject.lock();
-		if (userDataB && userDataB->parentObject.lock() && userDataB->parentObject.lock().get() != this)
-			otherObject = userDataB->parentObject.lock();
+			// Eye points along local +Y
+			// Local eye direction
+			b2Vec2 direction(
+				sin(localAngle),
+				cos(localAngle)
+			);
 
-		if (!otherObject)
-			continue;
+			// Convert to world direction
+			direction = body->GetWorldVector(direction);
 
-		if (otherObject->GetType() == "Eye")
-			continue;
+			// Convert range to meters
+			float rangeMeters = Util::pixelsToMeters(eyeInfo.range);
 
-		if (shared_ptr<BodyPart> bodyPart = dynamic_pointer_cast<BodyPart>(otherObject)) {
-			if (bodyPart->GetParentCreature().lock() == this->GetParentCreature().lock())
-				continue;
+			// Make ray
+			b2Vec2 start = body->GetWorldPoint(b2Vec2(0, 0));
+			b2Vec2 end = start + rangeMeters * direction;
 
-			seesObject = true;
-			break;
+			EyeRayCastCallback callback;
+			GameManager::world.RayCast(
+				&callback,
+				start,
+				end
+			);
+
+			if (callback.hitObject) {
+
+				rayValues[i] =
+					1.0f - callback.closestFraction;
+
+				seesObject = true;
+			}
+			else {
+				rayValues[i] = 0;
+			}
 		}
-		else if (shared_ptr<LiveObject> bodyPart = dynamic_pointer_cast<LiveObject>(otherObject)) {
-			seesObject = true;
-			break;
-		}
 
+		UpdateVisionValues();
+		visionTimer = visionTimerStart;
 	}
+	visionTimer--;
 }
 
 
 void Eye::Draw() {
-	//Object::Draw();
-
 	float angle = body->GetAngle();
+
 	b2Vec2 pos = Util::metersToPixels(body->GetPosition());
-	b2Vec2 origin(pixelSize.y * sin(-angle), pixelSize.y * cos(-angle));
+
+	// Offset so the eye is drawn from its base/tip correctly
+	b2Vec2 origin(
+		pixelSize.y * sin(-angle),
+		pixelSize.y * cos(-angle)
+	);
 
 	pos -= origin;
 
@@ -124,14 +194,69 @@ void Eye::Draw() {
 
 	al_use_transform(&t);
 
-	ALLEGRO_COLOR drawColor = al_map_rgba(50, 50, 50, 50);
-	if (seesObject)
-		drawColor = al_map_rgba(255, 255, 255, 50);
+	// Draw rays
+	if (eyeInfo.rayCount > 0) {
 
-	al_draw_line(0, 0, 0, pixelSize.y * 2, drawColor, pixelSize.x * 2);
-	al_draw_filled_circle(0, 0, 10, al_map_rgb(255, 255, 255));
-	al_draw_filled_circle(0, 5, 5, color);
+		float startAngle = -eyeInfo.fov * 0.5f;
+		float step = (eyeInfo.rayCount > 1) ? eyeInfo.fov / (eyeInfo.rayCount - 1) : 0;
 
+		for (int i = 0; i < eyeInfo.rayCount; i++) {
+			float localAngle = startAngle + step * i;
+
+			// Eye points along local +Y, not +X
+			float radians = Util::DegreesToRadians(localAngle);
+
+			float dx = sin(radians);
+			float dy = cos(radians);
+
+			// Draw ray in local eye space
+			al_draw_line(
+				0,
+				0,
+				dx * eyeInfo.range,
+				dy * eyeInfo.range,
+				al_map_rgba(100, 100, 100, 60),
+				1
+			);
+
+			if (i < rayValues.size() && rayValues[i] > 0.0f) {
+
+				float hitDistance = eyeInfo.range * (1.0f - rayValues[i]);
+
+				float hx = dx * hitDistance;
+				float hy = dy * hitDistance;
+
+				float brightness = std::min(rayValues[i], 1.0f);
+
+				al_draw_filled_circle(
+					hx,
+					hy,
+					3,
+					al_map_rgba_f(
+						brightness,
+						brightness,
+						brightness,
+						1.0f
+					)
+				);
+			}
+		}
+	}
+
+	// Draw eye
+	al_draw_filled_circle(
+		0,
+		0,
+		10,
+		al_map_rgb(255, 255, 255)
+	);
+	// Pupil
+	al_draw_filled_circle(
+		0,
+		5,
+		5,
+		color
+	);
 }
 
 
@@ -142,10 +267,20 @@ void Eye::UpdateJoint() {
 }
 
 
-float Eye::GetNerveOutput() {
-	return seesObject;
+float Eye::GetNerveOutput(NerveType type) {
+	//cout << "get eye output" << visionStrength << " " << visionDirection << endl;
+    switch(type) {
+        case NerveType::Activation:
+            return visionStrength;
+
+        case NerveType::Direction:
+            return visionDirection;
+
+        default:
+            return 0;
+    }
 }
 
-void Eye::SetNerveInput(float val) {
+void Eye::SetNerveInput(NerveType type, float val) {
 
 }

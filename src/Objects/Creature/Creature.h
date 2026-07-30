@@ -61,6 +61,9 @@ class Creature : public std::enable_shared_from_this<Creature> {
 			int geneLength = 16;
 			int angleOffset = 0;
 			int childAngleGene = 0;
+			int eyeRange = 50;
+			int eyeTargetHue = 0;
+			int eyeFov = 30;
 		};
 
 	public:
