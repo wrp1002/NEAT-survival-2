@@ -18,7 +18,7 @@ Cilium::Cilium(shared_ptr<Creature> parentCreature, shared_ptr<BodySegment> pare
 
 
 	this->polymorphic_id = "Cilium";
-	this->maxSpeed = 2;
+	this->maxSpeed = 10;
 	this->currentSpeed = 0;
 	this->parentPart = parentPart;
 
@@ -36,7 +36,7 @@ void Cilium::Update() {
 	if (creature.expired())
 		return;
 
-	double requestedEnergy = 0.005 * currentSpeed;
+	double requestedEnergy = abs(0.02 * currentSpeed / maxSpeed);
 
 	// Not enough energy, so do nothing
 	if (creature.lock()->GetUsableEnergy() < requestedEnergy) {
@@ -44,7 +44,7 @@ void Cilium::Update() {
 		return;
 	}
 
-	this->animationAngle = body->GetAngle() + sin(al_get_time() * currentSpeed);
+	this->animationAngle = body->GetAngle() + sin(al_get_time() * currentSpeed * 3);
 
 	this->body->ApplyForce(currentSpeed * b2Vec2(cos(body->GetAngle() - M_PI_2), sin(body->GetAngle() - M_PI_2)), body->GetPosition(), true);
 

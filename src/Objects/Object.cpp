@@ -46,8 +46,8 @@ Object::Object(b2Vec2 pos, b2Vec2 pixelSize, float angle, ALLEGRO_COLOR color, i
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position = Util::pixelsToMeters(pos);
 	bodyDef.angle = angle;
-	bodyDef.linearDamping = 0.1;
-	bodyDef.angularDamping = 0.1;
+	bodyDef.linearDamping = 1.0;
+	bodyDef.angularDamping = 1.0;
 	//bodyDef.userData.pointer = reinterpret_cast<uintptr_t>(this->objectUserData.get());
 	bodyDef.userData = (void*)this->objectUserData.get();
 
