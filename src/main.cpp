@@ -21,7 +21,7 @@
 #include "ObjectFactory.h"
 #include "Objects/Object.h"
 #include "UI/Camera.h"
-#include "UserInput.h"
+#include "Input/UserInput.h"
 #include "Util.h"
 #include "UI/Toolbar.h"
 #include "UI/InfoDisplay.h"

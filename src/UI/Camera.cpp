@@ -5,7 +5,7 @@
 #include <Box2D/Box2D.h>
 
 #include "../Globals.h"
-#include "../UserInput.h"
+#include "../Input/UserInput.h"
 
 
 namespace Camera {

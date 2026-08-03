@@ -2,7 +2,6 @@
 #include <Box2D/Box2D.h>
 
 #include "../GameManager.h"
-#include "../UserInput.h"
 
 #include <iostream>
 
@@ -12,14 +11,6 @@ void MyContactListener::BeginContact(b2Contact* contact) {
 
 	if (contact->GetFixtureA()->GetBody() == GameManager::worldBorder || contact->GetFixtureB()->GetBody() == GameManager::worldBorder) {
 		HandleBorderBeginContact(contact);
-	}
-	else {
-		ObjectUserData *userData1 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureA()->GetBody()->GetUserData());
-		ObjectUserData *userData2 = reinterpret_cast<ObjectUserData *>(contact->GetFixtureB()->GetBody()->GetUserData());
-
-		if (userData1->objectType == "mouse" || userData2->objectType == "mouse")
-			HandleMouseBeginContact(userData1, userData2);
-
 	}
 
 }
@@ -35,9 +26,6 @@ void MyContactListener::EndContact(b2Contact* contact) {
 		cout << "missing user data" << endl;
 		return;
 	}
-
-	if (userData1->objectType == "mouse" || userData2->objectType == "mouse")
-		UserInput::ClearHoveredObject();
 
 	else if (userData1->objectType == "border" || userData2->objectType == "border")
 		HandleBorderEndContact(userData1, userData2);
@@ -110,23 +98,4 @@ void MyContactListener::HandleBorderEndContact(ObjectUserData *userData1, Object
 		cout << "No user data!" << endl;
 }
 
-void MyContactListener::HandleMouseBeginContact(ObjectUserData *userData1, ObjectUserData *userData2) {
-	cout << "mouse contact!" << endl;
-	ObjectUserData *mouseData = nullptr;
-	ObjectUserData *otherObj = nullptr;
-
-	if (userData1 && userData1->objectType == "mouse") {
-		mouseData = userData1;
-		otherObj = userData2;
-	}
-	else if (userData2 && userData2->objectType == "mouse") {
-		mouseData = userData2;
-		otherObj = userData1;
-	}
-
-	if (mouseData && otherObj) {
-		cout << "Mouse hover begin! " << otherObj->objectType << endl;
-		UserInput::SetHoveredObject(otherObj->parentObject);
-	}
-}
 
