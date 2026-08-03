@@ -38,11 +38,17 @@ namespace Camera {
 		if (diff == 0)
 			return;
 
+		b2Vec2 mouseWorldBefore = ScreenPos2WorldPos(UserInput::mousePos);
+
 		if (diff > 0)
 			ZoomIn();
 		else
 			ZoomOut();
 
+		b2Vec2 mouseWorldAfter = ScreenPos2WorldPos(UserInput::mousePos);
+
+		// Move camera so the point under the mouse stays fixed
+		pos += mouseWorldBefore - mouseWorldAfter;
 	}
 
 	void ZoomIn() {
