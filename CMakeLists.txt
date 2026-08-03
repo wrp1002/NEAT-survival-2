@@ -15,7 +15,25 @@ add_executable(
 )
 
 
-target_link_libraries (NEAT-survival-2 allegro allegro_font allegro_ttf allegro_primitives allegro_color allegro_dialog fmt box2d)
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(ALLEGRO REQUIRED
+    allegro-5
+    allegro_font-5
+    allegro_ttf-5
+    allegro_primitives-5
+    allegro_color-5
+    allegro_dialog-5
+)
+
+target_include_directories(NEAT-survival-2 PRIVATE ${ALLEGRO_INCLUDE_DIRS})
+
+target_link_libraries(
+    NEAT-survival-2
+    ${ALLEGRO_LIBRARIES}
+    fmt
+    box2d
+)
 
 install(TARGETS NEAT-survival-2
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
