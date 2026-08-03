@@ -19,67 +19,68 @@ namespace Camera {
 
 	void Init() {
 		pos = b2Vec2(-Globals::SCREEN_WIDTH / 2.0, -Globals::SCREEN_HEIGHT / 2.0);
-		zoom = 1.0;
-		zoomFactor = 0.2;
-		minZoom = 0.15;
+		zoom = 0.1;
+		zoomFactor = 1.2;
+		minZoom = 0.03;
 	}
 
 	void UpdateTransform() {
-		//if (followObject.expired() && GameRules::IsRuleEnabled("FollowRandomAgent"))
-		//	FollowObject(dynamic_pointer_cast<Object>(GameManager::GetRandomAgent()));
-
-		al_identity_transform(&transform);
-
-		//al_translate_transform(&t, -followObject->GetPos().x, -followObject->GetPos().y);
-
 		b2Vec2 cameraPos = CalculatePos();
 
-		al_translate_transform(&transform, -cameraPos.x - Globals::SCREEN_WIDTH / 2, -cameraPos.y - Globals::SCREEN_HEIGHT / 2);
-
+		al_identity_transform(&transform);
+		al_translate_transform(&transform, -cameraPos.x - Globals::SCREEN_WIDTH / 2.0, -cameraPos.y - Globals::SCREEN_HEIGHT / 2.0);
 		al_scale_transform(&transform, zoom, zoom);
 		al_translate_transform(&transform, -cameraPos.x, -cameraPos.y);
-
-		//if (followObject)
-		//	al_translate_transform(&t, followObject->GetPos().x, followObject->GetPos().y);
-		//else
-		al_translate_transform(&transform, cameraPos.x + Globals::SCREEN_WIDTH / 2, cameraPos.y + Globals::SCREEN_HEIGHT / 2);
+		al_translate_transform(&transform, cameraPos.x + Globals::SCREEN_WIDTH / 2.0, cameraPos.y + Globals::SCREEN_HEIGHT / 2.0);
 	}
 
 	void UpdateZoom(int diff) {
 		if (diff == 0)
 			return;
 
-		if (zoom <= zoomFactor && diff < 0)
-			return;
-
-		b2Vec2 mouseDiff = zoomFactor * b2Vec2(Globals::SCREEN_WIDTH / 2, Globals::SCREEN_HEIGHT / 2);  // -UserInput::mousePos;
-
-		if (diff > 0) {
+		if (diff > 0)
 			ZoomIn();
-		}
-		else {
+		else
 			ZoomOut();
-			mouseDiff *= -1;
-		}
-
-		//pos += mouseDiff;// *zoomFactor;
 
 	}
 
 	void ZoomIn() {
-		zoom += zoomFactor;
+		zoom *= zoomFactor;
 	}
 
 	void ZoomOut() {
-		zoom -= zoomFactor;
+		zoom /= zoomFactor;
 		if (zoom < minZoom)
 			zoom = minZoom;
 	}
 
 	b2Vec2 CalculatePos() {
+		if (GameRules::IsRuleEnabled(GameRules::RuleName::FOLLOW_RANDOM_AGENT)) {
+			bool followNew = true;
+
+			if (auto objPtr = Camera::followedObject.lock()) {
+				if (auto bodyPartPtr = dynamic_pointer_cast<BodyPart>(objPtr)) {
+					followNew = bodyPartPtr->GetParentCreature().expired();
+				}
+				else {
+					followNew = false;
+				}
+			}
+
+			if (followNew) {
+				auto randomCreature = GameManager::GetRandomExistingCreature();
+				if (randomCreature) {
+					if (auto followObj = randomCreature->GetHead().lock()) {
+						Camera::FollowObject(followObj);
+						InfoDisplay::SelectObject(followObj);
+					}
+				}
+			}
+		}
 
 		if (shared_ptr<Object> object = followedObject.lock()) {
-			pos = object->GetPosPX()- b2Vec2(Globals::SCREEN_WIDTH / 2, Globals::SCREEN_HEIGHT / 2);
+			pos = object->GetPosPX()- b2Vec2(Globals::SCREEN_WIDTH / 2.0, Globals::SCREEN_HEIGHT / 2.0);
 			return pos;
 		}
 		else {

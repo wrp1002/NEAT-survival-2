@@ -5,6 +5,11 @@
 #include <Box2D/Box2D.h>
 #include <memory>
 
+#include "../GameManager.h"
+#include "../GameRules.h"
+#include "../Objects/Creature/BodySegment.h"
+#include "InfoDisplay.h"
+
 using namespace std;
 
 #include "../Objects/Object.h"
