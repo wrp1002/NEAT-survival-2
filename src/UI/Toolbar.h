@@ -30,11 +30,13 @@ namespace Toolbar {
 			SEARCH_LOWEST_HEALTH,
 
 			FOLLOW_RANDOM_AGENT,
+			FORCE_MIN_POPULATION,
 
 			SPEED_DISPLAY,
 			SPEED_INCREASE,
 			SPEED_DECREASE,
 			SPEED_RESET,
+			SPEED_AUTO_INCREASE,
 
 			PLAY_START,
 			PLAY_DAMAGE_INPUT,
@@ -54,6 +56,8 @@ namespace Toolbar {
 	void HandleEvent(ALLEGRO_EVENT ev);
 	void SetMenuCaption(int id, string text);
 	void UpdateSpeedDisplay();
+	void SetCheckboxEnabled(BUTTON_IDS::IDS buttonID, bool enabled);
+	void ToggleCheckbox(BUTTON_IDS::IDS buttonID);
 
 	//template <class searchType>
 	//void AgentSearch(bool highest, searchType(Agent::*funcPtr)(void));

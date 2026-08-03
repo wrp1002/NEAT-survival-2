@@ -73,13 +73,17 @@ namespace InfoDisplay {
 
 		vector<string> infoText;
 
+		string speedText = "Paused";
+		if (!GameManager::paused)
+			speedText = fmt::format("Speed: {}x", GameManager::speed);
+
 		infoText.insert(infoText.end(), {
 			//fmt::format("Food: {}", GameManager::allFood.size()),
 			//fmt::format("Objects: {}", GameManager::allObjects.size()),
 			fmt::format("Agents: {}", GameManager::agents.size()),
 
 			fmt::format("Sim Time: {}", GameManager::GetSimTicksStr()),
-			fmt::format("Speed: {}x", GameManager::speed),
+			speedText,
 			fmt::format("R Time: {}", GameManager::GetSimTimeStr()),
 
 			fmt::format("Total En: {}", GameManager::GetTotalEnergy()),

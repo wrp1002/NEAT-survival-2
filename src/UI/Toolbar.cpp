@@ -5,9 +5,9 @@
 #include <fmt/core.h>
 #include <memory>
 
-#include "../UI/Camera.h"
 #include "InfoDisplay.h"
 #include "../GameManager.h"
+#include "../GameRules.h"
 
 using namespace std;
 
@@ -15,7 +15,7 @@ namespace Toolbar {
 	ALLEGRO_MENU *menu;
 
 	void Init(ALLEGRO_DISPLAY *display) {
-		ALLEGRO_MENU_INFO menu_info[] = {
+		static ALLEGRO_MENU_INFO menu_info[] = {
 			ALLEGRO_START_OF_MENU("&File", 100),
 				{ "&Open", 101, 0, NULL },
 				ALLEGRO_START_OF_MENU("Open &Recent...", 110),
@@ -23,7 +23,7 @@ namespace Toolbar {
 					{ "Recent 2", 113, 0, NULL },
 					ALLEGRO_END_OF_MENU,
 
-				{ "Show Info Display", BUTTON_IDS::TOGGLE_INFO_DISPLAY, 0, NULL },
+				{ "Show Info Display", BUTTON_IDS::TOGGLE_INFO_DISPLAY, ALLEGRO_MENU_ITEM_CHECKBOX, NULL },
 				{ "Reset Sim", BUTTON_IDS::RESET_SIM, 0, NULL },
 				{ "E&xit", BUTTON_IDS::EXIT, 0, NULL },
 			ALLEGRO_END_OF_MENU,
@@ -47,7 +47,8 @@ namespace Toolbar {
 			ALLEGRO_END_OF_MENU,
 
 			ALLEGRO_START_OF_MENU("&Rules", 300),
-				{"Follow Random Agent", BUTTON_IDS::FOLLOW_RANDOM_AGENT, 0, NULL },
+				{"Follow Random Agent", BUTTON_IDS::FOLLOW_RANDOM_AGENT, ALLEGRO_MENU_ITEM_CHECKBOX, NULL },
+				{"Force Min Population", BUTTON_IDS::FORCE_MIN_POPULATION, ALLEGRO_MENU_ITEM_CHECKBOX, NULL },
 			ALLEGRO_END_OF_MENU,
 
 			ALLEGRO_START_OF_MENU("Sim Speed", 400),
@@ -55,7 +56,7 @@ namespace Toolbar {
 				{"Current: 1x", BUTTON_IDS::SPEED_DISPLAY, 0, NULL },
 				{"Decrease", BUTTON_IDS::SPEED_DECREASE, 0, NULL },
 				{"Reset", BUTTON_IDS::SPEED_RESET, 0, NULL },
-				{"Enable Auto Increase", 305, 0, NULL },
+				{"Auto Increase", BUTTON_IDS::SPEED_AUTO_INCREASE, ALLEGRO_MENU_ITEM_CHECKBOX, NULL },
 			ALLEGRO_END_OF_MENU,
 
 			ALLEGRO_START_OF_MENU("Play", 500),
@@ -88,11 +89,6 @@ namespace Toolbar {
 		switch (ev.user.data1) {
 			case BUTTON_IDS::TOGGLE_INFO_DISPLAY: {
 				InfoDisplay::Toggle();
-				if (InfoDisplay::IsVisible())
-					al_set_menu_item_caption(menu, ev.user.data1, "Hide Info Display");
-				else
-					al_set_menu_item_caption(menu, ev.user.data1, "Show Info Display");
-
 				break;
 			}
 			case BUTTON_IDS::EXIT: {
@@ -105,16 +101,14 @@ namespace Toolbar {
 			}
 
 			case BUTTON_IDS::FOLLOW_RANDOM_AGENT: {
-				GameRules::ToggleRule(GameRules::RuleName::FOLLOW_RANDOM_AGENT);\
-
-				al_set_menu_item_caption(
-					menu,
-					BUTTON_IDS::FOLLOW_RANDOM_AGENT,
-					(GameRules::IsRuleEnabled(GameRules::FOLLOW_RANDOM_AGENT) ? "✓ Follow Random Agent" : "Follow Random Agent")
-				);
-
+				GameRules::ToggleRule(GameRules::RuleName::FOLLOW_RANDOM_AGENT);
 				break;
 			}
+			case BUTTON_IDS::FORCE_MIN_POPULATION: {
+				GameRules::ToggleRule(GameRules::RuleName::FORCE_MIN_POPULATION);
+				break;
+			}
+
 
 			case BUTTON_IDS::SPEED_DECREASE: {
 				GameManager::DecreaseSpeed();
@@ -126,6 +120,10 @@ namespace Toolbar {
 			}
 			case BUTTON_IDS::SPEED_RESET: {
 				GameManager::ResetSpeed();
+				break;
+			}
+			case BUTTON_IDS::SPEED_AUTO_INCREASE: {
+				GameRules::ToggleRule(GameRules::RuleName::SPEED_AUTO_INCREASE);
 				break;
 			}
 
@@ -228,6 +226,27 @@ namespace Toolbar {
 
 	void UpdateSpeedDisplay() {
 		SetMenuCaption(BUTTON_IDS::SPEED_DISPLAY, fmt::format("Current: {}x", GameManager::speed));
+	}
+
+	void SetCheckboxEnabled(BUTTON_IDS::IDS buttonID, bool enabled) {
+		al_set_menu_item_flags(
+			Toolbar::menu,
+			BUTTON_IDS::TOGGLE_INFO_DISPLAY,
+			enabled ? ALLEGRO_MENU_ITEM_CHECKED : 0
+		);
+	}
+
+	void ToggleCheckbox(BUTTON_IDS::IDS buttonID) {
+		int flags = al_get_menu_item_flags(Toolbar::menu, buttonID);
+
+		if (flags & ALLEGRO_MENU_ITEM_CHECKED) {
+			flags &= ~ALLEGRO_MENU_ITEM_CHECKED;  // remove checked bit
+		}
+		else {
+			flags |= ALLEGRO_MENU_ITEM_CHECKED;   // add checked bit
+		}
+
+		al_set_menu_item_flags(Toolbar::menu, buttonID, flags);
 	}
 
 	/*

@@ -49,6 +49,8 @@ int main() {
 	bool redraw = true;
 	float lastRedrawTime = 0;
 	float maxRedrawTime = 2.0;
+	float lastAutoIncreaseTime = 0;
+	float maxAutoIncreaseTime = 10.0;
 	float count;
 	float nextTime = 5;
 
@@ -143,14 +145,16 @@ int main() {
 
 			if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
 				done = true;
-			else if (ev.keyboard.keycode == ALLEGRO_KEY_I)
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_I) {
 				InfoDisplay::Toggle();
+				Toolbar::ToggleCheckbox(Toolbar::BUTTON_IDS::IDS::TOGGLE_INFO_DISPLAY);
+			}
 			else if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE)
 				GameManager::TogglePaused();
 			else if (ev.keyboard.keycode == ALLEGRO_KEY_PGUP)
 				GameManager::IncreaseSpeed();
 			else if (ev.keyboard.keycode == ALLEGRO_KEY_PGDN)
-				GameManager::IncreaseSpeed();
+				GameManager::DecreaseSpeed();
 			else if (ev.keyboard.keycode == ALLEGRO_KEY_HOME)
 				GameManager::ResetSpeed();
 		}
@@ -197,6 +201,12 @@ int main() {
 			head->body->ApplyForce(b2Vec2(50 * (keys[ALLEGRO_KEY_RIGHT] - keys[ALLEGRO_KEY_LEFT]), 0), head->body->GetWorldCenter(), true);
 			*/
 
+			if (GameRules::IsRuleEnabled(GameRules::RuleName::SPEED_AUTO_INCREASE) && al_get_time() - lastAutoIncreaseTime > maxAutoIncreaseTime) {
+				cout << "Auto increasing sim speed" << endl;
+				GameManager::IncreaseSpeed();
+				lastAutoIncreaseTime = al_get_time();
+			}
+
 			if (al_get_time() - lastRedrawTime > maxRedrawTime) {
 				cout << "Last redraw was more than " << maxRedrawTime << " seconds ago" << endl;
 				cout << "Clearing event queue and lowering speed to " << (GameManager::speed > 1 ? GameManager::speed - 1 : 1) << endl;
@@ -207,6 +217,7 @@ int main() {
 				}
 
 				GameManager::DecreaseSpeed();
+				lastAutoIncreaseTime = al_get_time();
 				al_flush_event_queue(GameManager::event_queue);
 			}
 			else {
