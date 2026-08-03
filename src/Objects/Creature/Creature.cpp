@@ -271,15 +271,111 @@ void Creature::ApplyForce(b2Vec2 force) {
 	}
 }
 
-void Creature::PrintInfo() {
-	cout << "Selected creature " << this << endl;
-	cout << "DNA: " << endl << endl << genes << endl << endl;
-	cout << "Parts: " << bodySegments.size() << endl;
-	cout << "Energy: " << energy << " / " << maxEnergy << endl;
-	cout << "EggHatchTimer: " << eggHatchTimer << "  geneMutationCoef: " << geneMutationCoef << "  nnMutationCoef: " << nnMutationCoef << endl;
+void Creature::PrintGenes(string genes) {
+	int headerSize = Globals::GENE_LENGTH * Globals::HEADER_GENES_COUNT;
+	string headerGenes = genes.substr(0, headerSize);
 
+	cout << "headerGenes --> " << headerGenes << endl;
+
+	cout << "eggHatchTimer --> " << GetNextGene(headerGenes, 0, 3) << endl;
+	cout << "geneMutationCoef --> " << GetNextGene(headerGenes, 1, 3) << endl;
+	cout << "nnMutationCoef --> " << GetNextGene(headerGenes, 1, 3) << endl;
+
+	cout << "body plan genes:" << endl;
+
+	int instructionTypes = 5;
+	int maxSize = 50;
+	bool firstCreate = true;
+	for (int i = headerSize; i < genes.size(); i += Globals::GENE_LENGTH) {
+		string gene = genes.substr(i, Globals::GENE_LENGTH);
+
+		cout << gene << " ====> ";
+
+		if (gene.size() != Globals::GENE_LENGTH) {
+			//cout << "what happened here??" << endl;
+			continue;
+		}
+		int instructionType = int(GetNextGene(gene, 2, 0)) % instructionTypes;
+
+		switch(instructionType) {
+			// shapeType(1), width(3), height(3), leftover(2)
+			case 0: {
+				cout << " SHAPE -- ";
+				cout << " TYPE:" << int(GetNextGene(gene, 1, 0)) % 2;
+				cout << " WIDTH:" << Util::clamp(GetNextGene(gene, 0, 3) * maxSize, 10.0, 50.0);
+				cout << " HEIGHT:" << Util::clamp(GetNextGene(gene, 0, 3) * maxSize, 10.0, 50.0);
+				cout << endl;
+				break;
+			}
+			// r(3), g(3), b(3), leftover(6)
+			case 1: {
+				cout << " COLOR -- ";
+				cout << " R:" << GetNextGene(gene, 0, 3) * 255;
+				cout << " G" << GetNextGene(gene, 0, 3) * 255;
+				cout << " B" << GetNextGene(gene, 0, 3) * 255;
+				cout << endl;
+				break;
+			}
+			// parentID(1)
+			case 2: {
+				cout << " CREATE -- ";
+				if (firstCreate) {
+					cout << "HEAD";
+					firstCreate = false;
+				}
+				else {
+					int partType = GetNextGene(gene, 1, 0);
+					if (partType == 9)
+						cout << "CILIUM";
+					else if (partType == 8)
+						cout << "MOUTH";
+					else if (partType == 7)
+						cout << "EYE";
+					else if (partType < 7)
+						cout << "BODY";
+				}
+				cout << endl;
+				break;
+			}
+			// angleOnParent(1), angleOffset(3)
+			case 3: {
+				cout << " ANGLE -- ";
+				cout << " childAngleGene:" << GetNextGene(gene, 1, 0);
+				cout << " angleOffset" << GetNextGene(gene, 0, 3) * 90 - 45;
+				cout << endl;
+				break;
+			}
+			// parentID(1)
+			case 4: {
+				cout << " PARENT -- " << int(GetNextGene(gene, 2, 0)) << endl;
+				break;
+			}
+		}
+	}
+
+}
+
+void Creature::PrintInfo() {
+	cout << endl;
+	cout << "Creature parts: " << endl;
 	for (auto part : bodySegments)
 		part->Print();
+
+	cout << endl;
+	cout << "Selected creature " << this << endl;
+	cout << "DNA: " << endl << endl << genes << endl << endl;
+	PrintGenes(genes);
+	cout << "Parts: " << bodySegments.size() << endl;
+	cout << "Energy: " << energy << " / " << maxEnergy << endl;
+	cout << "EggHatchTimer: " << eggHatchTimer << "  nnMutationCoef: " << nnMutationCoef << endl;
+	cout << "headerMutationRate: " << geneMutationRates.headerMutationRate;
+	cout << "  parameterMutationRate: " << geneMutationRates.parameterMutationRate;
+	cout << "  instructionMutationRate: " << geneMutationRates.instructionMutationRate;
+	cout << "  duplicationRate: " << geneMutationRates.duplicationRate;
+	cout << "  deletionRate: " << geneMutationRates.deletionRate;
+	cout << "  rearrangementRate: " << geneMutationRates.rearrangementRate;
+	cout << "  randomInsertionRate: " << geneMutationRates.randomInsertionRate << endl;
+	cout << "Strength: " << strength << endl;
 }
 
 void Creature::DestroyAllJoints() {
