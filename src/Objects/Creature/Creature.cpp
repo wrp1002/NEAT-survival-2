@@ -94,38 +94,41 @@ void Creature::Init() {
 }
 
 const std::vector<std::string>& Creature::GetInputLabels() {
-    static const std::vector<std::string> labels = [] {
-        std::vector<std::string> l = {
-            "const",
-            "sin",
-            "energy",
-            "health",
-        };
+	static const std::vector<std::string> labels = [] {
+		std::vector<std::string> l = {
+			"const",
+			"sin",
+			"energy",
+			"health",
+			"foward speed",
+			"sideways speed",
+			"rotational speed",
+		};
 
-        for (int i = 0; i < extraInputCount; i++)
-            l.push_back("in" + std::to_string(i));
+		for (int i = 0; i < extraInputCount; i++)
+			l.push_back("in" + std::to_string(i));
 
-        return l;
-    }();
+		return l;
+	}();
 
-    return labels;
+	return labels;
 }
 
 const std::vector<std::string>& Creature::GetOutputLabels() {
-    static const std::vector<std::string> labels = [] {
-        std::vector<std::string> l = {
-            "wants egg",
-            "wants to heal",
-            "rotate",
-        };
+	static const std::vector<std::string> labels = [] {
+		std::vector<std::string> l = {
+			"wants egg",
+			"wants to heal",
+			"rotate",
+		};
 
-        for (int i = 0; i < extraOutputCount; i++)
-            l.push_back("out" + std::to_string(i));
+		for (int i = 0; i < extraOutputCount; i++)
+			l.push_back("out" + std::to_string(i));
 
-        return l;
-    }();
+		return l;
+	}();
 
-    return labels;
+	return labels;
 }
 
 void Creature::ApplyGenes() {
@@ -140,12 +143,30 @@ void Creature::Update() {
 
 	updateNN++;
 	if (updateNN == 3) {
+		float forwardSpeed = 0;
+		float sidewaysSpeed = 0;
+		float angularSpeed = 0;
+		if (shared_ptr<BodySegment> headPtr = head.lock()) {
+			b2Body *headBody = headPtr->GetBody();
+			b2Vec2 vel = headBody->GetLinearVelocity();
+			float angle = headBody->GetAngle();
+			b2Vec2 forward = Util::ForwardVector(angle);
+			b2Vec2 right = Util::RightVector(angle);
+
+			forwardSpeed = Util::clampForNN(b2Dot(vel, forward) / Globals::MAX_SPEED);
+			sidewaysSpeed = Util::clampForNN(b2Dot(vel, right) / Globals::MAX_SPEED);
+			angularSpeed = Util::clampForNN(headBody->GetAngularVelocity() / Globals::MAX_ROTATION);
+		}
+
 		// Inputs
 		vector<double> inputs = {
 			1.0,
 			sin(al_get_time()),
 			GetUsableEnergy() / 100.0,
 			GetHealth() / GetTotalHealth(),
+			forwardSpeed,
+			sidewaysSpeed,
+			angularSpeed
 		};
 
 		for (int i = 0; i < extraInputCount; i++)
@@ -210,6 +231,14 @@ void Creature::Update() {
 				this->AddEnergy(leftover);
 			}
 		}
+
+		if (shared_ptr<BodySegment> headPtr = head.lock()) {
+			float rotation = outputs[2];
+			float maxRotation = 2;
+			rotation = std::clamp(rotation, -1.0f, 1.0f);
+			headPtr->GetBody()->ApplyTorque(rotation * maxRotation, true);
+		}
+
 	}
 
 	for (int i = bodySegments.size() - 1; i >= 0; i--) {
