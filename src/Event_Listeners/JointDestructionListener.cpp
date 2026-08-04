@@ -2,6 +2,7 @@
 #include "../Objects/UserData/JointUserData.h"
 
 #include "../Objects/Creature/Joint.h"
+#include "../Input/UserInput.h"
 
 #include <iostream>
 
@@ -10,6 +11,11 @@ using namespace std;
 void JointDestructionListener::SayGoodbye(b2Joint* joint) {
 	// remove all references to joint.
 	//cout << "joint break!" << endl;
+
+	if (joint == UserInput::mouseJoint) {
+		UserInput::mouseJoint = nullptr;
+		return;
+	}
 
 	JointUserData *userData = reinterpret_cast<JointUserData *>(joint->GetUserData());
 

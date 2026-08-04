@@ -177,11 +177,16 @@ int main() {
 		}
 		else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 			if (ev.mouse.button == 1) {
-				InfoDisplay::SelectObject(UserInput::hoveredObject);
-				Camera::FollowObject(UserInput::hoveredObject);
+				auto hoveredObject = UserInput::GetObjectAtMouse();
+				Camera::FollowObject(hoveredObject);
+				InfoDisplay::SelectObject(hoveredObject);
 			}
 			else if (ev.mouse.button == 2)
 				UserInput::StartDragging(b2Vec2(ev.mouse.x, ev.mouse.y));
+			else if (ev.mouse.button == 3) {
+				auto hoveredObject = UserInput::GetObjectAtMouse();
+				UserInput::StartObjectDragging(hoveredObject);
+			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 			if (ev.mouse.display == GameManager::display) {
@@ -189,6 +194,8 @@ int main() {
 					Camera::pos = Camera::CalculatePos();
 					UserInput::StopDragging();
 				}
+				if (ev.mouse.button == 3)
+					UserInput::StopObjectDragging();
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
@@ -274,6 +281,7 @@ int main() {
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 
 			GameManager::Draw();
+			UserInput::DrawMouseJoint();
 
 			Util::ResetTransform();
 

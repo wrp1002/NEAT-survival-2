@@ -1,6 +1,8 @@
 #include "UserInput.h"
 #include "../Util.h"
 
+#include <Box2D/Common/b2Math.h>
+#include <Box2D/Dynamics/Joints/b2MouseJoint.h>
 #include <cstdint>
 #include <memory>
 #include <iostream>
@@ -20,6 +22,7 @@ namespace UserInput {
 	b2Vec2 mousePos;
 	bool isDragging;
 	int mouseWheel;
+	b2MouseJoint* mouseJoint;
 
 
 	void Init() {
@@ -27,6 +30,11 @@ namespace UserInput {
 		mousePos = b2Vec2();
 		isDragging = false;
 		mouseWheel = 0;
+	}
+
+	void Update() {
+		if (mouseJoint)
+			mouseJoint->SetTarget(Util::pixelsToMeters(Camera::ScreenPos2WorldPos(mousePos)));
 	}
 
 	void StartDragging(float x, float y) {
@@ -42,6 +50,40 @@ namespace UserInput {
 		isDragging = false;
 	}
 
+	void StartObjectDragging(shared_ptr<Object> object) {
+		b2Vec2 mouseWorldPos = Util::pixelsToMeters(Camera::ScreenPos2WorldPos(mousePos));
+
+		if (!object)
+			return;
+
+		b2Body* body = object->GetBody();
+
+		if (!body)
+			return;
+
+		b2MouseJointDef jointDef;
+
+		jointDef.bodyA = GameManager::mouseGroundBody;
+		jointDef.bodyB = body;
+		jointDef.target = mouseWorldPos;
+
+		jointDef.maxForce = 1000.0f * body->GetMass();
+
+		jointDef.frequencyHz = 5.0f;
+		jointDef.dampingRatio = 0.7f;
+
+		mouseJoint = (b2MouseJoint*)GameManager::world.CreateJoint(&jointDef);
+
+		body->SetAwake(true);
+	}
+
+	void StopObjectDragging() {
+		if (mouseJoint) {
+			GameManager::world.DestroyJoint(mouseJoint);
+			mouseJoint = nullptr;
+		}
+	}
+
 	void SetPressed(int key, bool pressed) {
 		keyStates[key] = pressed;
 	}
@@ -52,13 +94,25 @@ namespace UserInput {
 
 	void SetMousePos(b2Vec2 pos) {
 		mousePos = pos;
-		//b2Vec2 screenWorldPos = Camera::ScreenPos2WorldPos(b2Vec2(mousePos.x, mousePos.y));
-		//b2Vec2 worldPos = Util::pixelsToMeters(screenWorldPos);
-		//b2MouseObject->SetTransform(worldPos, 0);
 	}
 
 	void SetMousePos(float x, float y) {
 		mousePos = b2Vec2(x, y);
+	}
+
+	void DrawMouseJoint() {
+		if (mouseJoint) {
+			b2Vec2 target = UserInput::mouseJoint->GetTarget();
+
+			al_draw_line(
+				Util::metersToPixels(mouseJoint->GetAnchorB().x),
+				Util::metersToPixels(mouseJoint->GetAnchorB().y),
+				Util::metersToPixels(target.x),
+				Util::metersToPixels(target.y),
+				al_map_rgb(100,100,100),
+				2
+			);
+		}
 	}
 
 	shared_ptr<Object> GetObjectAtMouse() {

@@ -122,6 +122,9 @@ void Object::Kill() {
 	alive = false;
 }
 
+b2Body *Object::GetBody() {
+	return this->body;
+}
 
 // Raycast from a point from this angle towards the object to find collision point on edge
 b2Vec2 Object::GetEdgePoint(float angle) {

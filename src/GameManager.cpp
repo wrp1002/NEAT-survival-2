@@ -48,6 +48,7 @@ namespace GameManager {
 	b2World world(gravity);
 	b2Body *worldBorder;
 	b2ThreadPoolTaskExecutor executor;
+	b2Body* mouseGroundBody;
 
 	vector<shared_ptr<Creature>> agents;
 	vector<shared_ptr<Egg>> eggs;
@@ -74,6 +75,9 @@ namespace GameManager {
 		world.SetDestructionListener(jointDestructionListener);
 
 		worldBorder = CreateWorldBorder();
+
+		b2BodyDef bodyDef;
+		mouseGroundBody = world.CreateBody(&bodyDef);
 
 		simTicks = 0;
 		simStartTime = al_get_time();

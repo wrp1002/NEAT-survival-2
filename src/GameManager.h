@@ -27,6 +27,7 @@ namespace GameManager {
 	extern b2Vec2 gravity;
 	extern b2World world;
 	extern b2Body *worldBorder;
+	extern b2Body* mouseGroundBody;
 
 	extern vector<shared_ptr<Creature>> agents;
 	extern vector<shared_ptr<Egg>> eggs;

@@ -65,7 +65,6 @@ class BodyPart : public LiveObject {
 		void SetParentJoint(shared_ptr<Joint> newJoint);
 		void DestroyJoint();
 
-		b2Body *GetBody();
 		weak_ptr<Creature> GetParentCreature();
 
 		virtual bool CanAddChild();

@@ -37,6 +37,7 @@ class Object : public enable_shared_from_this<Object> {
 		void ApplyForce(b2Vec2 force);
 		void Kill();
 
+		b2Body *GetBody();
 		b2Vec2 GetEdgePoint(float angle);
 		b2Vec2 GetPos();
 		b2Vec2 GetPosPX();
