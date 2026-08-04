@@ -35,6 +35,7 @@ class Egg : public LiveObject {
 
 		bool ShouldHatch();
 		double GetEnergy();
+		int GetHatchTimer();
 
 		string GetGenes();
 		shared_ptr<NEAT> GetNN();

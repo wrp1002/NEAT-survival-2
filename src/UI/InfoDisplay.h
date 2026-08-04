@@ -25,6 +25,9 @@ namespace InfoDisplay {
 	extern weak_ptr<Object> selectedObject;
 	extern b2Vec2 screenSize;
 	extern b2Vec2 mousePos;
+	extern const unsigned nnTopPadding;
+	extern const unsigned nnSidePadding;
+	extern const unsigned nnBottomPadding;
 
 	void Init(ALLEGRO_EVENT_QUEUE *ev);
 	void Shutdown();

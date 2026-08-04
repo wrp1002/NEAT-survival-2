@@ -66,6 +66,10 @@ double Egg::GetEnergy() {
 	return energy;
 }
 
+int Egg::GetHatchTimer() {
+	return hatchTimer;
+}
+
 string Egg::GetGenes() {
 	return genes;
 }

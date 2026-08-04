@@ -22,6 +22,9 @@ namespace InfoDisplay {
 	weak_ptr<Object> selectedObject;
 	b2Vec2 screenSize;
 	b2Vec2 mousePos;
+	unsigned const nnTopPadding = 120;
+	unsigned const nnSidePadding = 20;
+	unsigned const nnBottomPadding = 20;
 
 	void Init(ALLEGRO_EVENT_QUEUE *event_queue) {
 		ALLEGRO_DISPLAY* display = nullptr;
@@ -111,6 +114,7 @@ namespace InfoDisplay {
 			}
 			else if (shared_ptr<Egg> egg = dynamic_pointer_cast<Egg>(object)) {
 				infoText.push_back(fmt::format("Energy: {:.2f}", egg->GetEnergy()));
+				infoText.push_back(fmt::format("Hatch In: {}", egg->GetHatchTimer()));
 			}
 			else if (shared_ptr<LiveObject> bodyPart = dynamic_pointer_cast<LiveObject>(object)) {
 				infoText.insert(infoText.end(), {
@@ -175,6 +179,8 @@ namespace InfoDisplay {
 
 			al_draw_text(font, al_map_rgb(255, 255, 255), x, y, flags, infoText[i].c_str());
 		}
+
+		al_draw_line(10, 2*17+5, screenSize.x - 10, 2*17+5, al_map_rgb(100, 100, 100), 1);
 
 		al_flip_display();
 	}
@@ -255,6 +261,15 @@ namespace InfoDisplay {
 		vector<shared_ptr<Node>> nodes;
 		shared_ptr<Node> hoveredNode = nullptr;
 
+		al_draw_rectangle(
+			nnSidePadding - nodeSize * 1.5,
+			nnTopPadding - nodeSize * 1.5,
+			screenSize.x - nnSidePadding + nodeSize * 1.5,
+			screenSize.y - nnBottomPadding + nodeSize * 1.5,
+			al_map_rgb(100, 100, 100),
+			2
+		);
+
 		for (auto node : nn->GetNodes()) {
 			b2Vec2 realPos = CalculateNodePos(node);
 
@@ -302,15 +317,11 @@ namespace InfoDisplay {
 	}
 
 	b2Vec2 CalculateNodePos(shared_ptr<Node> node) {
-		unsigned topPadding = 120;
-		unsigned sidePadding = 20;
-		unsigned bottomPadding = 20;
-
 		b2Vec2 nodePos = node->GetPos();
 
 		b2Vec2 realPos(
-			nodePos.x * (double(screenSize.x) - sidePadding * 2.0) + sidePadding,
-			nodePos.y * (double(screenSize.y) - topPadding - bottomPadding) + topPadding
+			nodePos.x * (double(screenSize.x) - nnSidePadding * 2.0) + nnSidePadding,
+			nodePos.y * (double(screenSize.y) - nnTopPadding - nnBottomPadding) + nnTopPadding
 		);
 
 		return realPos;
