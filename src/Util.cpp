@@ -50,6 +50,10 @@ float Util::clamp(float val, float min, float max) {
 	return val;
 }
 
+float Util::clampForNN(float val) {
+	return clamp(val, -1.0, 1.0);
+}
+
 float Util::DegreesToRadians(int degrees) {
 	return degrees * M_PI / 180;
 }
@@ -62,12 +66,25 @@ double Util::Random() {
 	return double(rand()) / double(RAND_MAX);
 }
 
+float Util::RandomRange(float min, float max) {
+    return min + Random() * (max - min);
+}
+
+float Util::RandomMutation(float maxChange) {
+    return RandomRange(-maxChange, maxChange);
+}
+
+float Util::Tweak(float value, float maxChange) {
+    value += RandomMutation(maxChange);
+    return clamp(value, 0.0f, 0.999f);
+}
+
 float Util::RandomDir() {
 	return float((rand() % 360 - 180) * (M_PI / 180));
 }
 
 int Util::RandomInt(int min, int max) {
-	return rand() % (max - min) + min;
+	return rand() % (max - min + 1) + min;
 }
 
 int Util::RandomSign() {
@@ -96,9 +113,34 @@ b2Vec2 Util::RandomWorldPosPX() {
 	return b2Vec2(cos(angle) * dist, sin(angle) * dist);
 }
 
+std::string Util::EncodeGeneValue(float value, int beforeDecimal, int afterDecimal) {
+    int multiplier = static_cast<int>(std::pow(10, afterDecimal));
+    int encoded = static_cast<int>(std::round(value * multiplier));
+
+    std::string str = std::to_string(encoded);
+
+    int length = beforeDecimal + afterDecimal;
+
+    while (str.length() < length)
+        str = "0" + str;
+
+    return str;
+}
 
 void Util::ResetTransform() {
 	ALLEGRO_TRANSFORM identityTransform;
 	al_identity_transform(&identityTransform);
 	al_use_transform(&identityTransform);
+}
+
+b2Vec2 Util::ForwardVector(float angle) {
+    return {
+        cos(angle - M_PI_2f),
+        sin(angle - M_PI_2f)
+    };
+}
+
+b2Vec2 Util::RightVector(float angle) {
+    b2Vec2 f = ForwardVector(angle);
+    return {-f.y, f.x};
 }

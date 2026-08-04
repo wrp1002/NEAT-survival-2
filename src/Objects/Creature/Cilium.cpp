@@ -46,7 +46,7 @@ void Cilium::Update() {
 
 	this->animationAngle = body->GetAngle() + sin(al_get_time() * currentSpeed * 3);
 
-	this->body->ApplyForce(currentSpeed * b2Vec2(cos(body->GetAngle() - M_PI_2), sin(body->GetAngle() - M_PI_2)), body->GetPosition(), true);
+	this->body->ApplyForce(currentSpeed * Util::ForwardVector(body->GetAngle()), body->GetPosition(), true);
 
 	this->energyUsage = requestedEnergy;
 }
